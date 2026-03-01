@@ -1,0 +1,53 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark gradient background (dark sky) -->
+  <defs>
+    <radialGradient id="skyGradient" cx="50%" cy="30%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0A0A0F;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <rect width="1024" height="1024" fill="url(#skyGradient)"/>
+  
+  <!-- Lyra constellation - actual star positions loosely mapped -->
+  <g transform="translate(512, 380)">
+    
+    <!-- Connection lines (muted, thin) -->
+    <!-- Top triangle -->
+    <line x1="-80" y1="-200" x2="0" y2="-120" stroke="#6C63FF" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+    <line x1="0" y1="-120" x2="80" y2="-200" stroke="#6C63FF" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+    <line x1="-80" y1="-200" x2="80" y2="-200" stroke="#6C63FF" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+    
+    <!-- Main parallelogram (harp shape) -->
+    <line x1="-100" y1="0" x2="-60" y2="-120" stroke="#6C63FF" stroke-width="2" opacity="0.35" stroke-linecap="round"/>
+    <line x1="-100" y1="0" x2="100" y2="0" stroke="#6C63FF" stroke-width="2" opacity="0.35" stroke-linecap="round"/>
+    <line x1="100" y1="0" x2="60" y2="-120" stroke="#6C63FF" stroke-width="2" opacity="0.35" stroke-linecap="round"/>
+    <line x1="-60" y1="-120" x2="60" y2="-120" stroke="#6C63FF" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+    
+    <!-- Bottom extension -->
+    <line x1="0" y1="-120" x2="0" y2="100" stroke="#6C63FF" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+    <line x1="0" y1="100" x2="-50" y2="160" stroke="#6C63FF" stroke-width="2" opacity="0.25" stroke-linecap="round"/>
+    <line x1="0" y1="100" x2="50" y2="160" stroke="#6C63FF" stroke-width="2" opacity="0.25" stroke-linecap="round"/>
+    
+    <!-- Star dots - varying sizes for brightness -->
+    <!-- Vega (brightest) -->
+    <circle cx="0" cy="-120" r="9" fill="#6C63FF"/>
+    
+    <!-- Main harp stars -->
+    <circle cx="-80" cy="-200" r="7" fill="#6C63FF"/>
+    <circle cx="80" cy="-200" r="7" fill="#6C63FF"/>
+    <circle cx="-100" cy="0" r="6" fill="#6C63FF" opacity="0.9"/>
+    <circle cx="100" cy="0" r="6" fill="#6C63FF" opacity="0.9"/>
+    
+    <!-- Secondary stars -->
+    <circle cx="-60" cy="-120" r="5" fill="#6C63FF" opacity="0.8"/>
+    <circle cx="60" cy="-120" r="5" fill="#6C63FF" opacity="0.8"/>
+    <circle cx="0" cy="100" r="5" fill="#6C63FF" opacity="0.7"/>
+    <circle cx="-50" cy="160" r="4" fill="#6C63FF" opacity="0.6"/>
+    <circle cx="50" cy="160" r="4" fill="#6C63FF" opacity="0.6"/>
+    
+    <!-- Additional faint stars for richness -->
+    <circle cx="-120" cy="-80" r="3" fill="#6C63FF" opacity="0.4"/>
+    <circle cx="120" cy="-80" r="3" fill="#6C63FF" opacity="0.4"/>
+  </g>
+</svg>

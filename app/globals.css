@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #0a0a0a; color: #ffffff; }
+body { background: #0a0a0a; min-height: 100vh; }
+
+::selection { background: #6C63FF; color: white; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1c1c1e; border-radius: 2px; }
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

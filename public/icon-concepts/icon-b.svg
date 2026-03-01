@@ -1,0 +1,31 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="1024" height="1024" fill="#0A0A0F"/>
+  
+  <!-- Main rating number "8.4" in premium monospace style -->
+  <g transform="translate(512, 480)">
+    <!-- "8" -->
+    <text x="-180" y="0" font-family="'SF Mono', 'Monaco', monospace" font-size="420" font-weight="600" fill="#6C63FF" text-anchor="middle" letter-spacing="-20">8</text>
+    
+    <!-- Decimal point -->
+    <circle cx="40" cy="120" r="20" fill="#6C63FF"/>
+    
+    <!-- "4" -->
+    <text x="220" y="0" font-family="'SF Mono', 'Monaco', monospace" font-size="420" font-weight="600" fill="#6C63FF" text-anchor="middle" letter-spacing="-20">4</text>
+  </g>
+  
+  <!-- Musical note integrated into the design - positioned as accent -->
+  <g transform="translate(750, 280)">
+    <!-- Note head -->
+    <ellipse cx="0" cy="0" rx="22" ry="26" fill="#6C63FF" transform="rotate(-20)"/>
+    
+    <!-- Stem -->
+    <line x1="20" y1="-26" x2="20" y2="-140" stroke="#6C63FF" stroke-width="14" stroke-linecap="round"/>
+    
+    <!-- Flag/beam -->
+    <path d="M 20 -140 Q 60 -110 70 -70" stroke="#6C63FF" stroke-width="16" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Subtle horizontal line as design element -->
+  <line x1="200" y1="550" x2="824" y2="550" stroke="#6C63FF" stroke-width="2" opacity="0.3"/>
+</svg>
