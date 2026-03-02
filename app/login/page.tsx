@@ -17,15 +17,19 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError('');
     setLoading(true);
 
     if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { setError(error.message); setLoading(false); return; }
-      router.push('/app');
+      try {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) { setError(error.message); setLoading(false); return; }
+        window.location.href = '/app';
+      } catch (err: any) {
+        setError(err?.message ?? 'Sign in failed'); setLoading(false);
+      }
     } else {
       if (handle.length < 2) { setError('Handle must be at least 2 characters'); setLoading(false); return; }
       const { data, error: signupError } = await supabase.auth.signUp({ email, password });
@@ -38,7 +42,7 @@ export default function LoginPage() {
           plan: 'free',
         });
       }
-      router.push('/app');
+      window.location.href = '/app';
     }
   };
 
