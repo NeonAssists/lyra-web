@@ -27,6 +27,11 @@ export default function RootLayout({
         {/* Hard-block all browser auto-translate — Chrome, Safari, Firefox */}
         <meta name="google" content="notranslate" />
         <meta httpEquiv="Content-Language" content="en" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          document.documentElement.setAttribute('translate','no');
+          document.documentElement.setAttribute('lang','en');
+          if(window.chrome){try{chrome.runtime&&chrome.runtime.sendMessage&&chrome.runtime.sendMessage('aapbdbdomjkkjkaonfhkkikfgjllcleb',{type:'STOP_TRANSLATE'})}catch(e){}}
+        ` }} />
       </head>
       <body className={`${inter.className} min-h-screen bg-[#000000] text-white antialiased notranslate`} translate="no">
         {children}

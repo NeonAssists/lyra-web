@@ -145,7 +145,7 @@ export default function LoginPage() {
           )}
 
           {/* Submit */}
-          <button type="submit" disabled={loading}
+          <button type="submit" onClick={handleSubmit as any} disabled={loading}
             className="w-full bg-[#6C63FF] rounded-[18px] py-4 flex items-center justify-center gap-2 text-[17px] font-bold text-white mt-2 active:opacity-80 disabled:opacity-60 transition-opacity">
             {loading
               ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
