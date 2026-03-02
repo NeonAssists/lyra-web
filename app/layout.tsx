@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Lyra — Rank your music",
   description: "Rank your music. Share your taste.",
+  other: {
+    'google': 'notranslate',
+  },
 };
 
 export const viewport: Viewport = {
@@ -23,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" translate="no">
       <body
         className={`${inter.className} min-h-screen bg-bg text-white antialiased`}
       >
