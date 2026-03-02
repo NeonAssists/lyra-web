@@ -1,16 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import BottomNav from "@/components/BottomNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Lyra — Rank your music",
   description: "Rank your music. Share your taste.",
-  other: {
-    'google': 'notranslate',
-  },
 };
 
 export const viewport: Viewport = {
@@ -26,12 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" translate="no">
-      <body
-        className={`${inter.className} min-h-screen bg-bg text-white antialiased`}
-      >
-        <main className="pb-20 md:pb-0">{children}</main>
-        <BottomNav />
+    <html lang="en" translate="no">
+      <head>
+        {/* Hard-block all browser auto-translate — Chrome, Safari, Firefox */}
+        <meta name="google" content="notranslate" />
+        <meta httpEquiv="Content-Language" content="en" />
+      </head>
+      <body className={`${inter.className} min-h-screen bg-[#000000] text-white antialiased`}>
+        {children}
       </body>
     </html>
   );
