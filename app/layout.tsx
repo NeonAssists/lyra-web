@@ -28,7 +28,7 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
         <meta httpEquiv="Content-Language" content="en" />
       </head>
-      <body className={`${inter.className} min-h-screen bg-[#000000] text-white antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-[#000000] text-white antialiased notranslate`} translate="no">
         {children}
       </body>
     </html>

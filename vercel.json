@@ -1,0 +1,11 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Language", "value": "en" },
+        { "key": "X-Content-Language", "value": "en" }
+      ]
+    }
+  ]
+}
