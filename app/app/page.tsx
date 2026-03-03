@@ -445,9 +445,7 @@ export default function AppHome() {
         )}
       </div>
 
-      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null}
-        onOpenArtist={(name) => { setModalOpen(false); router.push(`/artist/${encodeURIComponent(name)}`); }}
-        onOpenAlbum={(item) => { setModalOpen(false); router.push(`/artist/${encodeURIComponent(item.artist)}`); }} />
+      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
     </AppShell>
   );
 }

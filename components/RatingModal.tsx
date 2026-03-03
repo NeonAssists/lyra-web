@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
 
@@ -54,6 +55,17 @@ function StreamLink({ icon, label, url }: { icon: string; label: string; url: st
 }
 
 export default function RatingModal({ open, onClose, item, userId, onSaved, onOpenAlbum, onOpenArtist }: RatingModalProps) {
+  const router = useRouter();
+  const navigateToArtist = (name: string) => {
+    onClose();
+    if (onOpenArtist) { onOpenArtist(name); }
+    else { router.push(`/artist/${encodeURIComponent(name)}`); }
+  };
+  const navigateToAlbum = (it: ModalItem) => {
+    onClose();
+    if (onOpenAlbum) { onOpenAlbum(it); }
+    else { router.push(`/artist/${encodeURIComponent(it.artist)}`); }
+  };
   const [rating, setRating] = useState(0);
   const [ratingInput, setRatingInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -253,15 +265,15 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '8px 18px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', gap: 12 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 10, overflow: 'hidden', position: 'relative', flexShrink: 0, cursor: onOpenAlbum ? 'pointer' : 'default', border: onOpenAlbum ? '1.5px solid #6C63FF' : 'none' }}
-            onClick={() => onOpenAlbum && item && onOpenAlbum(item)}>
+          <div style={{ width: 48, height: 48, borderRadius: 10, overflow: 'hidden', position: 'relative', flexShrink: 0, cursor: 'pointer', border: '1.5px solid #6C63FF' }}
+            onClick={() => item && navigateToAlbum(item)}>
             {item.artwork && <Image src={item.artwork} alt={item.title} fill style={{ objectFit: 'cover' }} unoptimized sizes="48px" />}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p onClick={() => onOpenAlbum && item && onOpenAlbum(item)}
-              style={{ fontSize: 15, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px', cursor: onOpenAlbum ? 'pointer' : 'default' }}>{item.title}</p>
-            <p onClick={() => onOpenArtist && item && onOpenArtist(item.artist)}
-              style={{ fontSize: 12, color: onOpenArtist ? '#6C63FF' : 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1, cursor: onOpenArtist ? 'pointer' : 'default' }}>{item.artist}</p>
+            <p onClick={() => item && navigateToAlbum(item)}
+              style={{ fontSize: 15, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px', cursor: 'pointer' }}>{item.title}</p>
+            <p onClick={() => item && navigateToArtist(item.artist)}
+              style={{ fontSize: 12, color: '#6C63FF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1, cursor: 'pointer' }}>{item.artist}</p>
           </div>
           <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
         </div>
