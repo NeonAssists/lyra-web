@@ -128,6 +128,8 @@ export default function AppHome() {
   const [loading, setLoading] = useState(true);
   const [globalSongs, setGlobalSongs] = useState<any[]>([]);
   const [globalAlbums, setGlobalAlbums] = useState<any[]>([]);
+  const [worldSongs, setWorldSongs] = useState<any[]>([]);
+  const [worldAlbums, setWorldAlbums] = useState<any[]>([]);
   const [chartTab, setChartTab] = useState<'us' | 'global'>('us');
   const [communityPicks, setCommunityPicks] = useState<any[]>([]);
   const [friendsPicks, setFriendsPicks] = useState<any[]>([]);
@@ -195,7 +197,9 @@ export default function AppHome() {
       safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=25/json'),
       safeFetch('https://itunes.apple.com/gb/rss/topsongs/limit=50/json'),
       safeFetch('https://itunes.apple.com/gb/rss/topalbums/limit=25/json'),
-    ]).then(([songs, albums, newmus, globalSongsData, globalAlbumsData]) => {
+      safeFetch('https://itunes.apple.com/br/rss/topsongs/limit=25/json'),
+      safeFetch('https://itunes.apple.com/br/rss/topalbums/limit=15/json'),
+    ]).then(([songs, albums, newmus, globalSongsData, globalAlbumsData, brSongs, brAlbums]) => {
       const allSongs = (songs?.feed?.entry ?? []).map(map);
       const allAlbums = (albums?.feed?.entry ?? []).map(map);
       const allNewMus = (newmus?.feed?.entry ?? []).map(map);
@@ -209,6 +213,9 @@ export default function AppHome() {
       // Global charts (UK store as proxy for international)
       setGlobalSongs((globalSongsData?.feed?.entry ?? []).map(map));
       setGlobalAlbums((globalAlbumsData?.feed?.entry ?? []).map(map));
+      // World Music Week — Brazil
+      setWorldSongs((brSongs?.feed?.entry ?? []).map(map));
+      setWorldAlbums((brAlbums?.feed?.entry ?? []).map(map));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -340,6 +347,48 @@ export default function AppHome() {
                 </div>
               </Box>
             </div>
+
+            {/* World Music Week — Brazil 🇧🇷 */}
+            <Box>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 0' }}>
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 3 }}>World Music Week</p>
+                  <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px', margin: 0 }}>🇧🇷 Brazil</h2>
+                </div>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>This week's spotlight</span>
+              </div>
+              <p style={{ padding: '6px 20px 12px', fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
+                Discover what's trending in Brazil right now — from sertanejo to funk to MPB.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ padding: '12px 16px 6px' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)' }}>Top Songs</p>
+                  </div>
+                  <div style={{ padding: '0 0 8px' }}>
+                    {loading
+                      ? [...Array(5)].map((_, i) => <div key={`brsk-${i}`} style={{ height: 44, margin: '3px 12px', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : worldSongs.slice(0, 10).map((s: any, i: number) => (
+                          <ListRow key={`brs-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                            onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                        ))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ padding: '12px 16px 6px' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)' }}>Top Albums</p>
+                  </div>
+                  <div className="home-album-grid" style={{ padding: 12 }}>
+                    {loading
+                      ? [...Array(6)].map((_, i) => <div key={`brask-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : worldAlbums.slice(0, 10).map((a: any, i: number) => (
+                          <GridCard key={`bra-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} rank={i + 1}
+                            onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
+                        ))}
+                  </div>
+                </div>
+              </div>
+            </Box>
 
             {/* Row 2: New Music grid + Community Picks */}
             <div className="home-grid-half">
