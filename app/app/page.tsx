@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,98 +11,106 @@ import AppShell from '@/components/AppShell';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
 type Filter = 'all' | 'songs' | 'albums';
+type SortDir = 'high' | 'low';
 
 function getHiRes(url: string) { return url?.replace('100x100bb', '600x600bb') ?? ''; }
 function toItemId(id: string, type: 'song' | 'album') { return type === 'album' ? `itunes:alb:${id}` : `itunes:trk:${id}`; }
 function isAlbumId(id: string) { return id?.startsWith('itunes:alb:'); }
-function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-}
+function greeting() { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; }
 
-// Compact horizontal quick-access card (Spotify "shortcut" style)
-function QuickCard({ artwork, title, onClick }: { artwork: string; title: string; onClick: () => void }) {
-  const [hov, setHov] = useState(false);
+function AlbumArt({ src, size = 44, radius = 8 }: { src: string; size?: number; radius?: number }) {
   return (
-    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 6, overflow: 'hidden', background: hov ? '#333' : '#282828', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s', height: 56, width: '100%' }}>
-      <div style={{ width: 56, height: 56, flexShrink: 0, position: 'relative', background: '#1c1c1e' }}>
-        {artwork
-          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="56px" />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>♪</div>}
-      </div>
-      <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', padding: '0 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{title}</span>
-    </button>
+    <div style={{ width: size, height: size, borderRadius: radius, overflow: 'hidden', background: '#1c1c1e', flexShrink: 0, position: 'relative' }}>
+      {src
+        ? <Image src={src.replace('{w}','100').replace('{h}','100')} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes={`${size}px`} />
+        : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: size / 3 }}>♪</div>}
+    </div>
   );
 }
 
-// Square browse card with hover play button feel
-function BrowseCard({ artwork, title, artist, rating, rank, onClick }: {
-  artwork: string; title: string; artist: string; rating?: number; rank?: number; onClick: () => void;
-}) {
-  const [hov, setHov] = useState(false);
-  const col = rating ? ratingColor(rating) : null;
-  return (
-    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#1c1c1e' : '#111', border: 'none', cursor: 'pointer', padding: 12, borderRadius: 10, textAlign: 'left', transition: 'background 0.15s', width: '100%' }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 8, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
-        {artwork
-          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="180px" />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 24 }}>♪</div>}
-        {rank != null && <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 7px', borderRadius: 5 }}>#{rank}</div>}
-        {col && <div style={{ position: 'absolute', top: 8, right: 8, background: col, color: '#fff', fontSize: 11, fontWeight: 900, padding: '2px 7px', borderRadius: 5 }}>{rating!.toFixed(1)}</div>}
-      </div>
-      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{title}</p>
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
-    </button>
-  );
+function RatingPill({ rating }: { rating: number }) {
+  const col = ratingColor(rating);
+  return <div style={{ flexShrink: 0, padding: '3px 9px', borderRadius: 7, background: col + '1a', border: `1px solid ${col}30`, color: col, fontSize: 12, fontWeight: 900 }}>{rating.toFixed(1)}</div>;
 }
 
-// Row card — for song lists
-function RowItem({ item, rank, onClick }: { item: any; rank?: number; onClick: () => void }) {
+function ListRow({ item, rank, onClick }: { item: any; rank?: number; onClick: () => void }) {
   const [hov, setHov] = useState(false);
-  const col = item.rating > 0 ? ratingColor(item.rating) : null;
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '7px 8px', borderRadius: 8, background: hov ? 'rgba(255,255,255,0.06)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}>
-      {rank != null && <span style={{ width: 20, textAlign: 'right', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>{rank}</span>}
-      <div style={{ width: 40, height: 40, borderRadius: 6, overflow: 'hidden', background: '#1c1c1e', flexShrink: 0, position: 'relative' }}>
-        {(item.artwork_url || item.artwork)
-          ? <Image src={(item.artwork_url || item.artwork)?.replace('{w}','100')?.replace('{h}','100')} alt={item.title} fill style={{ objectFit: 'cover' }} unoptimized sizes="40px" />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c' }}>♪</div>}
-      </div>
+      style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '8px 16px', background: hov ? 'rgba(255,255,255,0.04)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}>
+      {rank != null && <span style={{ width: 22, textAlign: 'right', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>{rank}</span>}
+      <AlbumArt src={item.artwork_url || item.artwork || ''} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>{item.title}</p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
       </div>
-      {col && <div style={{ flexShrink: 0, padding: '3px 8px', borderRadius: 6, background: col + '1a', border: `1px solid ${col}2e`, color: col, fontSize: 12, fontWeight: 900 }}>{item.rating.toFixed(1)}</div>}
+      {item.rating > 0 && <RatingPill rating={item.rating} />}
     </button>
   );
 }
 
-// Section header — Spotify style: small gray label + large bold title + optional "Show all"
-function SHeader({ label, title, href }: { label?: string; title: string; href?: string }) {
+// Spotify-style compact shortcut card
+function ShortcutCard({ artwork, title, onClick }: { artwork: string; title: string; onClick: () => void }) {
+  const [hov, setHov] = useState(false);
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 16 }}>
-      <div>
-        {label && <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 5 }}>{label}</p>}
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>{title}</h2>
+    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 6, overflow: 'hidden', background: hov ? '#333' : '#282828', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s', height: 54, width: '100%' }}>
+      <div style={{ width: 54, height: 54, flexShrink: 0, position: 'relative', background: '#1c1c1e' }}>
+        {artwork ? <Image src={artwork} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes="54px" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>♪</div>}
       </div>
-      {href && <Link href={href} style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', letterSpacing: 1, textTransform: 'uppercase' }}>Show all</Link>}
+      <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', padding: '0 14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{title}</span>
+    </button>
+  );
+}
+
+// Boxed section container
+function Box({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden', ...style }}>
+      {children}
     </div>
   );
 }
 
-// Horizontal scroll row with arrow buttons
-function HRow({ children, cols = 5 }: { children: React.ReactNode; cols?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const scroll = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * 220, behavior: 'smooth' });
+function BoxHeader({ label, title, href, sort, onSort }: { label?: string; title: string; href?: string; sort?: SortDir; onSort?: (d: SortDir) => void }) {
   return (
-    <div style={{ position: 'relative' }}>
-      <div ref={ref} style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 6, overflowX: 'auto', scrollbarWidth: 'none' }}>
-        {children}
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <div>
+        {label && <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 3 }}>{label}</p>}
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px', margin: 0 }}>{title}</h2>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {sort && onSort && (
+          <div style={{ display: 'flex', gap: 4, background: '#1a1a1a', borderRadius: 8, padding: 3 }}>
+            {(['high', 'low'] as SortDir[]).map(d => (
+              <button key={d} onClick={() => onSort(d)}
+                style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: sort === d ? '#6C63FF' : 'transparent', color: sort === d ? '#fff' : 'rgba(255,255,255,0.4)', textTransform: 'capitalize' }}>
+                {d === 'high' ? '↑ High' : '↓ Low'}
+              </button>
+            ))}
+          </div>
+        )}
+        {href && <Link href={href} style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</Link>}
       </div>
     </div>
+  );
+}
+
+// Browse grid card
+function GridCard({ artwork, title, artist, rank, rating, onClick }: { artwork: string; title: string; artist: string; rank?: number; rating?: number; onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  const col = rating ? ratingColor(rating) : null;
+  return (
+    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', transition: 'background 0.15s', width: '100%' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 8, overflow: 'hidden', background: '#1c1c1e', marginBottom: 8 }}>
+        {artwork ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="180px" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 22 }}>♪</div>}
+        {rank != null && <div style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 5 }}>#{rank}</div>}
+        {col && <div style={{ position: 'absolute', top: 6, right: 6, background: col, color: '#fff', fontSize: 10, fontWeight: 900, padding: '2px 6px', borderRadius: 5 }}>{rating!.toFixed(1)}</div>}
+      </div>
+      <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{title}</p>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
+    </button>
   );
 }
 
@@ -119,6 +127,9 @@ export default function AppHome() {
   const [communityPicks, setCommunityPicks] = useState<any[]>([]);
   const [friendsPicks, setFriendsPicks] = useState<any[]>([]);
   const [hotRange, setHotRange] = useState<any[]>([]);
+  const [hotSort, setHotSort] = useState<SortDir>('high');
+  const [communitySort, setCommunitySort] = useState<SortDir>('high');
+  const [friendsSort, setFriendsSort] = useState<SortDir>('high');
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
@@ -142,14 +153,14 @@ export default function AppHome() {
   useEffect(() => {
     if (!me) return;
     (supabase as any).from('user_rankings').select('item_id, title, artist, artwork_url, rating')
-      .eq('user_id', me.id).gte('rating', 8).not('title', 'is', null)
-      .order('rating', { ascending: false }).limit(20)
+      .eq('user_id', me.id).gt('rating', 0).not('title', 'is', null)
+      .order('rating', { ascending: false }).limit(30)
       .then(({ data }: any) => { if (data) setHotRange(data); });
   }, [me]);
 
   useEffect(() => {
     (supabase as any).from('user_rankings').select('item_id, title, artist, artwork_url, rating, user_id')
-      .gte('rating', 8).not('title', 'is', null).order('rating', { ascending: false }).limit(30)
+      .gte('rating', 7).not('title', 'is', null).order('rating', { ascending: false }).limit(40)
       .then(({ data }: any) => {
         if (!data) return;
         const seen = new Set<string>();
@@ -164,7 +175,7 @@ export default function AppHome() {
         if (!follows?.length) return;
         const ids = follows.map((f: any) => f.followee_id);
         const { data } = await (supabase as any).from('user_rankings').select('item_id, title, artist, artwork_url, rating, user_id')
-          .in('user_id', ids).gte('rating', 8).not('title', 'is', null).order('rating', { ascending: false }).limit(20);
+          .in('user_id', ids).gte('rating', 7).not('title', 'is', null).order('rating', { ascending: false }).limit(20);
         if (data) setFriendsPicks(data);
       });
   }, [me]);
@@ -172,9 +183,9 @@ export default function AppHome() {
   useEffect(() => {
     const map = (e: any) => ({ id: e.id?.attributes?.['im:id'] ?? '', title: e['im:name']?.label ?? '', artist: e['im:artist']?.label ?? '', artwork: getHiRes(e['im:image']?.[2]?.label ?? '') });
     Promise.all([
-      fetch('https://itunes.apple.com/us/rss/topsongs/limit=25/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/topalbums/limit=25/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/newmusic/limit=25/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/topsongs/limit=20/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/topalbums/limit=20/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/newmusic/limit=20/json').then(r => r.json()),
     ]).then(([songs, albums, newmus]) => {
       setTopSongs((songs?.feed?.entry ?? []).map(map));
       setNewAlbums((albums?.feed?.entry ?? []).map(map));
@@ -195,23 +206,25 @@ export default function AppHome() {
     return () => clearTimeout(t);
   }, [query]);
 
-  // Filter quick-access items
-  const quickItems = hotRange.slice(0, 8);
+  const sortFn = (dir: SortDir) => (a: any, b: any) => dir === 'high' ? b.rating - a.rating : a.rating - b.rating;
+  const sortedHot = [...hotRange].sort(sortFn(hotSort));
+  const sortedCommunity = [...communityPicks].sort(sortFn(communitySort));
+  const sortedFriends = [...friendsPicks].sort(sortFn(friendsSort));
 
   return (
     <AppShell>
-      <div style={{ padding: '28px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif', minHeight: '100vh' }}>
+      <div style={{ padding: '28px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
-        {/* Top: greeting + search */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
             {me ? `${greeting()}, ${me.display_name || me.handle}` : 'Home'}
           </h1>
-          <div style={{ position: 'relative', width: 300 }}>
-            <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <div style={{ position: 'relative', width: 280 }}>
+            <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.35, pointerEvents: 'none' }} width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search…"
-              style={{ width: '100%', background: '#2a2a2a', border: '1px solid transparent', borderRadius: 100, padding: '9px 40px', fontSize: 14, color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
-            {query && <button onClick={() => setQuery('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>}
+              style={{ width: '100%', background: '#2a2a2a', border: '1px solid transparent', borderRadius: 100, padding: '9px 38px', fontSize: 14, color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
+            {query && <button onClick={() => setQuery('')} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>}
           </div>
         </div>
 
@@ -226,107 +239,113 @@ export default function AppHome() {
         </div>
 
         {query ? (
-          // Search results
-          <div>
-            <SHeader title={`Results for "${query}"`} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 32px' }}>
+          // Search view
+          <Box>
+            <BoxHeader title={`Results for "${query}"`} />
+            <div style={{ padding: '8px 0' }}>
               {results.map((r: any, i: number) => {
                 const isAlbum = r.wrapperType === 'collection' || !r.trackId;
                 const id = String(r.trackId ?? r.collectionId ?? '');
                 const title = r.trackName ?? r.collectionName ?? '';
                 const art = getHiRes(r.artworkUrl100 ?? '');
-                return <RowItem key={`sr-${i}`} item={{ title, artist: r.artistName ?? '', artwork_url: art }}
+                return <ListRow key={`sr-${i}`} item={{ title, artist: r.artistName ?? '', artwork_url: art, rating: 0 }}
                   onClick={() => open({ id: toItemId(id, isAlbum ? 'album' : 'song'), title, artist: r.artistName ?? '', artwork: art, type: isAlbum ? 'album' : 'song' })} />;
               })}
+              {!searching && results.length === 0 && <p style={{ color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '40px 0' }}>No results</p>}
             </div>
-            {!searching && results.length === 0 && <p style={{ color: 'rgba(255,255,255,0.3)', padding: '60px 0', textAlign: 'center' }}>No results</p>}
-          </div>
+          </Box>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* Quick-access grid — your hot range (Spotify shortcut cards) */}
-            {quickItems.length > 0 && (filter === 'all' || filter === 'songs') && (
-              <section>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
-                  {quickItems.map((item: any, i: number) => (
-                    <QuickCard key={`qc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
-                      onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* New Albums */}
-            {(filter === 'all' || filter === 'albums') && (
-              <section>
-                <SHeader label="Browse" title="New Albums" href="/music" />
-                {loading
-                  ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>{[...Array(5)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}</div>
-                  : <HRow cols={5}>{newAlbums.slice(0, 10).map((a: any, i: number) => (
-                      <BrowseCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
-                        onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
-                    ))}</HRow>}
-              </section>
-            )}
-
-            {/* Friends + Community — side by side list */}
-            {filter === 'all' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
-                {friendsPicks.length > 0 && (
-                  <section>
-                    <SHeader label="Social" title="Friends' Picks" />
-                    {friendsPicks.slice(0, 7).map((item: any, i: number) => (
-                      <RowItem key={`fp-${i}`} item={item} rank={i + 1}
-                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                    ))}
-                  </section>
-                )}
-                <section>
-                  <SHeader label="Community" title="Community Picks" />
-                  {communityPicks.slice(0, 7).map((item: any, i: number) => (
-                    <RowItem key={`cp-${i}`} item={item} rank={i + 1}
-                      onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                  ))}
-                </section>
+            {/* Quick shortcuts — your top rated */}
+            {hotRange.length > 0 && filter !== 'albums' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                {hotRange.slice(0, 8).map((item: any, i: number) => (
+                  <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
+                    onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                ))}
               </div>
             )}
 
-            {/* New Music */}
-            {(filter === 'all' || filter === 'songs') && (
-              <section>
-                <SHeader label="Just Released" title="New Music" href="/music" />
-                {loading
-                  ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>{[...Array(5)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}</div>
-                  : <HRow cols={5}>{newSongs.slice(0, 10).map((s: any, i: number) => (
-                      <BrowseCard key={`nm-${i}`} artwork={s.artwork} title={s.title} artist={s.artist}
-                        onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                    ))}</HRow>}
-              </section>
-            )}
-
-            {/* Your Music + Top 50 */}
-            <div style={{ display: 'grid', gridTemplateColumns: hotRange.length > 0 ? '1fr 1fr' : '1fr', gap: 32 }}>
-              {hotRange.length > 0 && (filter === 'all' || filter === 'songs') && (
-                <section>
-                  <SHeader label="Your Taste" title="Hot Range" href="/ranked" />
-                  {hotRange.slice(0, 7).map((item: any, i: number) => (
-                    <RowItem key={`hr-${i}`} item={item} rank={i + 1}
-                      onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                  ))}
-                </section>
+            {/* Row 1: New Albums + Community Picks */}
+            <div style={{ display: 'grid', gridTemplateColumns: filter === 'all' ? '1.4fr 1fr' : '1fr', gap: 16 }}>
+              {(filter === 'all' || filter === 'albums') && (
+                <Box>
+                  <BoxHeader label="Browse" title="New Albums" href="/music" />
+                  <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+                    {loading ? [...Array(8)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : newAlbums.slice(0, 8).map((a: any, i: number) => (
+                          <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                            onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
+                        ))}
+                  </div>
+                </Box>
               )}
               {(filter === 'all' || filter === 'songs') && (
-                <section>
-                  <SHeader label="Charts" title="Top 50 US 🇺🇸" href="/music" />
-                  {loading
-                    ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>{[...Array(6)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}</div>
-                    : <HRow cols={hotRange.length > 0 ? 3 : 5}>{topSongs.slice(0, hotRange.length > 0 ? 6 : 10).map((s: any, i: number) => (
-                        <BrowseCard key={`ts-${i}`} artwork={s.artwork} title={s.title} artist={s.artist} rank={i + 1}
-                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                      ))}</HRow>}
-                </section>
+                <Box>
+                  <BoxHeader label="Community" title="Community Picks" sort={communitySort} onSort={setCommunitySort} />
+                  <div style={{ padding: '8px 0' }}>
+                    {sortedCommunity.slice(0, 8).map((item: any, i: number) => (
+                      <ListRow key={`cp-${i}`} item={item} rank={i + 1}
+                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                    ))}
+                    {sortedCommunity.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>No picks yet</p>}
+                  </div>
+                </Box>
               )}
             </div>
+
+            {/* Row 2: Friends' Picks + Your Music */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {(filter === 'all' || filter === 'songs') && (
+                <Box>
+                  <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} />
+                  <div style={{ padding: '8px 0' }}>
+                    {sortedFriends.slice(0, 7).map((item: any, i: number) => (
+                      <ListRow key={`fp-${i}`} item={item} rank={i + 1}
+                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                    ))}
+                    {sortedFriends.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>Follow people to see their picks</p>}
+                  </div>
+                </Box>
+              )}
+              {(filter === 'all' || filter === 'songs') && hotRange.length > 0 && (
+                <Box>
+                  <BoxHeader label="Your Taste" title="Your Rankings" sort={hotSort} onSort={setHotSort} href="/ranked" />
+                  <div style={{ padding: '8px 0' }}>
+                    {sortedHot.slice(0, 7).map((item: any, i: number) => (
+                      <ListRow key={`hr-${i}`} item={item} rank={i + 1}
+                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                    ))}
+                  </div>
+                </Box>
+              )}
+            </div>
+
+            {/* Row 3: New Music grid + Top 50 */}
+            {(filter === 'all' || filter === 'songs') && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <Box>
+                  <BoxHeader label="Just Released" title="New Music" />
+                  <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+                    {loading ? [...Array(8)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : newSongs.slice(0, 8).map((s: any, i: number) => (
+                          <GridCard key={`nm-${i}`} artwork={s.artwork} title={s.title} artist={s.artist}
+                            onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                        ))}
+                  </div>
+                </Box>
+                <Box>
+                  <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/music" />
+                  <div style={{ padding: '8px 0' }}>
+                    {topSongs.slice(0, 8).map((s: any, i: number) => (
+                      <ListRow key={`ts-${i}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                        onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                    ))}
+                  </div>
+                </Box>
+              </div>
+            )}
 
           </div>
         )}
