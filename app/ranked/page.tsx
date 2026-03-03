@@ -65,7 +65,7 @@ export default function RankedPage() {
 
   return (
     <AppShell>
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Page header */}
         <div style={{ marginBottom: 32 }}>
@@ -89,6 +89,36 @@ export default function RankedPage() {
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 4, fontWeight: 500 }}>{s.label}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Top 3 podium cards */}
+        {!loading && sorted.length >= 3 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
+            {sorted.slice(0, 3).map((item, i) => {
+              const col = ratingColor(item.rating);
+              const sizes = [1.05, 1, 0.95];
+              return (
+                <button key={`pod-${i}`} onClick={() => openModal(item)}
+                  style={{ background: '#111', border: `1px solid ${col}30`, borderRadius: 18, padding: 20, textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s', transform: `scale(${sizes[i]})`, transformOrigin: 'center bottom' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1a1a1a'; (e.currentTarget as HTMLElement).style.transform = `scale(${sizes[i] + 0.02})`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111'; (e.currentTarget as HTMLElement).style.transform = `scale(${sizes[i]})`; }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <div style={{ width: 56, height: 56, borderRadius: 12, overflow: 'hidden', background: '#1c1c1e', flexShrink: 0, position: 'relative' }}>
+                      {item.artwork_url ? <Image src={item.artwork_url} alt={item.title} fill style={{ objectFit: 'cover' }} unoptimized sizes="56px" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>♪</div>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 15, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
+                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 1, textTransform: 'uppercase' }}>#{i + 1}</span>
+                    <span style={{ fontSize: 22, fontWeight: 900, color: col, letterSpacing: '-0.5px' }}>{item.rating.toFixed(1)}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -126,6 +156,9 @@ export default function RankedPage() {
           </select>
         </div>
 
+        {/* Main 2-col: list + stats sidebar */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start' }}>
+        <div>
         {/* List */}
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -170,7 +203,51 @@ export default function RankedPage() {
             })}
           </div>
         )}
-      </div>
+        </div>
+        {/* RIGHT sidebar — rating breakdown */}
+        <div style={{ position: 'sticky', top: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 20 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 10 }}>Breakdown</p>
+            {[{label:'Perfect (9–10)', min:9,max:10},{label:'Great (7–8.9)', min:7,max:8.9},{label:'Good (5–6.9)', min:5,max:6.9},{label:'Mid (1–4.9)', min:1,max:4.9}].map(tier => {
+              const count = base.filter(i => i.rating >= tier.min && i.rating <= tier.max).length;
+              const pct = base.length > 0 ? Math.round(count / base.length * 100) : 0;
+              const col = ratingColor(tier.min + 0.5);
+              return (
+                <div key={tier.label} style={{ marginBottom: 14 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{tier.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{count}</span>
+                  </div>
+                  <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: col, borderRadius: 4, transition: 'width 0.5s ease' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {/* Recent activity box */}
+          <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 20 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>Recently Rated</p>
+            {[...base].sort((a,b) => new Date(b.ranked_at ?? 0).getTime() - new Date(a.ranked_at ?? 0).getTime()).slice(0,5).map((item,i) => {
+              const col = ratingColor(item.rating);
+              return (
+                <button key={`rec-${i}`} onClick={() => openModal(item)} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', marginBottom: 10, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 8, overflow: 'hidden', background: '#1c1c1e', flexShrink: 0, position: 'relative' }}>
+                    {item.artwork_url ? <Image src={item.artwork_url} alt={item.title} fill style={{ objectFit: 'cover' }} unoptimized sizes="36px" /> : null}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
+                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 900, color: col, flexShrink: 0 }}>{item.rating.toFixed(1)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        </div>
+        </div>
+        </div>
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId}
         onSaved={() => { if (userId) fetchRankings(userId); }} />
