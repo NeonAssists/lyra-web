@@ -257,13 +257,22 @@ export default function AppHome() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* Shortcut row — your top rated */}
+            {/* Your Style shortcut row */}
             {hotRange.length > 0 && filter !== 'albums' && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                {hotRange.slice(0, 8).map((item: any, i: number) => (
-                  <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
-                    onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                ))}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>Quick Access</p>
+                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', margin: 0 }}>Your Style</h2>
+                  </div>
+                  <a href="/ranked" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</a>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {hotRange.slice(0, 8).map((item: any, i: number) => (
+                    <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
+                      onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                  ))}
+                </div>
               </div>
             )}
 
@@ -282,7 +291,7 @@ export default function AppHome() {
                   </Box>
                 )}
                 <Box>
-                  <BoxHeader label="Community" title="Community Picks" sort={communitySort} onSort={setCommunitySort} />
+                  <BoxHeader label="Community" title="Community Picks" sort={communitySort} onSort={setCommunitySort} href="/community-picks" />
                   <div style={{ padding: '8px 0' }}>
                     {sortedCommunity.slice(0, 10).map((item: any, i: number) => (
                       <ListRow key={`cp-${i}`} item={item} rank={i + 1}
@@ -310,7 +319,7 @@ export default function AppHome() {
               )}
               {(filter === 'all' || filter === 'songs') && (
                 <Box>
-                  <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} />
+                  <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} href="/friends-picks" />
                   <div style={{ padding: '8px 0' }}>
                     {sortedFriends.slice(0, 10).map((item: any, i: number) => (
                       <ListRow key={`fp-${i}`} item={item} rank={i + 1}
@@ -326,7 +335,7 @@ export default function AppHome() {
             {(filter === 'all' || filter === 'songs') && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <Box>
-                  <BoxHeader label="Just Released" title="New Music" />
+                  <BoxHeader label="Just Released" title="New Music" href="/new-music" />
                   <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
                     {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                       : newSongs.slice(0, 10).map((s: any, i: number) => (
@@ -336,7 +345,7 @@ export default function AppHome() {
                   </div>
                 </Box>
                 <Box>
-                  <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/music" />
+                  <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/top50" />
                   <div style={{ padding: '8px 0' }}>
                     {topSongs.slice(0, 10).map((s: any, i: number) => (
                       <ListRow key={`ts-${i}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
