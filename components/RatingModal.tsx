@@ -92,7 +92,7 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
           if (data.rating > 0) {
             setExisting(data);
             setRating(data.rating);
-            setRatingInput(data.rating.toFixed(1));
+            setRatingInput((data.rating ?? 0).toFixed(1));
             setNote(data.note ?? '');
             if (data.tags) setSelectedTags(data.tags);
           }
@@ -277,7 +277,7 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
                   ? <img src={fr.avatar_url} style={{ width: 16, height: 16, borderRadius: 8, objectFit: 'cover' }} alt="" />
                   : <span style={{ width: 16, height: 16, borderRadius: 8, background: '#6C63FF44', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 800, color: '#6C63FF' }}>{fr.handle[0]?.toUpperCase()}</span>}
                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>@{fr.handle}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: ratingColor(fr.rating) }}>{fr.rating.toFixed(1)}</span>
+                <span style={{ fontSize: 12, fontWeight: 800, color: ratingColor(fr.rating) }}>{(fr.rating ?? 0).toFixed(1)}</span>
               </span>
             ))}
           </div>

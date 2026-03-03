@@ -225,7 +225,7 @@ function FeedItem({ item, col, onOpen }: { item: Activity; col: string; onOpen: 
         </p>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist} · {timeAgo(item.ranked_at)}</p>
       </div>
-      <div style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, background: col + '18', border: `1px solid ${col}30`, color: col, fontSize: 13, fontWeight: 900 }}>{item.rating.toFixed(1)}</div>
+      <div style={{ flexShrink: 0, padding: '4px 10px', borderRadius: 8, background: col + '18', border: `1px solid ${col}30`, color: col, fontSize: 13, fontWeight: 900 }}>{(item.rating ?? 0).toFixed(1)}</div>
     </div>
   );
 }

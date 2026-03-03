@@ -71,7 +71,7 @@ export default function CommunityPicksPage() {
                     <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{item.title}</p>
                     <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
                   </div>
-                  <div style={{ flexShrink: 0, padding: '4px 12px', borderRadius: 8, background: col + '18', border: `1px solid ${col}30`, color: col, fontSize: 14, fontWeight: 900 }}>{item.rating.toFixed(1)}</div>
+                  <div style={{ flexShrink: 0, padding: '4px 12px', borderRadius: 8, background: col + '18', border: `1px solid ${col}30`, color: col, fontSize: 14, fontWeight: 900 }}>{(item.rating ?? 0).toFixed(1)}</div>
                 </button>
               );
             })}

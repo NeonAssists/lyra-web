@@ -111,7 +111,7 @@ export default function RankedPage() {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 1, textTransform: 'uppercase' }}>#{i + 1}</span>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: col, letterSpacing: '-0.5px' }}>{item.rating.toFixed(1)}</span>
+                    <span style={{ fontSize: 22, fontWeight: 900, color: col, letterSpacing: '-0.5px' }}>{(item.rating ?? 0).toFixed(1)}</span>
                   </div>
                 </button>
               );
@@ -193,7 +193,7 @@ export default function RankedPage() {
                   </div>
                   {/* Rating badge */}
                   <div style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 10, background: col + '18', border: `1px solid ${col}33`, color: col, fontSize: 15, fontWeight: 900, letterSpacing: '-0.3px' }}>
-                    {item.rating.toFixed(1)}
+                    {(item.rating ?? 0).toFixed(1)}
                   </div>
                 </button>
               );
@@ -236,7 +236,7 @@ export default function RankedPage() {
                     <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 900, color: col, flexShrink: 0 }}>{item.rating.toFixed(1)}</span>
+                  <span style={{ fontSize: 12, fontWeight: 900, color: col, flexShrink: 0 }}>{(item.rating ?? 0).toFixed(1)}</span>
                 </button>
               );
             })}

@@ -202,7 +202,7 @@ export default function UserProfilePage() {
                         {item.note && <p className="text-[11px] text-[#48484A] italic truncate">&ldquo;{item.note}&rdquo;</p>}
                       </div>
                       <div className="flex-none rounded-lg px-2.5 py-1 text-sm font-black" style={{ backgroundColor: col + '22', color: col, border: `1px solid ${col}44` }}>
-                        {item.rating.toFixed(1)}
+                        {(item.rating ?? 0).toFixed(1)}
                       </div>
                     </button>
                   );
