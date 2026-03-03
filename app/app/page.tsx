@@ -350,7 +350,7 @@ export default function AppHome() {
                   <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 3 }}>World Music Week</p>
                   <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px', margin: 0 }}>🇧🇷 Brazil</h2>
                 </div>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>This week's spotlight</span>
+                <Link href="/world-music" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</Link>
               </div>
               <p style={{ padding: '6px 20px 12px', fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>
                 Discover what's trending in Brazil right now — from sertanejo to funk to MPB.

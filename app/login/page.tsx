@@ -29,32 +29,32 @@ export default function LoginPage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setError(''); setLoading(true);
-    if (mode === 'login') {
-      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { setError(error.message); setLoading(false); return; }
-      // Ensure session is persisted before redirect
-      if (authData.session) {
-        await supabase.auth.setSession({
-          access_token: authData.session.access_token,
-          refresh_token: authData.session.refresh_token,
-        });
+    try {
+      if (mode === 'login') {
+        const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) { setError(error.message); setLoading(false); return; }
+        // Small delay to let session persist to localStorage
+        await new Promise(r => setTimeout(r, 200));
+        window.location.href = '/app';
+      } else {
+        if (handle.length < 2) { setError('Handle must be at least 2 characters'); setLoading(false); return; }
+        if (password.length < 6) { setError('Password must be at least 6 characters'); setLoading(false); return; }
+        const { data, error: err } = await supabase.auth.signUp({ email, password });
+        if (err) { setError(err.message); setLoading(false); return; }
+        if (data.user) {
+          await supabase.from('profiles' as any).upsert({
+            id: data.user.id,
+            handle: handle.toLowerCase().replace(/[^a-z0-9_]/g, ''),
+            display_name: displayName || handle,
+            plan: 'free',
+          });
+        }
+        await new Promise(r => setTimeout(r, 200));
+        window.location.href = '/app';
       }
-      window.location.href = '/app';
-    } else {
-      if (handle.length < 2) { setError('Handle must be at least 2 characters'); setLoading(false); return; }
-      const { data, error: err } = await supabase.auth.signUp({ email, password });
-      if (err) { setError(err.message); setLoading(false); return; }
-      if (data.user) {
-        await supabase.from('profiles' as any).upsert({ id: data.user.id, handle: handle.toLowerCase().replace(/[^a-z0-9_]/g, ''), display_name: displayName || handle, plan: 'free' });
-      }
-      // Ensure session persisted
-      if (data.session) {
-        await supabase.auth.setSession({
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        });
-      }
-      window.location.href = '/app';
+    } catch (e: any) {
+      setError(e?.message || 'Something went wrong. Try again.');
+      setLoading(false);
     }
   };
 
