@@ -24,23 +24,36 @@ export default function RankedPage() {
   const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
 
   const fetchRankings = async (uid: string) => {
-    const { data } = await supabase.from('user_rankings' as any)
+    const { data, error } = await supabase.from('user_rankings' as any)
       .select('id, item_id, rating, note, title, artist, artwork_url, ranked_at')
       .eq('user_id', uid).not('title', 'is', null).gt('rating', 0)
       .order('rating', { ascending: false });
+    console.log('[Ranked] fetchRankings uid:', uid, 'count:', data?.length, 'error:', error?.message);
     setItems((data ?? []) as RankedItem[]);
     setLoading(false);
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session?.user) { setLoading(false); return; }
-      setUserId(session.user.id);
-      await fetchRankings(session.user.id);
-    });
+    let loaded = false;
+    // Listen for auth changes first — this catches login redirect + token refresh
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (ev === 'SIGNED_OUT') { setUserId(null); setItems([]); }
-      else if (session?.user) { setUserId(session.user.id); fetchRankings(session.user.id); }
+      if (ev === 'SIGNED_OUT') { setUserId(null); setItems([]); setLoading(false); return; }
+      if (session?.user && !loaded) {
+        loaded = true;
+        setUserId(session.user.id);
+        await fetchRankings(session.user.id);
+      }
+    });
+    // Also try getSession for instant hydration
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user && !loaded) {
+        loaded = true;
+        setUserId(session.user.id);
+        await fetchRankings(session.user.id);
+      } else if (!session?.user) {
+        // Give onAuthStateChange 2s to fire before showing empty
+        setTimeout(() => { if (!loaded) setLoading(false); }, 2000);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);

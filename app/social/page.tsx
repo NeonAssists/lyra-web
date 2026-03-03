@@ -51,13 +51,20 @@ export default function SocialPage() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session?.user) return;
-      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
+    const loadUser = async (uid: string) => {
+      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', uid).single();
       setMe(p as Profile);
-      const { data: f } = await supabase.from('follows').select('followee_id').eq('follower_id', session.user.id);
+      const { data: f } = await supabase.from('follows').select('followee_id').eq('follower_id', uid);
       setFollowing(new Set((f ?? []).map((x: any) => x.followee_id)));
+    };
+    let loaded = false;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
+      if (session?.user && !loaded) { loaded = true; loadUser(session.user.id); }
     });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !loaded) { loaded = true; loadUser(session.user.id); }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
