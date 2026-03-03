@@ -34,7 +34,7 @@ export const WORLD_MUSIC_SCHEDULE: WorldMusicWeek[] = [
       { id: 'itunes:trk:439636358', title: 'O Bem', artist: 'Arlindo Cruz', artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d3/91/7f/d3917f1d-4eac-d966-2828-02e97fbc8cd5/mzi.jvpyhajo.jpg/600x600bb.jpg' },
       { id: 'itunes:trk:354579342', title: 'Maria Maria (feat. The Product G&B) [Radio Mix]', artist: 'Santana', artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f5/97/4c/f5974c1e-06cb-f84c-1da9-5f7505a20a0c/mzi.etsqfvqq.jpg/600x600bb.jpg' },
       { id: 'itunes:trk:907208491', title: 'Somente Sombras (feat. Zeca Pagodinho)', artist: 'Arlindo Cruz', artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/4b/b5/a1/4bb5a1b3-670c-0caa-5c49-5662ec795e25/886444745970.jpg/600x600bb.jpg' },
-      { id: 'itunes:trk:713177299', title: 'Estate', artist: 'Bruno Martino', artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music4/v4/33/56/73/335673d5-20e2-1746-9bc1-d4460c89e9e7/00724359822150.jpg/600x600bb.jpg' },
+      { id: 'itunes:trk:404520901', title: 'Estate', artist: 'João Gilberto', artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music/63/15/75/mzi.zlcacvwt.jpg/600x600bb.jpg' },
     ],
   },
   {
