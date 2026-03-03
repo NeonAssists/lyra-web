@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
 import AppShell from '@/components/AppShell';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
+import AlbumView from '@/components/AlbumView';
+import { useModals } from '@/hooks/useModals';
 
 type RankedItem = { id: string; item_id: string; rating: number; note?: string; title: string; artist: string; artwork_url: string; ranked_at?: string };
 type SortMode = 'rating' | 'recent' | 'alpha';
@@ -19,8 +21,7 @@ export default function RankedPage() {
   const [activeTab, setActiveTab] = useState<Tab>('songs');
   const [sort, setSort] = useState<SortMode>('rating');
   const [search, setSearch] = useState('');
-  const [modalItem, setModalItem] = useState<ModalItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
 
   const fetchRankings = async (uid: string) => {
     const { data } = await supabase.from('user_rankings' as any)
@@ -59,8 +60,7 @@ export default function RankedPage() {
   });
 
   const openModal = (item: RankedItem) => {
-    setModalItem({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url, type: item.item_id.startsWith('itunes:alb:') ? 'album' : 'song' });
-    setModalOpen(true);
+    openItem({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url, type: item.item_id.startsWith('itunes:alb:') ? 'album' : 'song' });
   };
 
   return (
@@ -248,8 +248,11 @@ export default function RankedPage() {
         </div>
         </div>
 
-      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId}
-        onSaved={() => { if (userId) fetchRankings(userId); }} />
+      <AlbumView open={albumOpen} onClose={closeAlbum}
+        albumId={albumView?.id ?? ''} albumTitle={albumView?.title ?? ''} albumArtist={albumView?.artist ?? ''} albumArtwork={albumView?.artwork ?? ''}
+        userId={userId} onOpenSong={onAlbumSongClick} onOpenAlbum={onAlbumRecClick} />
+      <RatingModal open={modalOpen} onClose={closeModal} item={modalItem} userId={userId}
+        onSaved={() => { if (userId) fetchRankings(userId); }} onOpenAlbum={onModalAlbumClick} />
     </AppShell>
   );
 }

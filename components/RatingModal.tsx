@@ -18,9 +18,10 @@ interface RatingModalProps {
   item: ModalItem | null;
   userId: string | null;
   onSaved?: () => void;
+  onOpenAlbum?: (item: ModalItem) => void;
 }
 
-export default function RatingModal({ open, onClose, item, userId, onSaved }: RatingModalProps) {
+export default function RatingModal({ open, onClose, item, userId, onSaved, onOpenAlbum }: RatingModalProps) {
   const [rating, setRating] = useState(7.0);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);

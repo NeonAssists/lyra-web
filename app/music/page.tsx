@@ -5,6 +5,8 @@ import { getArtworkHiRes } from '@/lib/itunes';
 import AppShell from '@/components/AppShell';
 import { sessionGenre, sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
+import AlbumView from '@/components/AlbumView';
+import { useModals } from '@/hooks/useModals';
 import { supabase } from '@/lib/supabase';
 import SeeAllCard from '@/components/SeeAllCard';
 
@@ -65,14 +67,11 @@ export default function MusicPage() {
   const [newAlbums, setNewAlbums] = useState<any[]>([]);
   const [classicAlbums, setClassicAlbums] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalItem, setModalItem] = useState<ModalItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
-
-  const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
+  const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem: open, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -272,7 +271,10 @@ export default function MusicPage() {
         )}
       </div>
 
-      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId} />
+      <AlbumView open={albumOpen} onClose={closeAlbum}
+        albumId={albumView?.id ?? ''} albumTitle={albumView?.title ?? ''} albumArtist={albumView?.artist ?? ''} albumArtwork={albumView?.artwork ?? ''}
+        userId={userId} onOpenSong={onAlbumSongClick} onOpenAlbum={onAlbumRecClick} />
+      <RatingModal open={modalOpen} onClose={closeModal} item={modalItem} userId={userId} onOpenAlbum={onModalAlbumClick} />
     </AppShell>
   );
 }

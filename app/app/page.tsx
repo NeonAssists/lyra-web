@@ -185,21 +185,20 @@ export default function AppHome() {
 
   useEffect(() => {
     const map = (e: any) => ({ id: e.id?.attributes?.['im:id'] ?? '', title: e['im:name']?.label ?? '', artist: e['im:artist']?.label ?? '', artwork: getHiRes(e['im:image']?.[2]?.label ?? '') });
+    const safeFetch = (url: string) => fetch(url).then(r => { if (!r.ok) return { feed: { entry: [] } }; return r.json(); }).catch(() => ({ feed: { entry: [] } }));
     Promise.all([
-      fetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/topalbums/limit=25/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/newmusic/limit=25/json').then(r => r.json()),
+      safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json'),
+      safeFetch('https://itunes.apple.com/us/rss/topalbums/limit=25/json'),
+      safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=25/json'), // newmusic RSS is dead (400), use topsongs as fallback for "new music"
     ]).then(([songs, albums, newmus]) => {
       const allSongs = (songs?.feed?.entry ?? []).map(map);
       const allAlbums = (albums?.feed?.entry ?? []).map(map);
       const allNewMus = (newmus?.feed?.entry ?? []).map(map);
-      // Top 50 always stays ordered — charts are charts
       setTopSongs(allSongs);
-      // New Albums: pick 10 from pool at a session-stable offset (fallback = first 10)
       const albumOffset = allAlbums.length > 10 ? sessionOffset('home_albums', allAlbums.length, 10) : 0;
       const albumSlice = allAlbums.slice(albumOffset, albumOffset + 10);
       setNewAlbums(albumSlice.length >= 5 ? albumSlice : allAlbums.slice(0, 10));
-      // New Music: shuffle per session, fallback = original order
+      // "New Music" — use a shuffled subset of top songs since the newmusic RSS is dead
       const shuffled = allNewMus.length > 0 ? sessionShuffle(allNewMus, 'home_newmusic') : allNewMus;
       setNewSongs(shuffled.slice(0, 10));
       setLoading(false);

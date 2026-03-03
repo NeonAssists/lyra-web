@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
 import AppShell from '@/components/AppShell';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
+import AlbumView from '@/components/AlbumView';
+import { useModals } from '@/hooks/useModals';
 
 type Profile = { id: string; handle: string; display_name: string; avatar_url: string | null };
 type Activity = {
@@ -43,11 +45,9 @@ export default function SocialPage() {
   const [following, setFollowing] = useState<Set<string>>(new Set());
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [search, setSearch] = useState('');
-  const [modalItem, setModalItem] = useState<ModalItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
   const open = (a: Activity) => {
-    setModalItem({ id: a.item_id, title: a.title, artist: a.artist, artwork: a.artwork_url, type: a.item_id?.startsWith('itunes:alb:') ? 'album' : 'song' });
-    setModalOpen(true);
+    openItem({ id: a.item_id, title: a.title, artist: a.artist, artwork: a.artwork_url, type: a.item_id?.startsWith('itunes:alb:') ? 'album' : 'song' });
   };
 
   useEffect(() => {
@@ -195,7 +195,10 @@ export default function SocialPage() {
         </div>
       </div>
 
-      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
+      <AlbumView open={albumOpen} onClose={closeAlbum}
+        albumId={albumView?.id ?? ''} albumTitle={albumView?.title ?? ''} albumArtist={albumView?.artist ?? ''} albumArtwork={albumView?.artwork ?? ''}
+        userId={me?.id ?? null} onOpenSong={onAlbumSongClick} onOpenAlbum={onAlbumRecClick} />
+      <RatingModal open={modalOpen} onClose={closeModal} item={modalItem} userId={me?.id ?? null} onOpenAlbum={onModalAlbumClick} />
     </AppShell>
   );
 }
