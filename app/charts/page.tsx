@@ -11,29 +11,31 @@ type ChartTab = 'us-songs' | 'us-albums' | 'global-songs' | 'global-albums';
 function getHiRes(url: string) { return url?.replace('100x100bb', '600x600bb') ?? ''; }
 function toItemId(id: string, type: 'song' | 'album') { return type === 'album' ? `itunes:alb:${id}` : `itunes:trk:${id}`; }
 
-function ChartCard({ artwork, title, artist, rank, onClick }: { artwork: string; title: string; artist: string; rank: number; onClick: () => void }) {
-  const [hov, setHov] = useState(false);
-  return (
-    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', width: '100%', transition: 'background 0.15s' }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 8 }}>
-        {artwork
-          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="200px" />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 24 }}>&#9835;</div>}
-        <div style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(0,0,0,0.75)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6 }}>#{rank}</div>
-      </div>
-      <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{title}</p>
-      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
-    </button>
-  );
-}
-
 const TABS: { key: ChartTab; label: string; icon: string }[] = [
   { key: 'us-songs', label: 'US Songs', icon: '🇺🇸' },
   { key: 'us-albums', label: 'US Albums', icon: '🇺🇸' },
   { key: 'global-songs', label: 'Global Songs', icon: '🌍' },
   { key: 'global-albums', label: 'Global Albums', icon: '🌍' },
 ];
+
+function ListRow({ artwork, title, artist, rank, onClick }: { artwork: string; title: string; artist: string; rank: number; onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '8px 20px', background: hov ? 'rgba(255,255,255,0.04)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}>
+      <span style={{ width: 28, textAlign: 'right', fontSize: 13, fontWeight: 700, color: rank <= 3 ? '#6C63FF' : 'rgba(255,255,255,0.25)', flexShrink: 0 }}>{rank}</span>
+      <div style={{ width: 44, height: 44, borderRadius: 8, overflow: 'hidden', background: '#1c1c1e', flexShrink: 0, position: 'relative' }}>
+        {artwork
+          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="44px" />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 16 }}>♪</div>}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>{title}</p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
+      </div>
+    </button>
+  );
+}
 
 export default function ChartsPage() {
   const [tab, setTab] = useState<ChartTab>('us-songs');
@@ -80,10 +82,6 @@ export default function ChartsPage() {
 
   return (
     <AppShell>
-      <style>{`
-        .charts-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        @media (max-width: 768px) { .charts-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-      `}</style>
       <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         <div style={{ marginBottom: 28 }}>
@@ -106,8 +104,8 @@ export default function ChartsPage() {
           ))}
         </div>
 
-        {/* Title for active tab */}
-        <div style={{ marginBottom: 20 }}>
+        {/* Header */}
+        <div style={{ marginBottom: 16, padding: '0 20px' }}>
           <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
             {isAlbum ? 'Albums' : 'Songs'}
           </p>
@@ -116,19 +114,26 @@ export default function ChartsPage() {
           </h2>
         </div>
 
-        {/* Grid */}
-        {loading ? (
-          <div className="charts-grid">
-            {[...Array(10)].map((_, i) => <div key={`sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
-          </div>
-        ) : (
-          <div className="charts-grid">
-            {items.map((item: any, i: number) => (
-              <ChartCard key={`c-${tab}-${i}-${item.id}`} artwork={item.artwork} title={item.title} artist={item.artist} rank={i + 1}
+        {/* List view */}
+        <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden' }}>
+          {loading ? (
+            [...Array(15)].map((_, i) => (
+              <div key={`sk-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 20px' }}>
+                <div style={{ width: 28 }} />
+                <div style={{ width: 44, height: 44, background: '#1c1c1e', borderRadius: 8 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ width: '60%', height: 12, background: '#1c1c1e', borderRadius: 4, marginBottom: 6 }} />
+                  <div style={{ width: '40%', height: 10, background: '#1c1c1e', borderRadius: 4 }} />
+                </div>
+              </div>
+            ))
+          ) : (
+            items.map((item: any, i: number) => (
+              <ListRow key={`c-${tab}-${i}-${item.id}`} artwork={item.artwork} title={item.title} artist={item.artist} rank={i + 1}
                 onClick={() => open({ id: toItemId(item.id, isAlbum ? 'album' : 'song'), title: item.title, artist: item.artist, artwork: item.artwork, type: isAlbum ? 'album' : 'song' })} />
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId} />
