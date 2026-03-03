@@ -41,8 +41,9 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
         {done ? (
           <>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're signed up!</h2>
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>We'll send you access when your account is ready. Keep an ear out.</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're in!</h2>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: 6 }}>We'll email you the moment the app is ready to download.</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1.5 }}>You'll be one of the first to rate, rank, and build your music taste profile.</p>
             <button onClick={onClose} style={{ marginTop: 28, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Done</button>
           </>
         ) : (
