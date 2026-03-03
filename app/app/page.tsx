@@ -288,18 +288,21 @@ export default function AppHome() {
                   </>
                 ) : (
                   <>
-                    <BoxHeader label="Discover" title="Trending Now" href="/charts" />
+                    <BoxHeader label="Discover" title="🇺🇸 Trending Now" href="/charts" />
                     <div style={{ padding: '4px 0', flex: 1 }}>
                       {topSongs.slice(0, 12).map((s: any, i: number) => (
                         <ListRow key={`tr-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                     </div>
+                    <div style={{ padding: '8px 18px 12px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <a href="/login" style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>🔒 Sign in to see what your friends are rating</a>
+                    </div>
                   </>
                 )}
               </Box>
 
-              {/* Right: Your Rankings or Community Picks for guests */}
+              {/* Right: Your Rankings or Global Charts for guests */}
               <Box style={{ flex: 1 }}>
                 {isLoggedIn ? (
                   <>
@@ -313,13 +316,15 @@ export default function AppHome() {
                   </>
                 ) : (
                   <>
-                    <BoxHeader label="Community" title="Top Rated" sort={communitySort} onSort={setCommunitySort} href="/community-picks" />
+                    <BoxHeader label="Charts" title="🌍 Global Top Songs" href="/charts" />
                     <div style={{ padding: '4px 0', flex: 1 }}>
-                      {sortedCommunity.slice(0, 12).map((item: any, i: number) => (
-                        <ListRow key={`cp-${i}`} item={item} rank={i + 1} compact
-                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                      {globalSongs.slice(0, 12).map((s: any, i: number) => (
+                        <ListRow key={`gg-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
+                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
-                      {sortedCommunity.length === 0 && <EmptyState icon="🎵" text="No community picks yet" />}
+                    </div>
+                    <div style={{ padding: '8px 18px 12px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <a href="/login" style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>🔒 Sign in to see your personal rankings</a>
                     </div>
                   </>
                 )}
@@ -343,11 +348,11 @@ export default function AppHome() {
                   </>
                 ) : (
                   <>
-                    <BoxHeader label="Charts" title="🌍 Global" href="/charts" />
+                    <BoxHeader label="Community" title="Top Rated" sort={communitySort} onSort={setCommunitySort} href="/community-picks" />
                     <div style={{ padding: '4px 0' }}>
-                      {globalSongs.slice(0, 8).map((s: any, i: number) => (
-                        <ListRow key={`gg-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
-                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                      {sortedCommunity.slice(0, 8).map((item: any, i: number) => (
+                        <ListRow key={`cpg-${i}`} item={item} rank={i + 1} compact
+                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
                       ))}
                     </div>
                   </>
