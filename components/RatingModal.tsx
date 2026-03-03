@@ -134,12 +134,34 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4, textTransform: 'uppercase', letterSpacing: 1.5 }}>Your Rating</p>
           </div>
 
-          {/* Slider */}
+          {/* Slider + number input */}
           <div style={{ marginBottom: 20, padding: '0 4px' }}>
-            <input type="range" min={1} max={10} step={0.1} value={rating}
-              onChange={e => setRating(parseFloat(e.target.value))}
-              style={{ width: '100%', cursor: 'pointer', accentColor: col, height: 4 }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+              <input type="range" min={1} max={10} step={0.1} value={rating}
+                onChange={e => setRating(parseFloat(e.target.value))}
+                style={{ flex: 1, cursor: 'pointer', accentColor: col, height: 4 }} />
+              <input
+                type="text"
+                inputMode="decimal"
+                value={rating.toFixed(1)}
+                onChange={e => {
+                  const v = e.target.value;
+                  if (v === '' || v === '.' || /^\d*\.?\d*$/.test(v)) {
+                    const n = parseFloat(v);
+                    if (!isNaN(n) && n >= 1.0 && n <= 10.0) {
+                      setRating(Math.round(n * 10) / 10);
+                    }
+                  }
+                }}
+                style={{
+                  width: 60, height: 34, borderRadius: 17, border: `2px solid ${col}44`,
+                  background: `${col}15`, color: col, fontSize: 14, fontWeight: 800,
+                  textAlign: 'center', outline: 'none', fontFamily: 'inherit',
+                  flexShrink: 0,
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>1.0</span>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>5.0</span>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 700 }}>10.0</span>

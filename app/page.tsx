@@ -20,7 +20,7 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
     const { error: err } = await (supabase as any).from('waitlist').insert({ name: name.trim(), email: email.trim().toLowerCase() });
     setLoading(false);
     if (err) {
-      if (err.code === '23505') setError("You're already on the list!");
+      if (err.code === '23505') setError("You've already signed up!");
       else setError('Something went wrong. Try again.');
     } else {
       setDone(true);
@@ -41,16 +41,16 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
         {done ? (
           <>
             <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're on the list.</h2>
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>We'll reach out when Lyra is ready for you. Keep an ear out.</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're signed up!</h2>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>We'll send you access when your account is ready. Keep an ear out.</p>
             <button onClick={onClose} style={{ marginTop: 28, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Done</button>
           </>
         ) : (
           <>
             {/* Ambient glow */}
             <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse, rgba(108,99,255,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 8 }}>Join the waitlist</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 32, lineHeight: 1.5 }}>Get early access when Lyra opens up. No spam — just the drop.</p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 8 }}>Create Account</h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 32, lineHeight: 1.5 }}>Sign up to start rating music. No spam — just the drop.</p>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <input
                 type="text"
@@ -69,7 +69,7 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
               {error && <p style={{ fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>}
               <button type="submit" disabled={loading}
                 style={{ background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, marginTop: 4 }}>
-                {loading ? 'Joining…' : 'Get Early Access →'}
+                {loading ? 'Creating…' : 'Sign Up →'}
               </button>
             </form>
             <p style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>No spam. Unsubscribe anytime.</p>
@@ -120,7 +120,7 @@ export default function HomePage() {
         </p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
           <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
-            Join the Waitlist
+            Sign Up Free
           </button>
           <Link href="/u/nate7" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
             See Example Profile
@@ -171,6 +171,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Feature 2b — Friend Features grid */}
+      <section style={{ padding: '80px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, textAlign: 'center' }}>
+            {[
+              { icon: '\uD83D\uDC40', title: 'See what your friends are rating', desc: 'Real-time feed of ratings from people you follow. No algorithm — just taste you trust.' },
+              { icon: '\uD83E\uDD1D', title: 'Follow music lovers you trust', desc: 'Build your circle. Follow friends, critics, and curators whose taste matches yours.' },
+              { icon: '\uD83D\uDCCB', title: 'Build shared lists together', desc: 'Collaborate on playlists and ranking lists with friends. Compare scores side by side.' },
+            ].map((f, i) => (
+              <div key={`ff-${i}`} style={{ padding: '32px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20 }}>
+                <div style={{ fontSize: 36, marginBottom: 16 }}>{f.icon}</div>
+                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.3px' }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Feature 3 — Discovery */}
       <section style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
@@ -192,7 +211,7 @@ export default function HomePage() {
             <span style={{ color: 'rgba(255,255,255,0.25)' }}>Defined.</span>
           </h2>
           <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#fff', color: '#000', fontWeight: 700, fontSize: 17, padding: '16px 40px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.3px' }}>
-            Get Early Access →
+            Create Account →
           </button>
           <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>No credit card. No algorithm. Just music.</p>
         </div>

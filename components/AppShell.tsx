@@ -9,6 +9,7 @@ type User = { id: string; handle: string; display_name: string; avatar_url: stri
 const NAV = [
   { href: '/app', label: 'Home', icon: (active: boolean) => <svg width="20" height="20" fill={active ? 'white' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg> },
   { href: '/music', label: 'Music', icon: (active: boolean) => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="8" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M11 18V6l10-2v10"/></svg> },
+  { href: '/charts', label: 'Charts', icon: (active: boolean) => <svg width="20" height="20" fill={active ? 'white' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg> },
   { href: '/ranked', label: 'Ranked', icon: (active: boolean) => <svg width="20" height="20" fill={active ? 'white' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
   { href: '/social', label: 'Social', icon: (active: boolean) => <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
 ];
@@ -22,21 +23,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Use getSession() first — reads from localStorage without a network request.
-    // Avoids premature redirect when the JWT hasn't hydrated yet.
+    // Guests can browse freely — no redirect when no session.
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setHydrated(true);
-      if (!session?.user) { router.push('/login'); return; }
-      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
-      setMe(p as User);
+      if (session?.user) {
+        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
+        setMe(p as User);
+      }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
         setMe(p as User);
       } else if (event === 'SIGNED_OUT') {
-        // Only redirect on explicit sign-out — not on null during hydration
         setMe(null);
-        router.push('/login');
       }
     });
     return () => subscription.unsubscribe();
@@ -95,7 +95,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {me && (
+          {me ? (
             <div style={{ padding: '16px 16px 24px', borderTop: '1px solid rgba(255,255,255,0.06)', position: 'relative' }}>
               <button onClick={() => setUserMenuOpen(v => !v)} style={{
                 display: 'flex', alignItems: 'center', gap: 10, width: '100%',
@@ -130,6 +130,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               )}
+            </div>
+          ) : (
+            <div style={{ padding: '16px 16px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <Link href="/login" style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
+                background: '#6C63FF', border: 'none', borderRadius: 12,
+                padding: '12px 12px', textDecoration: 'none', color: '#fff', fontSize: 14, fontWeight: 700,
+              }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                Sign In
+              </Link>
             </div>
           )}
         </aside>

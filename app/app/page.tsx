@@ -137,9 +137,9 @@ export default function AppHome() {
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (data.user) {
-        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', data.user.id).single();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
         setMe(p as User);
       }
     });
@@ -224,6 +224,16 @@ export default function AppHome() {
 
   return (
     <AppShell>
+      <style>{`
+        .home-grid-2col { display: grid; grid-template-columns: 1fr 1.5fr; gap: 16px; }
+        .home-grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .home-album-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+        @media (max-width: 768px) {
+          .home-grid-2col { grid-template-columns: 1fr !important; }
+          .home-grid-half { grid-template-columns: 1fr !important; }
+          .home-album-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
       <div style={{ padding: '28px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
@@ -261,7 +271,7 @@ export default function AppHome() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
             {/* Row 1: Top 50 + New Albums — ALWAYS visible, music-first */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 16 }}>
+            <div className="home-grid-2col">
               <Box>
                 <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/top50" />
                 <div style={{ padding: '8px 0' }}>
@@ -275,12 +285,12 @@ export default function AppHome() {
               </Box>
               <Box>
                 <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
-                <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
+                <div className="home-album-grid" style={{ padding: 12 }}>
                   {loading
-                    ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                    ? [...Array(10)].map((_, i) => <div key={`na-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                     : <>
                         {newAlbums.slice(0, 9).map((a: any, i: number) => (
-                          <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                          <GridCard key={`na-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist}
                             onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                         ))}
                         <SeeAllCard artworks={newAlbums.slice(9, 13).map((a: any) => a.artwork)} label="New Albums" href="/new-albums" />
@@ -291,13 +301,13 @@ export default function AppHome() {
             </div>
 
             {/* Row 2: New Music grid + Community Picks */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="home-grid-half">
               <Box>
                 <BoxHeader label="Just Released" title="New Music" href="/new-music" />
-                <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
-                  {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                <div className="home-album-grid" style={{ padding: 12 }}>
+                  {loading ? [...Array(10)].map((_, i) => <div key={`nm-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                     : newSongs.slice(0, 10).map((s: any, i: number) => (
-                        <GridCard key={`nm-${i}`} artwork={s.artwork} title={s.title} artist={s.artist}
+                        <GridCard key={`nm-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                 </div>
@@ -314,47 +324,55 @@ export default function AppHome() {
               </Box>
             </div>
 
-            {/* Row 3: Your Style shortcuts + Your Rankings (only if user has ratings) */}
-            {hotRange.length > 0 && (
-              <>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <div>
-                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>Quick Access</p>
-                      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', margin: 0 }}>Your Style</h2>
+            {/* Row 3: Your Style shortcuts + Your Rankings — auth-only */}
+            {me ? (
+              hotRange.length > 0 && (
+                <>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <div>
+                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>Quick Access</p>
+                        <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', margin: 0 }}>Your Style</h2>
+                      </div>
+                      <a href="/ranked" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</a>
                     </div>
-                    <a href="/ranked" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</a>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                      {hotRange.slice(0, 8).map((item: any, i: number) => (
+                        <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
+                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                      ))}
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                    {hotRange.slice(0, 8).map((item: any, i: number) => (
-                      <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
-                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                    ))}
-                  </div>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <Box>
-                    <BoxHeader label="Your Taste" title="Your Rankings" sort={hotSort} onSort={setHotSort} href="/ranked" />
-                    <div style={{ padding: '8px 0' }}>
-                      {sortedHot.slice(0, 10).map((item: any, i: number) => (
-                        <ListRow key={`hr-${i}`} item={item} rank={i + 1}
-                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                      ))}
-                    </div>
-                  </Box>
-                  <Box>
-                    <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} href="/friends-picks" />
-                    <div style={{ padding: '8px 0' }}>
-                      {sortedFriends.slice(0, 10).map((item: any, i: number) => (
-                        <ListRow key={`fp-${i}`} item={item} rank={i + 1}
-                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                      ))}
-                      {sortedFriends.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>Follow people to see their picks</p>}
-                    </div>
-                  </Box>
-                </div>
-              </>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <Box>
+                      <BoxHeader label="Your Taste" title="Your Rankings" sort={hotSort} onSort={setHotSort} href="/ranked" />
+                      <div style={{ padding: '8px 0' }}>
+                        {sortedHot.slice(0, 10).map((item: any, i: number) => (
+                          <ListRow key={`hr-${i}`} item={item} rank={i + 1}
+                            onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                        ))}
+                      </div>
+                    </Box>
+                    <Box>
+                      <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} href="/friends-picks" />
+                      <div style={{ padding: '8px 0' }}>
+                        {sortedFriends.slice(0, 10).map((item: any, i: number) => (
+                          <ListRow key={`fp-${i}`} item={item} rank={i + 1}
+                            onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                        ))}
+                        {sortedFriends.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>Follow people to see their picks</p>}
+                      </div>
+                    </Box>
+                  </div>
+                </>
+              )
+            ) : (
+              <Box style={{ padding: '40px 24px', textAlign: 'center' as const }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>Sign in to see your rankings</p>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', marginBottom: 20 }}>Rate songs and albums to build your personal taste profile</p>
+                <a href="/login" style={{ display: 'inline-block', padding: '10px 28px', borderRadius: 100, background: '#6C63FF', color: '#fff', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>Sign In</a>
+              </Box>
             )}
 
           </div>
