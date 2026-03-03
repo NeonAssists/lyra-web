@@ -34,26 +34,10 @@ export default function RankedPage() {
   };
 
   useEffect(() => {
-    let loaded = false;
-    // Listen for auth changes first — this catches login redirect + token refresh
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (ev === 'SIGNED_OUT') { setUserId(null); setItems([]); setLoading(false); return; }
-      if (session?.user && !loaded) {
-        loaded = true;
-        setUserId(session.user.id);
-        await fetchRankings(session.user.id);
-      }
-    });
-    // Also try getSession for instant hydration
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user && !loaded) {
-        loaded = true;
-        setUserId(session.user.id);
-        await fetchRankings(session.user.id);
-      } else if (!session?.user) {
-        // Give onAuthStateChange 2s to fire before showing empty
-        setTimeout(() => { if (!loaded) setLoading(false); }, 2000);
-      }
+      if (ev === 'SIGNED_OUT' || !session?.user) { setUserId(null); setItems([]); setLoading(false); return; }
+      setUserId(session.user.id);
+      await fetchRankings(session.user.id);
     });
     return () => subscription.unsubscribe();
   }, []);

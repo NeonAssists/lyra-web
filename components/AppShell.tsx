@@ -22,19 +22,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Use getSession() first — reads from localStorage without a network request.
-    // Guests can browse freely — no redirect when no session.
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const loadProfile = async (uid: string) => {
+      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', uid).single();
+      setMe(p as User);
+    };
+    // onAuthStateChange fires INITIAL_SESSION on first hydration from localStorage
+    // This is the reliable way to detect auth state on page load
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setHydrated(true);
       if (session?.user) {
-        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
-        setMe(p as User);
-      }
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
-        setMe(p as User);
+        loadProfile(session.user.id);
       } else if (event === 'SIGNED_OUT') {
         setMe(null);
       }

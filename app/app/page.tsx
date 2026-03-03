@@ -142,17 +142,12 @@ export default function AppHome() {
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
-        setMe(p as User);
-      }
-    });
+    const loadProfile = async (uid: string) => {
+      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', uid).single();
+      setMe(p as User);
+    };
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (session?.user) {
-        const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
-        setMe(p as User);
-      }
+      if (session?.user) loadProfile(session.user.id);
     });
     return () => subscription.unsubscribe();
   }, []);

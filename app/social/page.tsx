@@ -57,12 +57,8 @@ export default function SocialPage() {
       const { data: f } = await supabase.from('follows').select('followee_id').eq('follower_id', uid);
       setFollowing(new Set((f ?? []).map((x: any) => x.followee_id)));
     };
-    let loaded = false;
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (session?.user && !loaded) { loaded = true; loadUser(session.user.id); }
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !loaded) { loaded = true; loadUser(session.user.id); }
+      if (session?.user) loadUser(session.user.id);
     });
     return () => subscription.unsubscribe();
   }, []);
