@@ -171,21 +171,115 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Feature 2b — Friend Features grid */}
-      <section style={{ padding: '80px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, textAlign: 'center' }}>
-            {[
-              { icon: '\uD83D\uDC40', title: 'See what your friends are rating', desc: 'Real-time feed of ratings from people you follow. No algorithm — just taste you trust.' },
-              { icon: '\uD83E\uDD1D', title: 'Follow music lovers you trust', desc: 'Build your circle. Follow friends, critics, and curators whose taste matches yours.' },
-              { icon: '\uD83D\uDCCB', title: 'Build shared lists together', desc: 'Collaborate on playlists and ranking lists with friends. Compare scores side by side.' },
-            ].map((f, i) => (
-              <div key={`ff-${i}`} style={{ padding: '32px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20 }}>
-                <div style={{ fontSize: 36, marginBottom: 16 }}>{f.icon}</div>
-                <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.3px' }}>{f.title}</h3>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>{f.desc}</p>
+      {/* Feature 2b — Friend Features with app mockups */}
+      <section style={{ padding: '80px 24px 100px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
+        <style>{`
+          .friend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+          @media (max-width: 768px) { .friend-grid { grid-template-columns: 1fr; max-width: 340px; margin: 0 auto; } }
+        `}</style>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
+          <div className="friend-grid">
+
+            {/* Mock 1: Friend Activity Feed */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+                <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Activity</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>Friend Ratings</p>
+                </div>
+                {[
+                  { handle: 'maya', name: 'Maya Chen', song: 'luther', artist: 'Kendrick Lamar', rating: 9.2, color: '#22c55e' },
+                  { handle: 'ari', name: 'Ari M', song: 'Birds of a Feather', artist: 'Billie Eilish', rating: 8.7, color: '#4ade80' },
+                  { handle: 'ethan', name: 'Ethan S', song: 'Fortnight', artist: 'Taylor Swift', rating: 7.4, color: '#eab308' },
+                  { handle: 'turbo', name: 'Turbo', song: 'Not Like Us', artist: 'Kendrick Lamar', rating: 9.8, color: '#a855f7' },
+                ].map((item, i) => (
+                  <div key={`feed-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${item.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: item.color }}>{item.handle[0].toUpperCase()}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{item.handle} rated <span style={{ color: 'rgba(255,255,255,0.5)' }}>{item.song}</span></p>
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{item.artist}</p>
+                    </div>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: `${item.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 900, color: item.color }}>{item.rating}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: '-0.3px' }}>See what friends are rating</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Real-time feed. No algorithm, just taste you trust.</p>
+            </div>
+
+            {/* Mock 2: Following / People */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+                <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Social</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>People on Lyra</p>
+                </div>
+                {[
+                  { handle: 'maya_c', name: 'Maya Chen', ratings: 142, following: true, accent: '#6C63FF' },
+                  { handle: 'jpark', name: 'Jonathan P', ratings: 87, following: false, accent: '#6C63FF' },
+                  { handle: 'musicsnob', name: 'musicsnob17', ratings: 231, following: true, accent: '#6C63FF' },
+                  { handle: 'cole', name: 'Cole H', ratings: 64, following: false, accent: '#6C63FF' },
+                ].map((u, i) => (
+                  <div key={`ppl-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(108,99,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#6C63FF' }}>{u.name[0]}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</p>
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>@{u.handle} · {u.ratings} ratings</p>
+                    </div>
+                    <div style={{
+                      padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0,
+                      background: u.following ? 'rgba(108,99,255,0.12)' : '#6C63FF',
+                      color: u.following ? '#6C63FF' : '#fff',
+                      border: u.following ? '1px solid rgba(108,99,255,0.3)' : 'none',
+                    }}>
+                      {u.following ? 'Following' : 'Follow'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: '-0.3px' }}>Follow music lovers you trust</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Build your circle. Curators, friends, critics.</p>
+            </div>
+
+            {/* Mock 3: Shared List */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+                <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Collab</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>Summer 2026 🔥</p>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>by @nate7 + @ari + @ethan</p>
+                </div>
+                {[
+                  { rank: 1, title: 'luther', artist: 'Kendrick Lamar', scores: ['9.2', '8.8', '9.5'], avgColor: '#22c55e' },
+                  { rank: 2, title: 'Birds of a Feather', artist: 'Billie Eilish', scores: ['8.7', '9.1', '7.9'], avgColor: '#4ade80' },
+                  { rank: 3, title: 'Espresso', artist: 'Sabrina Carpenter', scores: ['7.5', '8.2', '8.0'], avgColor: '#eab308' },
+                  { rank: 4, title: 'Not Like Us', artist: 'Kendrick Lamar', scores: ['9.8', '9.4', '9.6'], avgColor: '#a855f7' },
+                ].map((s, i) => (
+                  <div key={`list-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: 'rgba(255,255,255,0.2)', width: 20, textAlign: 'center', flexShrink: 0 }}>{s.rank}</span>
+                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</p>
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{s.artist}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 3, flexShrink: 0 }}>
+                      {s.scores.map((sc, j) => (
+                        <span key={`sc-${i}-${j}`} style={{ fontSize: 10, fontWeight: 800, color: s.avgColor, background: `${s.avgColor}15`, padding: '2px 5px', borderRadius: 6 }}>{sc}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: '-0.3px' }}>Build shared lists together</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>Collab lists with friends. Compare scores side by side.</p>
+            </div>
+
           </div>
         </div>
       </section>
