@@ -124,6 +124,7 @@ export default function AppHome() {
   const [globalSongs, setGlobalSongs] = useState<any[]>([]);
   const [worldSongs, setWorldSongs] = useState<any[]>([]);
   const worldWeek = getCurrentWorldMusicWeek();
+  const [chartTab, setChartTab] = useState<'us' | 'global'>('us');
   const [communityPicks, setCommunityPicks] = useState<any[]>([]);
   const [friendsPicks, setFriendsPicks] = useState<any[]>([]);
   const [hotRange, setHotRange] = useState<any[]>([]);
@@ -385,43 +386,40 @@ export default function AppHome() {
               </div>
             </Box>
 
-            {/* ═══ ROW 4: Charts (US + Global side by side) ═══ */}
+            {/* ═══ ROW 4: New Music + Tabbed Charts ═══ */}
             <div className="dash-grid">
               <Box>
-                <BoxHeader label="Charts" title="🇺🇸 US Top Songs" href="/charts" />
-                <div style={{ padding: '4px 0' }}>
-                  {loading
-                    ? [...Array(6)].map((_, i) => <div key={`usk-${i}`} style={{ height: 40, margin: '3px 14px', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : topSongs.slice(0, 10).map((s: any, i: number) => (
-                        <ListRow key={`us-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
+                <BoxHeader label="Just Released" title="New Music" href="/new-music" />
+                <div className="album-grid-sm" style={{ padding: 10 }}>
+                  {loading ? [...Array(8)].map((_, i) => <div key={`nm-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : newSongs.slice(0, 8).map((s: any, i: number) => (
+                        <GridCard key={`nm-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                 </div>
               </Box>
               <Box>
-                <BoxHeader label="Charts" title="🌍 Global Top Songs" href="/charts" />
+                <BoxHeader label="Charts" title="Top Songs" href="/charts"
+                  extra={
+                    <div style={{ display: 'flex', gap: 3, background: '#1a1a1a', borderRadius: 7, padding: 2 }}>
+                      {(['us', 'global'] as const).map(t => (
+                        <button key={t} onClick={() => setChartTab(t)}
+                          style={{ padding: '3px 10px', borderRadius: 5, fontSize: 10, fontWeight: 700, border: 'none', cursor: 'pointer', background: chartTab === t ? '#6C63FF' : 'transparent', color: chartTab === t ? '#fff' : 'rgba(255,255,255,0.35)' }}>
+                          {t === 'us' ? '🇺🇸 US' : '🌍 Global'}
+                        </button>
+                      ))}
+                    </div>
+                  } />
                 <div style={{ padding: '4px 0' }}>
                   {loading
-                    ? [...Array(6)].map((_, i) => <div key={`gsk-${i}`} style={{ height: 40, margin: '3px 14px', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : globalSongs.slice(0, 10).map((s: any, i: number) => (
-                        <ListRow key={`gl-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
+                    ? [...Array(8)].map((_, i) => <div key={`csk-${i}`} style={{ height: 40, margin: '3px 14px', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : (chartTab === 'us' ? topSongs : globalSongs).slice(0, 10).map((s: any, i: number) => (
+                        <ListRow key={`ch-${chartTab}-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                 </div>
               </Box>
             </div>
-
-            {/* ═══ ROW 5: New Music grid ═══ */}
-            <Box>
-              <BoxHeader label="Just Released" title="New Music" href="/new-music" />
-              <div className="album-grid-sm" style={{ padding: 10 }}>
-                {loading ? [...Array(8)].map((_, i) => <div key={`nm-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
-                  : newSongs.slice(0, 8).map((s: any, i: number) => (
-                      <GridCard key={`nm-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
-                        onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                    ))}
-              </div>
-            </Box>
 
             {/* Guest sign-in prompt */}
             {!isLoggedIn && (
