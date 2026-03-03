@@ -37,7 +37,12 @@ export default function NewAlbumsPage() {
   const [modal, setModal] = useState<ModalItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null)); }, []);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const params = new URLSearchParams(window.location.search);
+    const g = params.get('genre');
+    if (g) setActiveGenre(g);
+  }, []);
 
   useEffect(() => {
     setLoading(true);

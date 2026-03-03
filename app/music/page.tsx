@@ -6,6 +6,7 @@ import AppShell from '@/components/AppShell';
 import { sessionGenre, sessionOffset } from '@/lib/sessionSeed';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import { supabase } from '@/lib/supabase';
+import SeeAllCard from '@/components/SeeAllCard';
 
 const GENRES = [
   { name: 'All',        id: null },
@@ -40,34 +41,7 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
   );
 }
 
-function SeeAllCard({ artworks, label, href }: { artworks: string[]; label: string; href: string }) {
-  const [hov, setHov] = useState(false);
-  const grid = artworks.slice(0, 4);
-  return (
-    <a href={href} style={{ textDecoration: 'none', display: 'block' }}>
-      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-        style={{ background: hov ? '#1c1c1e' : 'transparent', borderRadius: 12, padding: 10, transition: 'background 0.15s', cursor: 'pointer' }}>
-        <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', height: '100%' }}>
-            {grid.map((src, i) => (
-              <div key={i} style={{ position: 'relative', overflow: 'hidden', background: '#2a2a2a' }}>
-                <Image src={src} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes="100px" />
-              </div>
-            ))}
-            {grid.length < 4 && [...Array(4 - grid.length)].map((_, i) => (
-              <div key={`e-${i}`} style={{ background: '#2a2a2a' }} />
-            ))}
-          </div>
-          <div style={{ position: 'absolute', inset: 0, background: hov ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'background 0.15s' }}>
-            <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>→</span>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>See all</span>
-          </div>
-        </div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF', textAlign: 'center' }}>{label}</p>
-      </div>
-    </a>
-  );
-}
+// SeeAllCard now lives in @/components/SeeAllCard — imported above
 
 export default function MusicPage() {
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
@@ -92,8 +66,8 @@ export default function MusicPage() {
   useEffect(() => {
     setLoading(true);
     const url = activeGenre
-      ? `https://itunes.apple.com/us/rss/topalbums/limit=25/genre=${activeGenre}/json`
-      : `https://itunes.apple.com/us/rss/topalbums/limit=25/json`;
+      ? `https://itunes.apple.com/us/rss/topalbums/limit=50/genre=${activeGenre}/json`
+      : `https://itunes.apple.com/us/rss/topalbums/limit=50/json`;
     fetch(url).then(r => r.json()).then(d => {
       const all = (d?.feed?.entry ?? []).map((e: any) => ({
         id: e.id?.attributes?.['im:id'] ?? '',
@@ -101,8 +75,8 @@ export default function MusicPage() {
         artist: e['im:artist']?.label ?? '',
         artwork: getArtworkHiRes(e['im:image']?.[2]?.label ?? ''),
       }));
-      // Offset the visible grid per session so it's not always the same 9
-      const off = sessionOffset(`music_grid_${activeGenre ?? 'all'}`, all.length, 9);
+      // Offset visible grid per session so it rotates on each visit
+      const off = sessionOffset(`music_grid_${activeGenre ?? 'all'}`, all.length, 24);
       const rotated = [...all.slice(off), ...all.slice(0, off)];
       setAlbums(rotated);
       setLoading(false);
@@ -190,15 +164,19 @@ export default function MusicPage() {
 
             {loading ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                {[...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
+                {[...Array(25)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                {albums.slice(0, 9).map((a: any, i: number) => (
+                {albums.slice(0, 24).map((a: any, i: number) => (
                   <AlbumTile key={`${a.id}-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
                     onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                 ))}
-                <SeeAllCard artworks={albums.slice(9, 13).map((a: any) => a.artwork)} label="Browse all" href="/music" />
+                <SeeAllCard
+                  artworks={albums.slice(24, 28).map((a: any) => a.artwork)}
+                  label="See all"
+                  href={activeGenre ? `/new-albums?genre=${activeGenre}` : '/new-albums'}
+                />
               </div>
             )}
           </div>

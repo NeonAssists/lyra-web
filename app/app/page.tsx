@@ -9,6 +9,7 @@ import { ratingColor } from '@/lib/ratingColor';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import AppShell from '@/components/AppShell';
 import { sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
+import SeeAllCard from '@/components/SeeAllCard';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
 type Filter = 'all' | 'songs' | 'albums';
@@ -320,11 +321,16 @@ export default function AppHome() {
                 <Box>
                   <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
                   <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
-                    {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
-                      : newAlbums.slice(0, 10).map((a: any, i: number) => (
-                          <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
-                            onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
-                        ))}
+                    {loading
+                      ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : <>
+                          {newAlbums.slice(0, 9).map((a: any, i: number) => (
+                            <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                              onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
+                          ))}
+                          <SeeAllCard artworks={newAlbums.slice(9, 13).map((a: any) => a.artwork)} label="New Albums" href="/new-albums" />
+                        </>
+                    }
                   </div>
                 </Box>
               )}
