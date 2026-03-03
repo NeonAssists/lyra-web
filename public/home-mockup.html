@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #111; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; display: flex; gap: 24px; padding: 24px; min-height: 100vh; }
+.phone { width: 320px; flex-shrink: 0; }
+.phone-label { color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; opacity: 0.45; }
+.screen { background: #000; border: 2px solid #2a2a2a; border-radius: 40px; overflow: hidden; height: 680px; overflow-y: auto; padding-bottom: 20px; }
+.screen::-webkit-scrollbar { display: none; }
+.status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+.status-txt { color: #fff; font-size: 12px; font-weight: 600; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 0 16px 12px; }
+.nav-title { color: #fff; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+.sh { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.sh-t { color: #fff; font-size: 15px; font-weight: 800; }
+.sh-s { color: #6C63FF; font-size: 11px; font-weight: 700; }
+.sec { padding: 0 16px 18px; }
+.hs { display: flex; gap: 8px; overflow: hidden; }
+.c { width: 80px; flex-shrink: 0; }
+.ca { width: 80px; height: 80px; border-radius: 8px; margin-bottom: 5px; }
+.ct { color: #fff; font-size: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; }
+.g1{background:linear-gradient(135deg,#1a1a2e,#16213e)}.g2{background:linear-gradient(135deg,#2d1b69,#11998e)}.g3{background:linear-gradient(135deg,#360033,#0b8793)}.g4{background:linear-gradient(135deg,#1f4037,#99f2c8)}.g5{background:linear-gradient(135deg,#373b44,#4286f4)}
+.div { height: 1px; background: rgba(255,255,255,0.06); margin: 0 16px 18px; }
+
+/* NEW */
+.cb { width: 110px; flex-shrink: 0; }
+.cba { width: 110px; height: 110px; border-radius: 10px; margin-bottom: 6px; }
+.grp { background: #0d0d0d; border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; margin: 0 16px 14px; overflow: hidden; }
+.gh { padding: 13px 14px 0; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.gl { color: rgba(255,255,255,0.3); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 2px; }
+.gt { color: #fff; font-size: 15px; font-weight: 900; }
+.gsa { color: #6C63FF; font-size: 10px; font-weight: 700; }
+.sr { padding: 0 14px 12px; }
+.srl { color: rgba(255,255,255,0.35); font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 7px; }
+.sd { height: 1px; background: rgba(255,255,255,0.05); margin: 0 14px 12px; }
+.ic { display: flex; gap: 8px; padding: 0 14px 12px; overflow: hidden; }
+.icc { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 9px; min-width: 170px; flex-shrink: 0; }
+.ica { width: 36px; height: 36px; border-radius: 6px; flex-shrink: 0; }
+.ici { flex: 1; overflow: hidden; }
+.ict { color: #fff; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.ics { color: rgba(255,255,255,0.35); font-size: 9px; margin-top: 2px; }
+.icr { color: #6C63FF; font-size: 13px; font-weight: 900; }
+.tog { display: flex; gap: 5px; margin: 0 14px 9px; }
+.tb { flex: 1; padding: 6px; border-radius: 7px; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; }
+.ta { background: #fff; color: #000; }
+.ti { background: #1a1a1a; color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.08); }
+.cl { padding: 0 14px; }
+.cr { display: flex; align-items: center; gap: 9px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.crn { color: rgba(255,255,255,0.25); font-size: 10px; font-weight: 800; width: 16px; text-align: right; flex-shrink: 0; }
+.cra { width: 33px; height: 33px; border-radius: 5px; flex-shrink: 0; }
+.crt { color: #fff; font-size: 11px; font-weight: 700; }
+.crs { color: rgba(255,255,255,0.4); font-size: 9px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="phone-label">← Current (scroll hell)</div>
+  <div class="screen">
+    <div class="status"><span class="status-txt">9:41</span><span class="status-txt">●●●</span></div>
+    <div class="nav"><span class="nav-title">Home</span></div>
+    <div class="sec"><div class="sh"><span class="sh-t">Your Style</span><span class="sh-s">See all →</span></div><div class="hs"><div class="c"><div class="ca g1"></div><div class="ct">Drake</div></div><div class="c"><div class="ca g2"></div><div class="ct">Kendrick</div></div><div class="c"><div class="ca g3"></div><div class="ct">Frank Ocean</div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">Friends' Picks</span><span class="sh-s">See all →</span></div><div class="hs"><div class="c"><div class="ca g2"></div><div class="ct">Blonde</div></div><div class="c"><div class="ca g4"></div><div class="ct">DAMN.</div></div><div class="c"><div class="ca g5"></div><div class="ct">SOS</div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">New Albums</span><span class="sh-s">See all →</span></div><div class="hs"><div class="c"><div class="ca g3"></div><div class="ct">GNX</div></div><div class="c"><div class="ca g1"></div><div class="ct">Chromakopia</div></div><div class="c"><div class="ca g2"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">Community Picks</span></div><div class="hs"><div class="c"><div class="ca g4"></div><div class="ct">Midnights</div></div><div class="c"><div class="ca g5"></div></div><div class="c"><div class="ca g1"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">Friends Are Into</span></div><div class="hs"><div class="c"><div class="ca g5"></div></div><div class="c"><div class="ca g2"></div></div><div class="c"><div class="ca g3"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">New Music</span></div><div class="hs"><div class="c"><div class="ca g1"></div></div><div class="c"><div class="ca g4"></div></div><div class="c"><div class="ca g2"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">🇺🇸 Top 50 US</span></div><div class="hs"><div class="c"><div class="ca g3"></div></div><div class="c"><div class="ca g5"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">🌍 Top 50 Global</span></div><div class="hs"><div class="c"><div class="ca g2"></div></div><div class="c"><div class="ca g1"></div></div></div></div>
+    <div class="div"></div>
+    <div class="sec"><div class="sh"><span class="sh-t">In Common</span></div><div class="hs"><div class="c"><div class="ca g4"></div></div><div class="c"><div class="ca g3"></div></div></div></div>
+  </div>
+</div>
+
+<div class="phone">
+  <div class="phone-label">→ Proposed (grouped)</div>
+  <div class="screen">
+    <div class="status"><span class="status-txt">9:41</span><span class="status-txt">●●●</span></div>
+    <div class="nav"><span class="nav-title">Home</span></div>
+
+    <!-- Your Style - big cards -->
+    <div class="sec"><div class="sh"><div><div style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Your Taste</div><span class="sh-t">Your Style</span></div><span class="sh-s">Edit →</span></div><div class="hs"><div class="cb"><div class="cba g1"></div><div class="ct">Drake</div></div><div class="cb"><div class="cba g2"></div><div class="ct">Kendrick</div></div><div class="cb"><div class="cba g3"></div><div class="ct">Frank Ocean</div></div></div></div>
+
+    <!-- GROUP: From Your Network -->
+    <div class="grp">
+      <div class="gh"><div><div class="gl">Social</div><div class="gt">From Your Network</div></div><span class="gsa">See all →</span></div>
+      <div class="sr"><div class="srl">Friends' Picks · rated 8+</div><div class="hs"><div class="c"><div class="ca g2"></div><div class="ct">Blonde</div></div><div class="c"><div class="ca g4"></div><div class="ct">DAMN.</div></div><div class="c"><div class="ca g5"></div><div class="ct">SOS</div></div></div></div>
+      <div class="sd"></div>
+      <div class="sr"><div class="srl">Friends Are Into · this week</div><div class="hs"><div class="c"><div class="ca g3"></div><div class="ct">GNX</div></div><div class="c"><div class="ca g1"></div><div class="ct">Chromakopia</div></div><div class="c"><div class="ca g5"></div></div></div></div>
+      <div class="sd"></div>
+      <div><div style="padding:0 14px;margin-bottom:7px" class="srl">In Common · you both ranked these</div><div class="ic"><div class="icc"><div class="ica g2"></div><div class="ici"><div class="ict">Blonde</div><div class="ics">@ari · @g rated this</div></div><div class="icr">9.2</div></div><div class="icc"><div class="ica g1"></div><div class="ici"><div class="ict">DAMN.</div><div class="ics">@ethan · @turbo</div></div><div class="icr">8.7</div></div></div></div>
+    </div>
+
+    <!-- Community Picks standalone -->
+    <div class="sec"><div class="sh"><div><div style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Community</div><span class="sh-t">Community Picks</span></div><span class="sh-s">See all →</span></div><div class="hs"><div class="c"><div class="ca g4"></div><div class="ct">Midnights</div></div><div class="c"><div class="ca g5"></div><div class="ct">GNX</div></div><div class="c"><div class="ca g1"></div></div></div></div>
+
+    <!-- New Albums big cards -->
+    <div class="sec" style="padding-top:2px"><div class="sh"><div><div style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">Browse</div><span class="sh-t">New Albums</span></div><span class="sh-s">See all →</span></div><div class="hs"><div class="cb"><div class="cba g3"></div><div class="ct">GNX</div></div><div class="cb"><div class="cba g2"></div><div class="ct">Chromakopia</div></div><div class="cb"><div class="cba g4"></div><div class="ct">Cowboy Carter</div></div></div></div>
+
+    <!-- Charts — one block with toggle -->
+    <div class="grp">
+      <div class="gh" style="margin-bottom:9px"><div><div class="gl">Charts</div><div class="gt">Top 50</div></div><span class="gsa">See all →</span></div>
+      <div class="tog"><div class="tb ta">🇺🇸 US</div><div class="tb ti">🌍 Global</div></div>
+      <div class="cl">
+        <div class="cr"><span class="crn">1</span><div class="cra g1"></div><div><div class="crt">Not Like Us</div><div class="crs">Kendrick Lamar</div></div></div>
+        <div class="cr"><span class="crn">2</span><div class="cra g2"></div><div><div class="crt">Luther</div><div class="crs">Kendrick & SZA</div></div></div>
+        <div class="cr"><span class="crn">3</span><div class="cra g3"></div><div><div class="crt">Die With A Smile</div><div class="crs">Lady Gaga & Bruno</div></div></div>
+        <div class="cr"><span class="crn">4</span><div class="cra g4"></div><div><div class="crt">APT.</div><div class="crs">ROSÉ & Bruno Mars</div></div></div>
+        <div class="cr"><span class="crn">5</span><div class="cra g5"></div><div><div class="crt">Espresso</div><div class="crs">Sabrina Carpenter</div></div></div>
+      </div>
+      <div style="height:10px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Notes -->
+<div style="width:200px;flex-shrink:0;padding-top:44px;display:flex;flex-direction:column;gap:16px">
+  <div style="background:#6C63FF20;border:1px solid #6C63FF40;border-radius:10px;padding:10px">
+    <div style="color:#6C63FF;font-size:10px;font-weight:800;margin-bottom:5px">① YOUR STYLE</div>
+    <div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.5">Bigger cards (110px). No change to content — just more visual weight to signal it's priority.</div>
+  </div>
+  <div style="background:#6C63FF20;border:1px solid #6C63FF40;border-radius:10px;padding:10px">
+    <div style="color:#6C63FF;font-size:10px;font-weight:800;margin-bottom:5px">② FROM YOUR NETWORK</div>
+    <div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.5">Friends' Picks + Friends Are Into + In Common in ONE block. 3 section headers → 1. In Common uses wider cards with @handle + score inline.</div>
+  </div>
+  <div style="background:#6C63FF20;border:1px solid #6C63FF40;border-radius:10px;padding:10px">
+    <div style="color:#6C63FF;font-size:10px;font-weight:800;margin-bottom:5px">③ CHARTS TOGGLE</div>
+    <div style="color:rgba(255,255,255,0.6);font-size:11px;line-height:1.5">US + Global in ONE block. Toggle pill switches between them. List view (not cards) — more info density, less scroll.</div>
+  </div>
+  <div style="background:#11#111;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px">
+    <div style="color:#fff;font-size:10px;font-weight:800;margin-bottom:5px">NET RESULT</div>
+    <div style="color:rgba(255,255,255,0.5);font-size:11px;line-height:1.5">Same content. ~40% shorter scroll. Community Picks, New Music, World Music still get full standalone sections below.</div>
+  </div>
+</div>
+
+</body>
+</html>
