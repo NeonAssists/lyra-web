@@ -60,7 +60,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
         }}>
           <div style={{ padding: '28px 24px 20px' }}>
-            <Link href="/app" style={{ textDecoration: 'none' }}>
+            <Link href="/" style={{ textDecoration: 'none' }}>
               <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>Lyra</span>
             </Link>
           </div>
@@ -110,6 +110,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <Link href={`/u/${me.handle}`} onClick={() => setUserMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', color: '#fff', textDecoration: 'none', fontSize: 14 }}>
                     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     View Profile
+                  </Link>
+                  <Link href="/account" onClick={() => setUserMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', color: '#fff', textDecoration: 'none', fontSize: 14 }}>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Account & Billing
                   </Link>
                   <div style={{ height: 1, background: 'rgba(255,255,255,0.08)' }} />
                   <button onClick={signOut} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', color: '#FF453A', background: 'none', border: 'none', cursor: 'pointer', width: '100%', fontSize: 14, textAlign: 'left' }}>
