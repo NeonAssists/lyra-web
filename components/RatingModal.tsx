@@ -59,6 +59,9 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
   const [note, setNote] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagsExpanded, setTagsExpanded] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
+  const [credits, setCredits] = useState<{ label: string; names: string[] }[]>([]);
+  const [creditsLoading, setCreditsLoading] = useState(false);
   const [liked, setLiked] = useState(false);
   const [listenLater, setListenLater] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -75,6 +78,7 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
     }
     setRating(0); setRatingInput(''); setIsEditing(false);
     setNote(''); setSelectedTags([]); setTagsExpanded(false);
+    setCreditsOpen(false); setCredits([]); setCreditsLoading(false);
     setSaved(false); setLiked(false); setListenLater(false);
 
     if (!userId) return;
@@ -118,6 +122,37 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
       } catch {}
     })();
   }, [open, item?.id, userId]);
+
+  // Fetch credits from Genius when credits panel opens
+  useEffect(() => {
+    if (!creditsOpen || !item || credits.length > 0) return;
+    setCreditsLoading(true);
+    const geniusToken = 'QOq2DOUYlcO6KKc--0vv5nP-HWf77mutVRkxsp5LhjqtJamZ7KLURBZDU-TWSNan';
+    fetch(`https://api.genius.com/search?q=${encodeURIComponent(item.title + ' ' + item.artist)}&per_page=1`, {
+      headers: { Authorization: `Bearer ${geniusToken}` },
+    })
+      .then(r => r.json())
+      .then(async (d) => {
+        const hit = d?.response?.hits?.[0]?.result;
+        if (!hit?.id) { setCreditsLoading(false); return; }
+        const songRes = await fetch(`https://api.genius.com/songs/${hit.id}`, { headers: { Authorization: `Bearer ${geniusToken}` } });
+        const songData = await songRes.json();
+        const song = songData?.response?.song;
+        if (!song) { setCreditsLoading(false); return; }
+        const creds: { label: string; names: string[] }[] = [];
+        if (song.producer_artists?.length) creds.push({ label: 'Producers', names: song.producer_artists.map((a: any) => a.name) });
+        if (song.writer_artists?.length) creds.push({ label: 'Writers', names: song.writer_artists.map((a: any) => a.name) });
+        const customPerfs = song.custom_performances;
+        if (customPerfs?.length) {
+          customPerfs.forEach((cp: any) => {
+            if (cp.artists?.length) creds.push({ label: cp.label, names: cp.artists.map((a: any) => a.name) });
+          });
+        }
+        setCredits(creds);
+        setCreditsLoading(false);
+      })
+      .catch(() => setCreditsLoading(false));
+  }, [creditsOpen, item?.id]);
 
   // Escape to close
   useEffect(() => {
@@ -310,44 +345,67 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
             </div>
           </div>
 
-          {/* Action pills */}
-          {userId && (
-            <div style={{ display: 'flex', gap: 8, paddingTop: 14, paddingBottom: 8 }}>
-              <button className="rm-pill" onClick={handleLike} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                padding: '8px 6px', borderRadius: 14, cursor: 'pointer',
-                border: liked ? '1px solid #FF3B6F' : '1px solid rgba(255,255,255,0.08)',
-                background: liked ? 'rgba(255,59,111,0.08)' : 'rgba(255,255,255,0.03)',
-                color: liked ? '#FF3B6F' : 'rgba(255,255,255,0.45)',
-                fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
-              }}>
-                <span style={{ fontSize: 16 }}>{liked ? '❤️' : '🤍'}</span>
-                {liked ? 'Liked' : 'Like'}
-              </button>
-              <button className="rm-pill" onClick={handleListenLater} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                padding: '8px 6px', borderRadius: 14, cursor: 'pointer',
-                border: listenLater ? '1px solid #4A9EFF' : '1px solid rgba(255,255,255,0.08)',
-                background: listenLater ? 'rgba(74,158,255,0.08)' : 'rgba(255,255,255,0.03)',
-                color: listenLater ? '#4A9EFF' : 'rgba(255,255,255,0.45)',
-                fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
-              }}>
-                <span style={{ fontSize: 16 }}>{listenLater ? '🕐' : '🕐'}</span>
-                {listenLater ? 'Saved' : 'Later'}
-              </button>
-              <button className="rm-pill" onClick={() => setTagsExpanded(v => !v)} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                padding: '8px 6px', borderRadius: 14, cursor: 'pointer',
-                border: tagsExpanded ? '1px solid #6C63FF' : '1px solid rgba(255,255,255,0.08)',
-                background: tagsExpanded ? 'rgba(108,99,255,0.08)' : 'rgba(255,255,255,0.03)',
-                color: tagsExpanded ? '#6C63FF' : 'rgba(255,255,255,0.45)',
-                fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
-              }}>
-                <span style={{ fontSize: 16 }}>🏷️</span>
-                Tags{selectedTags.length > 0 && ` (${selectedTags.length})`}
-              </button>
-            </div>
-          )}
+          {/* Action pills — always visible, functional when logged in */}
+          <div style={{ display: 'flex', gap: 6, paddingTop: 14, paddingBottom: 8 }}>
+            <button className="rm-pill" onClick={userId ? handleLike : undefined} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '8px 4px', borderRadius: 14, cursor: userId ? 'pointer' : 'default',
+              border: liked ? '1px solid #FF3B6F' : '1px solid rgba(255,255,255,0.08)',
+              background: liked ? 'rgba(255,59,111,0.08)' : 'rgba(255,255,255,0.03)',
+              color: liked ? '#FF3B6F' : 'rgba(255,255,255,0.45)',
+              fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+              opacity: userId ? 1 : 0.4,
+            }}>
+              <span style={{ fontSize: 15 }}>{liked ? '❤️' : '🤍'}</span>
+              {liked ? 'Liked' : 'Like'}
+            </button>
+            <button className="rm-pill" onClick={userId ? handleListenLater : undefined} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '8px 4px', borderRadius: 14, cursor: userId ? 'pointer' : 'default',
+              border: listenLater ? '1px solid #4A9EFF' : '1px solid rgba(255,255,255,0.08)',
+              background: listenLater ? 'rgba(74,158,255,0.08)' : 'rgba(255,255,255,0.03)',
+              color: listenLater ? '#4A9EFF' : 'rgba(255,255,255,0.45)',
+              fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+              opacity: userId ? 1 : 0.4,
+            }}>
+              <span style={{ fontSize: 15 }}>🕐</span>
+              {listenLater ? 'Saved' : 'Later'}
+            </button>
+            <button className="rm-pill" style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '8px 4px', borderRadius: 14, cursor: userId ? 'pointer' : 'default',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(255,255,255,0.03)',
+              color: 'rgba(255,255,255,0.45)',
+              fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+              opacity: userId ? 1 : 0.4,
+            }}>
+              <span style={{ fontSize: 15 }}>📋</span>
+              List
+            </button>
+            <button className="rm-pill" onClick={() => setTagsExpanded(v => !v)} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '8px 4px', borderRadius: 14, cursor: 'pointer',
+              border: tagsExpanded ? '1px solid #6C63FF' : '1px solid rgba(255,255,255,0.08)',
+              background: tagsExpanded ? 'rgba(108,99,255,0.08)' : 'rgba(255,255,255,0.03)',
+              color: tagsExpanded ? '#6C63FF' : 'rgba(255,255,255,0.45)',
+              fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+            }}>
+              <span style={{ fontSize: 15 }}>🏷️</span>
+              Tags{selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}
+            </button>
+            <button className="rm-pill" onClick={() => setCreditsOpen(v => !v)} style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+              padding: '8px 4px', borderRadius: 14, cursor: 'pointer',
+              border: creditsOpen ? '1px solid #6C63FF' : '1px solid rgba(255,255,255,0.08)',
+              background: creditsOpen ? 'rgba(108,99,255,0.08)' : 'rgba(255,255,255,0.03)',
+              color: creditsOpen ? '#6C63FF' : 'rgba(255,255,255,0.45)',
+              fontSize: 11, fontWeight: 600, transition: 'all 0.15s',
+            }}>
+              <span style={{ fontSize: 15 }}>🎼</span>
+              Credits
+            </button>
+          </div>
 
           {/* Tags */}
           {tagsExpanded && (
@@ -364,6 +422,26 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
                   {tag}
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* Credits */}
+          {creditsOpen && (
+            <div style={{ padding: '8px 0 12px' }}>
+              {creditsLoading ? (
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>Loading credits…</p>
+              ) : credits.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {credits.map((c, i) => (
+                    <div key={`cred-${i}`} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '10px 14px' }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>{c.label}</p>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>{c.names.join(', ')}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', textAlign: 'center', padding: '8px 0' }}>No credits found</p>
+              )}
             </div>
           )}
 

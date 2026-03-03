@@ -302,13 +302,26 @@ export default function AppHome() {
                     </button>
                   ))}
                 </div>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '8px 0' }}>
-                  {loading
-                    ? [...Array(8)].map((_, i) => <div key={`csk-${i}`} style={{ height: 48, margin: '4px 16px', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : (chartTab === 'us' ? topSongs : globalSongs).slice(0, 10).map((s: any, i: number) => (
-                        <ListRow key={`ts-${chartTab}-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
-                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                      ))}
+                {/* Side-by-side US + Global lists */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', padding: '8px 0' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', padding: '4px 16px 6px', display: chartTab === 'us' ? 'none' : 'block' }}>🇺🇸 US</p>
+                    {loading
+                      ? [...Array(5)].map((_, i) => <div key={`usk-${i}`} style={{ height: 44, margin: '3px 12px', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : topSongs.slice(0, 15).map((s: any, i: number) => (
+                          <ListRow key={`us-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                            onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                        ))}
+                  </div>
+                  <div style={{ padding: '8px 0' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', padding: '4px 16px 6px', display: chartTab === 'global' ? 'none' : 'block' }}>🌍 Global</p>
+                    {loading
+                      ? [...Array(5)].map((_, i) => <div key={`gsk-${i}`} style={{ height: 44, margin: '3px 12px', background: '#1c1c1e', borderRadius: 8 }} />)
+                      : globalSongs.slice(0, 15).map((s: any, i: number) => (
+                          <ListRow key={`gl-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                            onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                        ))}
+                  </div>
                 </div>
               </Box>
               <Box>

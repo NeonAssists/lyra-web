@@ -33,13 +33,13 @@ export default function RankedPage() {
   };
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { router.push('/login'); return; }
-      setUserId(data.user.id);
-      await fetchRankings(data.user.id);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) { setLoading(false); return; }
+      setUserId(session.user.id);
+      await fetchRankings(session.user.id);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (ev === 'SIGNED_OUT') router.push('/login');
+      if (ev === 'SIGNED_OUT') { setUserId(null); setItems([]); }
       else if (session?.user) { setUserId(session.user.id); fetchRankings(session.user.id); }
     });
     return () => subscription.unsubscribe();

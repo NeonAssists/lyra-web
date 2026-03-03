@@ -51,11 +51,11 @@ export default function SocialPage() {
   };
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return;
-      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', data.user.id).single();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) return;
+      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
       setMe(p as Profile);
-      const { data: f } = await supabase.from('follows').select('followee_id').eq('follower_id', data.user.id);
+      const { data: f } = await supabase.from('follows').select('followee_id').eq('follower_id', session.user.id);
       setFollowing(new Set((f ?? []).map((x: any) => x.followee_id)));
     });
   }, []);

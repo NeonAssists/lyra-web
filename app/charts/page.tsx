@@ -6,6 +6,8 @@ import AppShell from '@/components/AppShell';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import { supabase } from '@/lib/supabase';
 
+type ChartTab = 'us-songs' | 'us-albums' | 'global-songs' | 'global-albums';
+
 function getHiRes(url: string) { return url?.replace('100x100bb', '600x600bb') ?? ''; }
 function toItemId(id: string, type: 'song' | 'album') { return type === 'album' ? `itunes:alb:${id}` : `itunes:trk:${id}`; }
 
@@ -26,9 +28,16 @@ function ChartCard({ artwork, title, artist, rank, onClick }: { artwork: string;
   );
 }
 
+const TABS: { key: ChartTab; label: string; icon: string }[] = [
+  { key: 'us-songs', label: 'US Songs', icon: '🇺🇸' },
+  { key: 'us-albums', label: 'US Albums', icon: '🇺🇸' },
+  { key: 'global-songs', label: 'Global Songs', icon: '🌍' },
+  { key: 'global-albums', label: 'Global Albums', icon: '🌍' },
+];
+
 export default function ChartsPage() {
-  const [topSongs, setTopSongs] = useState<any[]>([]);
-  const [topAlbums, setTopAlbums] = useState<any[]>([]);
+  const [tab, setTab] = useState<ChartTab>('us-songs');
+  const [data, setData] = useState<Record<ChartTab, any[]>>({ 'us-songs': [], 'us-albums': [], 'global-songs': [], 'global-albums': [] });
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
@@ -52,12 +61,22 @@ export default function ChartsPage() {
     Promise.all([
       safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json'),
       safeFetch('https://itunes.apple.com/us/rss/topalbums/limit=50/json'),
-    ]).then(([songs, albums]) => {
-      setTopSongs((songs?.feed?.entry ?? []).map(map));
-      setTopAlbums((albums?.feed?.entry ?? []).map(map));
+      safeFetch('https://itunes.apple.com/gb/rss/topsongs/limit=50/json'),
+      safeFetch('https://itunes.apple.com/gb/rss/topalbums/limit=50/json'),
+    ]).then(([usSongs, usAlbums, gbSongs, gbAlbums]) => {
+      setData({
+        'us-songs': (usSongs?.feed?.entry ?? []).map(map),
+        'us-albums': (usAlbums?.feed?.entry ?? []).map(map),
+        'global-songs': (gbSongs?.feed?.entry ?? []).map(map),
+        'global-albums': (gbAlbums?.feed?.entry ?? []).map(map),
+      });
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  const isAlbum = tab.includes('albums');
+  const items = data[tab];
+  const tabInfo = TABS.find(t => t.key === tab)!;
 
   return (
     <AppShell>
@@ -67,50 +86,49 @@ export default function ChartsPage() {
       `}</style>
       <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
-        <div style={{ marginBottom: 40 }}>
+        <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>Charts</h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>What the US is listening to right now</p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>What the world is listening to right now</p>
         </div>
 
-        {/* Top 50 Songs */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Songs</p>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top 50 Songs</h2>
-          </div>
-          {loading ? (
-            <div className="charts-grid">
-              {[...Array(10)].map((_, i) => <div key={`ss-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
-            </div>
-          ) : (
-            <div className="charts-grid">
-              {topSongs.map((s: any, i: number) => (
-                <ChartCard key={`cs-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist} rank={i + 1}
-                  onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-              ))}
-            </div>
-          )}
+        {/* 4 tabs */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 28, flexWrap: 'wrap' }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              style={{
+                padding: '8px 18px', borderRadius: 24, fontSize: 13, fontWeight: 700,
+                border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+                background: tab === t.key ? '#6C63FF' : 'rgba(255,255,255,0.06)',
+                color: tab === t.key ? '#fff' : 'rgba(255,255,255,0.45)',
+              }}>
+              {t.icon} {t.label}
+            </button>
+          ))}
         </div>
 
-        {/* Top 50 Albums */}
-        <div>
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Albums</p>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top 50 Albums</h2>
-          </div>
-          {loading ? (
-            <div className="charts-grid">
-              {[...Array(10)].map((_, i) => <div key={`sa-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
-            </div>
-          ) : (
-            <div className="charts-grid">
-              {topAlbums.map((a: any, i: number) => (
-                <ChartCard key={`ca-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} rank={i + 1}
-                  onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
-              ))}
-            </div>
-          )}
+        {/* Title for active tab */}
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+            {isAlbum ? 'Albums' : 'Songs'}
+          </p>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
+            {tabInfo.icon} Top 50 {tabInfo.label}
+          </h2>
         </div>
+
+        {/* Grid */}
+        {loading ? (
+          <div className="charts-grid">
+            {[...Array(10)].map((_, i) => <div key={`sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
+          </div>
+        ) : (
+          <div className="charts-grid">
+            {items.map((item: any, i: number) => (
+              <ChartCard key={`c-${tab}-${i}-${item.id}`} artwork={item.artwork} title={item.title} artist={item.artist} rank={i + 1}
+                onClick={() => open({ id: toItemId(item.id, isAlbum ? 'album' : 'song'), title: item.title, artist: item.artist, artwork: item.artwork, type: isAlbum ? 'album' : 'song' })} />
+            ))}
+          </div>
+        )}
       </div>
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId} />
