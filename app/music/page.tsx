@@ -27,15 +27,53 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
   const [hov, setHov] = useState(false);
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', transition: 'background 0.15s', width: '100%' }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
+      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', width: '100%', position: 'relative', zIndex: hov ? 10 : 1 }}>
+      <div style={{
+        position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
+        background: '#1c1c1e', marginBottom: 10,
+        transform: hov ? 'scale(1.07)' : 'scale(1)',
+        transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)',
+        boxShadow: hov ? '0 16px 40px rgba(0,0,0,0.7)' : '0 2px 8px rgba(0,0,0,0.3)',
+      }}>
         {artwork
           ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="200px" />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 28 }}>♪</div>}
       </div>
-      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{title}</p>
+      <p style={{ fontSize: 13, fontWeight: 600, color: hov ? '#fff' : 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3, transition: 'color 0.15s' }}>{title}</p>
       <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
     </button>
+  );
+}
+
+function SeeAllCard({ artworks, href }: { artworks: string[]; href: string }) {
+  const [hov, setHov] = useState(false);
+  const grid = artworks.slice(0, 4);
+  return (
+    <Link href={href} style={{ textDecoration: 'none' }}>
+      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        style={{ padding: 10, borderRadius: 12, background: hov ? '#1c1c1e' : 'transparent', transition: 'background 0.15s', cursor: 'pointer' }}>
+        <div style={{
+          position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
+          background: '#1c1c1e', marginBottom: 10,
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2,
+          transform: hov ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.2s ease',
+          boxShadow: hov ? '0 12px 32px rgba(0,0,0,0.6)' : '0 2px 8px rgba(0,0,0,0.3)',
+        }}>
+          {grid.map((src, i) => (
+            <div key={i} style={{ position: 'relative', width: '100%', height: '100%', background: '#2a2a2a' }}>
+              <Image src={src} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes="100px" />
+            </div>
+          ))}
+          {grid.length < 4 && [...Array(4 - grid.length)].map((_, i) => (
+            <div key={`e-${i}`} style={{ background: '#2a2a2a' }} />
+          ))}
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>See all →</span>
+          </div>
+        </div>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF', textAlign: 'center' }}>Browse all</p>
+      </div>
+    </Link>
   );
 }
 
@@ -157,10 +195,11 @@ export default function MusicPage() {
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                {albums.map((a: any, i: number) => (
+                {albums.slice(0, 9).map((a: any, i: number) => (
                   <AlbumTile key={`${a.id}-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
                     onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                 ))}
+                <SeeAllCard artworks={albums.slice(9, 13).map((a: any) => a.artwork)} href="/music" />
               </div>
             )}
           </div>
