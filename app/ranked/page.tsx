@@ -247,7 +247,6 @@ export default function RankedPage() {
         </div>
         </div>
         </div>
-        </div>
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={userId}
         onSaved={() => { if (userId) fetchRankings(userId); }} />
