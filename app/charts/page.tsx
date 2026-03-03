@@ -42,6 +42,7 @@ export default function ChartsPage() {
   const [data, setData] = useState<Record<ChartTab, any[]>>({ 'us-songs': [], 'us-albums': [], 'global-songs': [], 'global-albums': [] });
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'high' | 'low'>('high');
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
@@ -77,7 +78,8 @@ export default function ChartsPage() {
   }, []);
 
   const isAlbum = tab.includes('albums');
-  const items = data[tab];
+  const rawItems = data[tab];
+  const items = sortDir === 'low' ? [...rawItems].reverse() : rawItems;
   const tabInfo = TABS.find(t => t.key === tab)!;
 
   return (
@@ -105,13 +107,23 @@ export default function ChartsPage() {
         </div>
 
         {/* Header */}
-        <div style={{ marginBottom: 16, padding: '0 20px' }}>
-          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
-            {isAlbum ? 'Albums' : 'Songs'}
-          </p>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
-            {tabInfo.icon} Top 50 {tabInfo.label}
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, padding: '0 20px' }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+              {isAlbum ? 'Albums' : 'Songs'}
+            </p>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
+              {tabInfo.icon} Top 50 {tabInfo.label}
+            </h2>
+          </div>
+          <div style={{ display: 'flex', gap: 4, background: '#1a1a1a', borderRadius: 8, padding: 3 }}>
+            {(['high', 'low'] as const).map(d => (
+              <button key={d} onClick={() => setSortDir(d)}
+                style={{ padding: '5px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: sortDir === d ? '#6C63FF' : 'transparent', color: sortDir === d ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {d === 'high' ? '↑ High' : '↓ Low'}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* List view */}
@@ -129,7 +141,7 @@ export default function ChartsPage() {
             ))
           ) : (
             items.map((item: any, i: number) => (
-              <ListRow key={`c-${tab}-${i}-${item.id}`} artwork={item.artwork} title={item.title} artist={item.artist} rank={i + 1}
+              <ListRow key={`c-${tab}-${i}-${item.id}`} artwork={item.artwork} title={item.title} artist={item.artist} rank={sortDir === 'high' ? i + 1 : rawItems.length - i}
                 onClick={() => open({ id: toItemId(item.id, isAlbum ? 'album' : 'song'), title: item.title, artist: item.artist, artwork: item.artwork, type: isAlbum ? 'album' : 'song' })} />
             ))
           )}
