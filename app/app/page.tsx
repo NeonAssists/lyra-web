@@ -240,15 +240,7 @@ export default function AppHome() {
           </div>
         </div>
 
-        {/* Filter chips */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
-          {(['all', 'songs', 'albums'] as Filter[]).map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              style={{ padding: '6px 16px', borderRadius: 100, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: filter === f ? '#fff' : '#2a2a2a', color: filter === f ? '#000' : '#fff', textTransform: 'capitalize' }}>
-              {f}
-            </button>
-          ))}
-        </div>
+        {/* Filter chips — removed; all content always visible */}
 
         {query ? (
           // Search view
@@ -269,29 +261,80 @@ export default function AppHome() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* Your Style shortcut row */}
-            {hotRange.length > 0 && filter !== 'albums' && (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>Quick Access</p>
-                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', margin: 0 }}>Your Style</h2>
-                  </div>
-                  <a href="/ranked" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</a>
+            {/* Row 1: Top 50 + New Albums — ALWAYS visible, music-first */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 16 }}>
+              <Box>
+                <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/top50" />
+                <div style={{ padding: '8px 0' }}>
+                  {loading
+                    ? [...Array(8)].map((_, i) => <div key={i} style={{ height: 48, margin: '4px 16px', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : topSongs.slice(0, 10).map((s: any, i: number) => (
+                        <ListRow key={`ts-${i}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                      ))}
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-                  {hotRange.slice(0, 8).map((item: any, i: number) => (
-                    <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
+              </Box>
+              <Box>
+                <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
+                <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
+                  {loading
+                    ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : <>
+                        {newAlbums.slice(0, 9).map((a: any, i: number) => (
+                          <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                            onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
+                        ))}
+                        <SeeAllCard artworks={newAlbums.slice(9, 13).map((a: any) => a.artwork)} label="New Albums" href="/new-albums" />
+                      </>
+                  }
+                </div>
+              </Box>
+            </div>
+
+            {/* Row 2: New Music grid + Community Picks */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <Box>
+                <BoxHeader label="Just Released" title="New Music" href="/new-music" />
+                <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
+                  {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : newSongs.slice(0, 10).map((s: any, i: number) => (
+                        <GridCard key={`nm-${i}`} artwork={s.artwork} title={s.title} artist={s.artist}
+                          onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
+                      ))}
+                </div>
+              </Box>
+              <Box>
+                <BoxHeader label="Community" title="Community Picks" sort={communitySort} onSort={setCommunitySort} href="/community-picks" />
+                <div style={{ padding: '8px 0' }}>
+                  {sortedCommunity.slice(0, 10).map((item: any, i: number) => (
+                    <ListRow key={`cp-${i}`} item={item} rank={i + 1}
                       onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
                   ))}
+                  {sortedCommunity.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>No community picks yet</p>}
                 </div>
-              </div>
-            )}
+              </Box>
+            </div>
 
-            {/* Row 1: Your Rankings (wide) + Community Picks */}
-            {(filter === 'all' || filter === 'songs') && (
-              <div style={{ display: 'grid', gridTemplateColumns: hotRange.length > 0 ? '1fr 1fr' : '1fr', gap: 16 }}>
-                {hotRange.length > 0 && (
+            {/* Row 3: Your Style shortcuts + Your Rankings (only if user has ratings) */}
+            {hotRange.length > 0 && (
+              <>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <div>
+                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>Quick Access</p>
+                      <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', margin: 0 }}>Your Style</h2>
+                    </div>
+                    <a href="/ranked" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</a>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                    {hotRange.slice(0, 8).map((item: any, i: number) => (
+                      <ShortcutCard key={`sc-${i}`} artwork={item.artwork_url ?? ''} title={item.title}
+                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   <Box>
                     <BoxHeader label="Your Taste" title="Your Rankings" sort={hotSort} onSort={setHotSort} href="/ranked" />
                     <div style={{ padding: '8px 0' }}>
@@ -301,76 +344,18 @@ export default function AppHome() {
                       ))}
                     </div>
                   </Box>
-                )}
-                <Box>
-                  <BoxHeader label="Community" title="Community Picks" sort={communitySort} onSort={setCommunitySort} href="/community-picks" />
-                  <div style={{ padding: '8px 0' }}>
-                    {sortedCommunity.slice(0, 10).map((item: any, i: number) => (
-                      <ListRow key={`cp-${i}`} item={item} rank={i + 1}
-                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                    ))}
-                    {sortedCommunity.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>No picks yet</p>}
-                  </div>
-                </Box>
-              </div>
-            )}
-
-            {/* Row 2: New Albums (wide grid) + Friends' Picks */}
-            <div style={{ display: 'grid', gridTemplateColumns: filter === 'all' ? '1.5fr 1fr' : '1fr', gap: 16 }}>
-              {(filter === 'all' || filter === 'albums') && (
-                <Box>
-                  <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
-                  <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
-                    {loading
-                      ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
-                      : <>
-                          {newAlbums.slice(0, 9).map((a: any, i: number) => (
-                            <GridCard key={`na-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
-                              onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
-                          ))}
-                          <SeeAllCard artworks={newAlbums.slice(9, 13).map((a: any) => a.artwork)} label="New Albums" href="/new-albums" />
-                        </>
-                    }
-                  </div>
-                </Box>
-              )}
-              {(filter === 'all' || filter === 'songs') && (
-                <Box>
-                  <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} href="/friends-picks" />
-                  <div style={{ padding: '8px 0' }}>
-                    {sortedFriends.slice(0, 10).map((item: any, i: number) => (
-                      <ListRow key={`fp-${i}`} item={item} rank={i + 1}
-                        onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                    ))}
-                    {sortedFriends.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>Follow people to see their picks</p>}
-                  </div>
-                </Box>
-              )}
-            </div>
-
-            {/* Row 3: New Music grid + Top 50 list */}
-            {(filter === 'all' || filter === 'songs') && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <Box>
-                  <BoxHeader label="Just Released" title="New Music" href="/new-music" />
-                  <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
-                    {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
-                      : newSongs.slice(0, 10).map((s: any, i: number) => (
-                          <GridCard key={`nm-${i}`} artwork={s.artwork} title={s.title} artist={s.artist}
-                            onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                        ))}
-                  </div>
-                </Box>
-                <Box>
-                  <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/top50" />
-                  <div style={{ padding: '8px 0' }}>
-                    {topSongs.slice(0, 10).map((s: any, i: number) => (
-                      <ListRow key={`ts-${i}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
-                        onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
-                    ))}
-                  </div>
-                </Box>
-              </div>
+                  <Box>
+                    <BoxHeader label="Social" title="Friends' Picks" sort={friendsSort} onSort={setFriendsSort} href="/friends-picks" />
+                    <div style={{ padding: '8px 0' }}>
+                      {sortedFriends.slice(0, 10).map((item: any, i: number) => (
+                        <ListRow key={`fp-${i}`} item={item} rank={i + 1}
+                          onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                      ))}
+                      {sortedFriends.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 12 }}>Follow people to see their picks</p>}
+                    </div>
+                  </Box>
+                </div>
+              </>
             )}
 
           </div>

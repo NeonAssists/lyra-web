@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { getArtworkHiRes } from '@/lib/itunes';
 import AppShell from '@/components/AppShell';
-import { sessionGenre, sessionOffset } from '@/lib/sessionSeed';
+import { sessionGenre, sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import { supabase } from '@/lib/supabase';
 import SeeAllCard from '@/components/SeeAllCard';
@@ -21,11 +21,25 @@ const GENRES = [
   { name: 'Classical',  id: '5'  },
 ];
 
+// Classic artists for the 60/40 mix — covers hip-hop, R&B, rock, pop, jazz, soul
+const CLASSIC_SEEDS = [
+  'The Beatles', 'Pink Floyd', 'Led Zeppelin', 'Marvin Gaye',
+  'Stevie Wonder', 'Michael Jackson', 'Prince', 'Fleetwood Mac',
+  'Bob Marley', 'Nirvana', 'Radiohead', 'Lauryn Hill',
+  'OutKast', 'A Tribe Called Quest', 'The Notorious B.I.G.',
+  'Tupac Shakur', 'Wu-Tang Clan', 'Nas', 'Jay-Z', 'Kanye West',
+  'Frank Ocean', 'Kendrick Lamar', 'Amy Winehouse', 'Erykah Badu',
+  'Miles Davis', 'John Coltrane', 'Aretha Franklin', 'Al Green',
+  'D\'Angelo', 'Sade', 'Bob Dylan', 'David Bowie',
+  'Queen', 'The Rolling Stones', 'Jimi Hendrix', 'Curtis Mayfield',
+  'Childish Gambino', 'Tyler The Creator', 'SZA', 'Mac Miller',
+];
+
 function toItemId(id: string, type: 'song' | 'album') {
   return type === 'album' ? `itunes:alb:${id}` : `itunes:trk:${id}`;
 }
 
-function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title: string; artist: string; onClick: () => void }) {
+function AlbumTile({ artwork, title, artist, badge, onClick }: { artwork: string; title: string; artist: string; badge?: string; onClick: () => void }) {
   const [hov, setHov] = useState(false);
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
@@ -34,6 +48,11 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
         {artwork
           ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="200px" />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 28 }}>♪</div>}
+        {badge && (
+          <div style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', color: 'rgba(255,255,255,0.7)', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 5, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+            {badge}
+          </div>
+        )}
       </div>
       <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{title}</p>
       <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
@@ -41,11 +60,10 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
   );
 }
 
-// SeeAllCard now lives in @/components/SeeAllCard — imported above
-
 export default function MusicPage() {
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
-  const [albums, setAlbums] = useState<any[]>([]);
+  const [newAlbums, setNewAlbums] = useState<any[]>([]);
+  const [classicAlbums, setClassicAlbums] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,11 +76,10 @@ export default function MusicPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-    // Set random starting genre after mount to avoid SSR hydration mismatch
-    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
-    setActiveGenre(pick.id);
+    setActiveGenre(null); // Start on "All"
   }, []);
 
+  // Fetch new/trending albums from iTunes RSS
   useEffect(() => {
     setLoading(true);
     const url = activeGenre
@@ -74,15 +91,71 @@ export default function MusicPage() {
         title: e['im:name']?.label ?? '',
         artist: e['im:artist']?.label ?? '',
         artwork: getArtworkHiRes(e['im:image']?.[2]?.label ?? ''),
+        source: 'new' as const,
       }));
-      // Offset visible grid per session so it rotates on each visit
-      const off = sessionOffset(`music_grid_${activeGenre ?? 'all'}`, all.length, 24);
-      const rotated = [...all.slice(off), ...all.slice(0, off)];
-      setAlbums(rotated);
+      setNewAlbums(all);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [activeGenre]);
 
+  // Fetch classic albums from iTunes search (session-stable selection)
+  useEffect(() => {
+    const shuffled = sessionShuffle([...CLASSIC_SEEDS], 'classic_artists');
+    const picks = shuffled.slice(0, 12); // Pick 12 artists per session
+    
+    Promise.all(
+      picks.map(artist =>
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist)}&entity=album&media=music&limit=3`)
+          .then(r => r.json())
+          .then(d => (d?.results ?? [])
+            .filter((r: any) => r.wrapperType === 'collection')
+            .map((r: any) => ({
+              id: String(r.collectionId),
+              title: r.collectionName,
+              artist: r.artistName,
+              artwork: getArtworkHiRes(r.artworkUrl100 ?? ''),
+              source: 'classic' as const,
+            }))
+          )
+          .catch(() => [])
+      )
+    ).then(batches => {
+      const all = batches.flat();
+      // Deduplicate by album ID
+      const seen = new Set<string>();
+      const deduped = all.filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; });
+      setClassicAlbums(sessionShuffle(deduped, 'classic_albums'));
+    });
+  }, []);
+
+  // Build the 60/40 mix
+  const mixedAlbums = useMemo(() => {
+    if (!newAlbums.length && !classicAlbums.length) return [];
+    
+    const totalSlots = 30;
+    const classicCount = Math.round(totalSlots * 0.6);
+    const newCount = totalSlots - classicCount;
+    
+    const classicSlice = classicAlbums.slice(0, classicCount);
+    const newSlice = newAlbums.slice(0, newCount);
+    
+    // Interleave: for every 3 classic, insert 2 new
+    const mixed: any[] = [];
+    let ci = 0, ni = 0;
+    while (mixed.length < totalSlots && (ci < classicSlice.length || ni < newSlice.length)) {
+      // Add 3 classic
+      for (let k = 0; k < 3 && ci < classicSlice.length; k++) {
+        mixed.push(classicSlice[ci++]);
+      }
+      // Add 2 new
+      for (let k = 0; k < 2 && ni < newSlice.length; k++) {
+        mixed.push(newSlice[ni++]);
+      }
+    }
+    return mixed.slice(0, totalSlots);
+  }, [newAlbums, classicAlbums]);
+
+  // Search
   useEffect(() => {
     if (!query.trim()) { setResults([]); return; }
     const t = setTimeout(async () => {
@@ -95,7 +168,7 @@ export default function MusicPage() {
     return () => clearTimeout(t);
   }, [query]);
 
-  const genreName = GENRES.find(g => g.id === activeGenre)?.name ?? 'Top Albums';
+  const genreName = GENRES.find(g => g.id === activeGenre)?.name ?? 'All Music';
 
   return (
     <AppShell>
@@ -104,10 +177,10 @@ export default function MusicPage() {
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>Music</h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>Explore, search, and rate anything in the catalog</p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>Classic and new — explore, search, and rate anything</p>
         </div>
 
-        {/* Search — full width, prominent */}
+        {/* Search */}
         <div style={{ position: 'relative', marginBottom: 32 }}>
           <svg style={{ position: 'absolute', left: 18, top: '50%', transform: 'translateY(-50%)', opacity: 0.4, pointerEvents: 'none' }} width="16" height="16" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search songs, albums, artists…"
@@ -131,7 +204,7 @@ export default function MusicPage() {
           </div>
         )}
 
-        {/* Results */}
+        {/* Search results */}
         {query ? (
           <div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
@@ -153,30 +226,46 @@ export default function MusicPage() {
         ) : (
           <div>
             {/* Section label */}
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
-                {activeGenre ? 'Genre' : 'Charts'}
-              </p>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>
-                {genreName}
-              </h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+                  {activeGenre ? 'Genre' : 'Classic & New'}
+                </p>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>
+                  {activeGenre ? genreName : 'Mixed for You'}
+                </h2>
+              </div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>60% classic</span>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>40% new</span>
+              </div>
             </div>
 
-            {loading ? (
+            {loading && !classicAlbums.length ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                 {[...Array(25)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
               </div>
-            ) : (
+            ) : activeGenre ? (
+              /* When a genre is selected, show genre-filtered top albums (no classic mix) */
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
-                {albums.slice(0, 24).map((a: any, i: number) => (
-                  <AlbumTile key={`${a.id}-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                {newAlbums.slice(0, 24).map((a: any, i: number) => (
+                  <AlbumTile key={`genre-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist}
                     onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                 ))}
                 <SeeAllCard
-                  artworks={albums.slice(24, 28).map((a: any) => a.artwork)}
+                  artworks={newAlbums.slice(24, 28).map((a: any) => a.artwork)}
                   label="See all"
-                  href={activeGenre ? `/new-albums?genre=${activeGenre}` : '/new-albums'}
+                  href={`/new-albums?genre=${activeGenre}`}
                 />
+              </div>
+            ) : (
+              /* "All" tab — 60/40 classic/new mix */
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+                {mixedAlbums.slice(0, 25).map((a: any, i: number) => (
+                  <AlbumTile key={`mix-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist}
+                    badge={a.source === 'classic' ? 'classic' : undefined}
+                    onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
+                ))}
               </div>
             )}
           </div>

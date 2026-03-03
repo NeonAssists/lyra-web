@@ -75,9 +75,27 @@ export default function SocialPage() {
       });
   }, []);
 
+  const [stats, setStats] = useState<Record<string, { ratings: number; followers: number }>>({});
+
   useEffect(() => {
     supabase.from('profiles').select('id, handle, display_name, avatar_url').limit(40)
-      .then(({ data }) => { if (data) setPeople(data as Profile[]); });
+      .then(async ({ data }) => {
+        if (!data) return;
+        setPeople(data as Profile[]);
+        // Fetch rating counts and follower counts for each user
+        const ids = data.map(p => p.id);
+        const [ratingsRes, followsRes] = await Promise.all([
+          (supabase as any).from('user_rankings').select('user_id').in('user_id', ids).gt('rating', 0),
+          (supabase as any).from('follows').select('followee_id').in('followee_id', ids),
+        ]);
+        const rMap: Record<string, number> = {};
+        const fMap: Record<string, number> = {};
+        for (const r of (ratingsRes.data ?? [])) rMap[r.user_id] = (rMap[r.user_id] ?? 0) + 1;
+        for (const f of (followsRes.data ?? [])) fMap[f.followee_id] = (fMap[f.followee_id] ?? 0) + 1;
+        const s: Record<string, { ratings: number; followers: number }> = {};
+        for (const id of ids) s[id] = { ratings: rMap[id] ?? 0, followers: fMap[id] ?? 0 };
+        setStats(s);
+      });
   }, []);
 
   const handleFollow = async (uid: string) => {
@@ -135,6 +153,22 @@ export default function SocialPage() {
           {/* RIGHT — People panel (sticky) */}
           <div style={{ position: 'sticky', top: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
 
+            {/* Community stats */}
+            <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '16px 20px', display: 'flex', gap: 16, justifyContent: 'space-around' }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{people.length}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Members</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{Object.values(stats).reduce((s, v) => s + v.ratings, 0)}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Total Ratings</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: 20, fontWeight: 900, color: '#6C63FF' }}>{following.size}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Following</p>
+              </div>
+            </div>
+
             {/* Search people */}
             <div style={{ position: 'relative' }}>
               <svg style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', opacity: 0.35, pointerEvents: 'none' }} width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -150,7 +184,8 @@ export default function SocialPage() {
               </div>
               <div style={{ padding: '8px 0', maxHeight: 520, overflowY: 'auto' }}>
                 {filteredPeople.map(user => (
-                  <PersonRow key={user.id} user={user} isFollowing={following.has(user.id)} onFollow={() => handleFollow(user.id)} showFollow={!!me} />
+                  <PersonRow key={user.id} user={user} isFollowing={following.has(user.id)} onFollow={() => handleFollow(user.id)} showFollow={!!me}
+                    ratings={stats[user.id]?.ratings} followers={stats[user.id]?.followers} />
                 ))}
                 {filteredPeople.length === 0 && <p style={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', padding: '24px 0', fontSize: 13 }}>No users found</p>}
               </div>
@@ -189,23 +224,27 @@ function FeedItem({ item, col, onOpen }: { item: Activity; col: string; onOpen: 
   );
 }
 
-function PersonRow({ user, isFollowing, onFollow, showFollow }: { user: Profile; isFollowing: boolean; onFollow: () => void; showFollow: boolean }) {
+function PersonRow({ user, isFollowing, onFollow, showFollow, ratings, followers }: { user: Profile; isFollowing: boolean; onFollow: () => void; showFollow: boolean; ratings?: number; followers?: number }) {
   const [hov, setHov] = useState(false);
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 16px', background: hov ? 'rgba(255,255,255,0.03)' : 'transparent', transition: 'background 0.15s' }}>
+      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: hov ? 'rgba(255,255,255,0.03)' : 'transparent', transition: 'background 0.15s' }}>
       <Link href={`/u/${user.handle}`} style={{ flexShrink: 0 }}>
-        <Avatar user={user} size={38} />
+        <Avatar user={user} size={42} />
       </Link>
       <div style={{ flex: 1, minWidth: 0 }}>
         <Link href={`/u/${user.handle}`} style={{ textDecoration: 'none' }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.display_name || user.handle}</p>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{user.handle}</p>
         </Link>
+        <div style={{ display: 'flex', gap: 10, marginTop: 3 }}>
+          {(ratings ?? 0) > 0 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>★ {ratings} rated</span>}
+          {(followers ?? 0) > 0 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{followers} followers</span>}
+        </div>
       </div>
       {showFollow && (
         <button onClick={onFollow}
-          style={{ flexShrink: 0, padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: isFollowing ? '#1c1c1e' : '#6C63FF', color: isFollowing ? 'rgba(255,255,255,0.5)' : '#fff' }}>
+          style={{ flexShrink: 0, padding: '6px 16px', borderRadius: 100, fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: isFollowing ? '#1c1c1e' : '#6C63FF', color: isFollowing ? 'rgba(255,255,255,0.5)' : '#fff' }}>
           {isFollowing ? 'Following' : 'Follow'}
         </button>
       )}
