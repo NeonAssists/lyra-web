@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import AppShell from '@/components/AppShell';
+import { sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
 type Filter = 'all' | 'songs' | 'albums';
@@ -164,7 +165,8 @@ export default function AppHome() {
       .then(({ data }: any) => {
         if (!data) return;
         const seen = new Set<string>();
-        setCommunityPicks(data.filter((i: any) => { const k = `${i.user_id}_${i.item_id}`; if (seen.has(k)) return false; seen.add(k); return true; }));
+        const deduped = data.filter((i: any) => { const k = `${i.user_id}_${i.item_id}`; if (seen.has(k)) return false; seen.add(k); return true; });
+        setCommunityPicks(sessionShuffle(deduped, 'community_picks'));
       });
   }, []);
 
@@ -183,13 +185,20 @@ export default function AppHome() {
   useEffect(() => {
     const map = (e: any) => ({ id: e.id?.attributes?.['im:id'] ?? '', title: e['im:name']?.label ?? '', artist: e['im:artist']?.label ?? '', artwork: getHiRes(e['im:image']?.[2]?.label ?? '') });
     Promise.all([
-      fetch('https://itunes.apple.com/us/rss/topsongs/limit=20/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/topalbums/limit=20/json').then(r => r.json()),
-      fetch('https://itunes.apple.com/us/rss/newmusic/limit=20/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/topalbums/limit=25/json').then(r => r.json()),
+      fetch('https://itunes.apple.com/us/rss/newmusic/limit=25/json').then(r => r.json()),
     ]).then(([songs, albums, newmus]) => {
-      setTopSongs((songs?.feed?.entry ?? []).map(map));
-      setNewAlbums((albums?.feed?.entry ?? []).map(map));
-      setNewSongs((newmus?.feed?.entry ?? []).map(map));
+      const allSongs = (songs?.feed?.entry ?? []).map(map);
+      const allAlbums = (albums?.feed?.entry ?? []).map(map);
+      const allNewMus = (newmus?.feed?.entry ?? []).map(map);
+      // Top 50 always stays ordered — charts are charts
+      setTopSongs(allSongs);
+      // New Albums: pick 10 from pool of 25 at a session-stable offset
+      const albumOffset = sessionOffset('home_albums', allAlbums.length, 10);
+      setNewAlbums(allAlbums.slice(albumOffset, albumOffset + 10));
+      // New Music: shuffle entire pool per session, show first 10
+      setNewSongs(sessionShuffle(allNewMus, 'home_newmusic').slice(0, 10));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);

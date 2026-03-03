@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { getArtworkHiRes } from '@/lib/itunes';
 import AppShell from '@/components/AppShell';
+import { sessionGenre, sessionOffset } from '@/lib/sessionSeed';
 import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import { supabase } from '@/lib/supabase';
 
@@ -69,7 +70,12 @@ function SeeAllCard({ artworks, label, href }: { artworks: string[]; label: stri
 }
 
 export default function MusicPage() {
-  const [activeGenre, setActiveGenre] = useState<string | null>(null);
+  const [activeGenre, setActiveGenre] = useState<string | null>(() => {
+    // Start on a random genre each session (not always "All")
+    if (typeof window === 'undefined') return null;
+    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
+    return pick.id;
+  });
   const [albums, setAlbums] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
@@ -91,12 +97,16 @@ export default function MusicPage() {
       ? `https://itunes.apple.com/us/rss/topalbums/limit=25/genre=${activeGenre}/json`
       : `https://itunes.apple.com/us/rss/topalbums/limit=25/json`;
     fetch(url).then(r => r.json()).then(d => {
-      setAlbums((d?.feed?.entry ?? []).map((e: any) => ({
+      const all = (d?.feed?.entry ?? []).map((e: any) => ({
         id: e.id?.attributes?.['im:id'] ?? '',
         title: e['im:name']?.label ?? '',
         artist: e['im:artist']?.label ?? '',
         artwork: getArtworkHiRes(e['im:image']?.[2]?.label ?? ''),
-      })));
+      }));
+      // Offset the visible grid per session so it's not always the same 9
+      const off = sessionOffset(`music_grid_${activeGenre ?? 'all'}`, all.length, 9);
+      const rotated = [...all.slice(off), ...all.slice(0, off)];
+      setAlbums(rotated);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [activeGenre]);
