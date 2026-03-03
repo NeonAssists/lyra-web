@@ -119,6 +119,7 @@ function GridCard({ artwork, title, artist, rank, rating, onClick }: { artwork: 
 
 export default function AppHome() {
   const [me, setMe] = useState<User | null>(null);
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
@@ -444,7 +445,9 @@ export default function AppHome() {
         )}
       </div>
 
-      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
+      <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null}
+        onOpenArtist={(name) => { setModalOpen(false); router.push(`/artist/${encodeURIComponent(name)}`); }}
+        onOpenAlbum={(item) => { setModalOpen(false); router.push(`/artist/${encodeURIComponent(item.artist)}`); }} />
     </AppShell>
   );
 }

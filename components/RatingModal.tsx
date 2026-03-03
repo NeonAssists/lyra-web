@@ -19,6 +19,7 @@ interface RatingModalProps {
   userId: string | null;
   onSaved?: () => void;
   onOpenAlbum?: (item: ModalItem) => void;
+  onOpenArtist?: (artistName: string) => void;
 }
 
 const RATING_TAGS = ['Chill', 'Hype', 'Emotional', 'Classic', 'Underrated', 'Overrated', 'Nostalgic', 'Summer', 'Late Night', 'Gym', 'Road Trip', 'Study'];
@@ -52,7 +53,7 @@ function StreamLink({ icon, label, url }: { icon: string; label: string; url: st
   );
 }
 
-export default function RatingModal({ open, onClose, item, userId, onSaved, onOpenAlbum }: RatingModalProps) {
+export default function RatingModal({ open, onClose, item, userId, onSaved, onOpenAlbum, onOpenArtist }: RatingModalProps) {
   const [rating, setRating] = useState(0);
   const [ratingInput, setRatingInput] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -257,8 +258,10 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
             {item.artwork && <Image src={item.artwork} alt={item.title} fill style={{ objectFit: 'cover' }} unoptimized sizes="48px" />}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px' }}>{item.title}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1 }}>{item.artist}</p>
+            <p onClick={() => onOpenAlbum && item && onOpenAlbum(item)}
+              style={{ fontSize: 15, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.2px', cursor: onOpenAlbum ? 'pointer' : 'default' }}>{item.title}</p>
+            <p onClick={() => onOpenArtist && item && onOpenArtist(item.artist)}
+              style={{ fontSize: 12, color: onOpenArtist ? '#6C63FF' : 'rgba(255,255,255,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 1, cursor: onOpenArtist ? 'pointer' : 'default' }}>{item.artist}</p>
           </div>
           <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>×</button>
         </div>
