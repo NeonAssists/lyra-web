@@ -126,6 +126,9 @@ export default function AppHome() {
   const [newAlbums, setNewAlbums] = useState<any[]>([]);
   const [newSongs, setNewSongs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [globalSongs, setGlobalSongs] = useState<any[]>([]);
+  const [globalAlbums, setGlobalAlbums] = useState<any[]>([]);
+  const [chartTab, setChartTab] = useState<'us' | 'global'>('us');
   const [communityPicks, setCommunityPicks] = useState<any[]>([]);
   const [friendsPicks, setFriendsPicks] = useState<any[]>([]);
   const [hotRange, setHotRange] = useState<any[]>([]);
@@ -189,8 +192,10 @@ export default function AppHome() {
     Promise.all([
       safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=50/json'),
       safeFetch('https://itunes.apple.com/us/rss/topalbums/limit=25/json'),
-      safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=25/json'), // newmusic RSS is dead (400), use topsongs as fallback for "new music"
-    ]).then(([songs, albums, newmus]) => {
+      safeFetch('https://itunes.apple.com/us/rss/topsongs/limit=25/json'),
+      safeFetch('https://itunes.apple.com/gb/rss/topsongs/limit=50/json'),
+      safeFetch('https://itunes.apple.com/gb/rss/topalbums/limit=25/json'),
+    ]).then(([songs, albums, newmus, globalSongsData, globalAlbumsData]) => {
       const allSongs = (songs?.feed?.entry ?? []).map(map);
       const allAlbums = (albums?.feed?.entry ?? []).map(map);
       const allNewMus = (newmus?.feed?.entry ?? []).map(map);
@@ -201,6 +206,9 @@ export default function AppHome() {
       // "New Music" — use a shuffled subset of top songs since the newmusic RSS is dead
       const shuffled = allNewMus.length > 0 ? sessionShuffle(allNewMus, 'home_newmusic') : allNewMus;
       setNewSongs(shuffled.slice(0, 10));
+      // Global charts (UK store as proxy for international)
+      setGlobalSongs((globalSongsData?.feed?.entry ?? []).map(map));
+      setGlobalAlbums((globalAlbumsData?.feed?.entry ?? []).map(map));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -273,12 +281,32 @@ export default function AppHome() {
             {/* Row 1: Top 50 + New Albums — ALWAYS visible, music-first */}
             <div className="home-grid-2col">
               <Box>
-                <BoxHeader label="Charts" title="Top 50 US 🇺🇸" href="/top50" />
-                <div style={{ padding: '8px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 0' }}>
+                  <div>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 3 }}>Charts</p>
+                    <h2 style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px', margin: 0 }}>Top Songs</h2>
+                  </div>
+                  <Link href="/charts" style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', textDecoration: 'none', letterSpacing: 0.5 }}>See all →</Link>
+                </div>
+                {/* US / Global toggle */}
+                <div style={{ display: 'flex', gap: 4, padding: '10px 20px 8px' }}>
+                  {(['us', 'global'] as const).map(tab => (
+                    <button key={tab} onClick={() => setChartTab(tab)}
+                      style={{
+                        padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                        border: 'none', cursor: 'pointer', transition: 'all 0.15s',
+                        background: chartTab === tab ? '#6C63FF' : 'rgba(255,255,255,0.06)',
+                        color: chartTab === tab ? '#fff' : 'rgba(255,255,255,0.4)',
+                      }}>
+                      {tab === 'us' ? '🇺🇸 US' : '🌍 Global'}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '8px 0' }}>
                   {loading
-                    ? [...Array(8)].map((_, i) => <div key={i} style={{ height: 48, margin: '4px 16px', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : topSongs.slice(0, 10).map((s: any, i: number) => (
-                        <ListRow key={`ts-${i}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
+                    ? [...Array(8)].map((_, i) => <div key={`csk-${i}`} style={{ height: 48, margin: '4px 16px', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : (chartTab === 'us' ? topSongs : globalSongs).slice(0, 10).map((s: any, i: number) => (
+                        <ListRow key={`ts-${chartTab}-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                 </div>
