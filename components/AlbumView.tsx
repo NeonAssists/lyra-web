@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
 import { getArtworkHiRes } from '@/lib/itunes';
@@ -22,6 +23,7 @@ interface AlbumViewProps {
 const LASTFM_KEY = '7b3ef80111877bb34f01fe2d7163d6ba';
 
 export default function AlbumView({ open, onClose, albumId, albumTitle, albumArtist, albumArtwork, userId, onOpenSong, onOpenAlbum, highlightSongId }: AlbumViewProps) {
+  const router = useRouter();
   const [tracks, setTracks] = useState<any[]>([]);
   const [recs, setRecs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +102,8 @@ export default function AlbumView({ open, onClose, albumId, albumTitle, albumArt
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: 18, fontWeight: 800, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{albumTitle}</p>
-            <p style={{ fontSize: 14, color: '#6C63FF', fontWeight: 500 }}>{albumArtist}</p>
+            <p onClick={() => { onClose(); router.push(`/artist/${encodeURIComponent(albumArtist)}`); }}
+              style={{ fontSize: 14, color: '#6C63FF', fontWeight: 500, cursor: 'pointer' }}>{albumArtist}</p>
             <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
               <button onClick={() => onOpenSong({ id: albumId, title: albumTitle, artist: albumArtist, artwork: albumArtwork, type: 'album' })}
                 style={{ padding: '5px 12px', borderRadius: 8, background: '#6C63FF', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
