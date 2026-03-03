@@ -194,11 +194,13 @@ export default function AppHome() {
       const allNewMus = (newmus?.feed?.entry ?? []).map(map);
       // Top 50 always stays ordered — charts are charts
       setTopSongs(allSongs);
-      // New Albums: pick 10 from pool of 25 at a session-stable offset
-      const albumOffset = sessionOffset('home_albums', allAlbums.length, 10);
-      setNewAlbums(allAlbums.slice(albumOffset, albumOffset + 10));
-      // New Music: shuffle entire pool per session, show first 10
-      setNewSongs(sessionShuffle(allNewMus, 'home_newmusic').slice(0, 10));
+      // New Albums: pick 10 from pool at a session-stable offset (fallback = first 10)
+      const albumOffset = allAlbums.length > 10 ? sessionOffset('home_albums', allAlbums.length, 10) : 0;
+      const albumSlice = allAlbums.slice(albumOffset, albumOffset + 10);
+      setNewAlbums(albumSlice.length >= 5 ? albumSlice : allAlbums.slice(0, 10));
+      // New Music: shuffle per session, fallback = original order
+      const shuffled = allNewMus.length > 0 ? sessionShuffle(allNewMus, 'home_newmusic') : allNewMus;
+      setNewSongs(shuffled.slice(0, 10));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -316,7 +318,7 @@ export default function AppHome() {
             <div style={{ display: 'grid', gridTemplateColumns: filter === 'all' ? '1.5fr 1fr' : '1fr', gap: 16 }}>
               {(filter === 'all' || filter === 'albums') && (
                 <Box>
-                  <BoxHeader label="Browse" title="New Albums" href="/music" />
+                  <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
                   <div style={{ padding: 12, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
                     {loading ? [...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                       : newAlbums.slice(0, 10).map((a: any, i: number) => (

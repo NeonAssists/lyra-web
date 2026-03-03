@@ -70,12 +70,7 @@ function SeeAllCard({ artworks, label, href }: { artworks: string[]; label: stri
 }
 
 export default function MusicPage() {
-  const [activeGenre, setActiveGenre] = useState<string | null>(() => {
-    // Start on a random genre each session (not always "All")
-    if (typeof window === 'undefined') return null;
-    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
-    return pick.id;
-  });
+  const [activeGenre, setActiveGenre] = useState<string | null>(null);
   const [albums, setAlbums] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalItem, setModalItem] = useState<ModalItem | null>(null);
@@ -89,6 +84,9 @@ export default function MusicPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    // Set random starting genre after mount to avoid SSR hydration mismatch
+    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
+    setActiveGenre(pick.id);
   }, []);
 
   useEffect(() => {
