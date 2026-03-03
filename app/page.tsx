@@ -1,12 +1,88 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
+function WaitlistModal({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim()) { setError('Both fields are required.'); return; }
+    setLoading(true);
+    setError('');
+    const { error: err } = await (supabase as any).from('waitlist').insert({ name: name.trim(), email: email.trim().toLowerCase() });
+    setLoading(false);
+    if (err) {
+      if (err.code === '23505') setError("You're already on the list!");
+      else setError('Something went wrong. Try again.');
+    } else {
+      setDone(true);
+    }
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      onClick={onClose}>
+      {/* Backdrop */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)' }} />
+      {/* Card */}
+      <div style={{ position: 'relative', background: 'rgba(18,18,18,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 28, padding: '48px 40px', width: '100%', maxWidth: 420, textAlign: 'center' }}
+        onClick={e => e.stopPropagation()}>
+        {/* Close */}
+        <button onClick={onClose} style={{ position: 'absolute', top: 18, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
+
+        {done ? (
+          <>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're on the list.</h2>
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>We'll reach out when Lyra is ready for you. Keep an ear out.</p>
+            <button onClick={onClose} style={{ marginTop: 28, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Done</button>
+          </>
+        ) : (
+          <>
+            {/* Ambient glow */}
+            <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse, rgba(108,99,255,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 8 }}>Join the waitlist</h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 32, lineHeight: 1.5 }}>Get early access when Lyra opens up. No spam — just the drop.</p>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <input
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', fontSize: 15, color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+              />
+              <input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '14px 16px', fontSize: 15, color: '#fff', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+              />
+              {error && <p style={{ fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>}
+              <button type="submit" disabled={loading}
+                style={{ background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, marginTop: 4 }}>
+                {loading ? 'Joining…' : 'Get Early Access →'}
+              </button>
+            </form>
+            <p style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>No spam. Unsubscribe anytime.</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const router = useRouter();
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -14,8 +90,12 @@ export default function HomePage() {
     });
   }, []);
 
+  const openWaitlist = () => setShowWaitlist(true);
+
   return (
     <div className="bg-black text-white overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif' }}>
+
+      {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
 
       {/* Nav — Apple minimal */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -39,9 +119,9 @@ export default function HomePage() {
           Decimal scores. Real opinions. No algorithm telling you what to like.
         </p>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', letterSpacing: '-0.2px' }}>
-            Join the Beta
-          </Link>
+          <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
+            Join the Waitlist
+          </button>
           <Link href="/u/nate7" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
             See Example Profile
           </Link>
@@ -104,16 +184,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Bottom CTA — Nike energy */}
+      {/* Bottom CTA */}
       <section style={{ padding: '160px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(3rem, 9vw, 6rem)', fontWeight: 900, letterSpacing: '-2px', lineHeight: 1.0, marginBottom: 40 }}>
             Your taste.<br />
             <span style={{ color: 'rgba(255,255,255,0.25)' }}>Defined.</span>
           </h2>
-          <Link href="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#fff', color: '#000', fontWeight: 700, fontSize: 17, padding: '16px 40px', borderRadius: 100, textDecoration: 'none', letterSpacing: '-0.3px' }}>
-            Start Ranking Free →
-          </Link>
+          <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#fff', color: '#000', fontWeight: 700, fontSize: 17, padding: '16px 40px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.3px' }}>
+            Get Early Access →
+          </button>
           <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>No credit card. No algorithm. Just music.</p>
         </div>
       </section>
