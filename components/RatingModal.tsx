@@ -61,7 +61,28 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
     if (onOpenArtist) { onOpenArtist(name); }
     else { router.push(`/artist/${encodeURIComponent(name)}`); }
   };
-  const navigateToAlbum = (it: ModalItem) => {
+  const navigateToAlbum = async (it: ModalItem) => {
+    // For songs, look up the album via iTunes and navigate to album page
+    const trackId = it.id.replace('itunes:trk:', '').replace('itunes:alb:', '');
+    if (it.type === 'song' && trackId) {
+      try {
+        const res = await fetch(`https://itunes.apple.com/lookup?id=${trackId}`);
+        const data = await res.json();
+        const track = data.results?.[0];
+        if (track?.collectionId) {
+          onClose();
+          router.push(`/album/${track.collectionId}`);
+          return;
+        }
+      } catch {}
+    }
+    // Fallback for albums or if lookup fails
+    if (it.type === 'album') {
+      onClose();
+      router.push(`/album/${trackId}`);
+      return;
+    }
+    // Last fallback: artist page
     onClose();
     if (onOpenAlbum) { onOpenAlbum(it); }
     else { router.push(`/artist/${encodeURIComponent(it.artist)}`); }
