@@ -27,47 +27,44 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
   const [hov, setHov] = useState(false);
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', width: '100%', position: 'relative', zIndex: hov ? 10 : 1 }}>
-      <div style={{
-        position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden',
-        background: '#1c1c1e', marginBottom: 10,
-        transform: hov ? 'scale(1.07)' : 'scale(1)',
-        transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-        boxShadow: hov ? '0 16px 40px rgba(0,0,0,0.7)' : '0 2px 8px rgba(0,0,0,0.3)',
-      }}>
+      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', width: '100%', transition: 'background 0.15s' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
         {artwork
           ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="200px" />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 28 }}>♪</div>}
       </div>
-      <p style={{ fontSize: 13, fontWeight: 600, color: hov ? '#fff' : 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3, transition: 'color 0.15s' }}>{title}</p>
+      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{title}</p>
       <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
     </button>
   );
 }
 
-function SeeAllCard({ artworks }: { artworks: string[] }) {
+function SeeAllCard({ artworks, label, href }: { artworks: string[]; label: string; href: string }) {
   const [hov, setHov] = useState(false);
   const grid = artworks.slice(0, 4);
   return (
-    <button onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ padding: 10, borderRadius: 12, background: hov ? '#1c1c1e' : 'transparent', transition: 'background 0.15s', cursor: 'pointer', border: 'none', width: '100%', textAlign: 'left' }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10, transform: hov ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.2s ease', boxShadow: hov ? '0 12px 32px rgba(0,0,0,0.6)' : '0 2px 8px rgba(0,0,0,0.3)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>
-          {grid.map((src, i) => (
-            <div key={i} style={{ position: 'relative', background: '#2a2a2a', overflow: 'hidden' }}>
-              <Image src={src} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes="100px" />
-            </div>
-          ))}
-          {grid.length < 4 && [...Array(4 - grid.length)].map((_, i) => (
-            <div key={`e-${i}`} style={{ background: '#2a2a2a' }} />
-          ))}
+    <a href={href} style={{ textDecoration: 'none', display: 'block' }}>
+      <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+        style={{ background: hov ? '#1c1c1e' : 'transparent', borderRadius: 12, padding: 10, transition: 'background 0.15s', cursor: 'pointer' }}>
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', height: '100%' }}>
+            {grid.map((src, i) => (
+              <div key={i} style={{ position: 'relative', overflow: 'hidden', background: '#2a2a2a' }}>
+                <Image src={src} alt="" fill style={{ objectFit: 'cover' }} unoptimized sizes="100px" />
+              </div>
+            ))}
+            {grid.length < 4 && [...Array(4 - grid.length)].map((_, i) => (
+              <div key={`e-${i}`} style={{ background: '#2a2a2a' }} />
+            ))}
+          </div>
+          <div style={{ position: 'absolute', inset: 0, background: hov ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, transition: 'background 0.15s' }}>
+            <span style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>→</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>See all</span>
+          </div>
         </div>
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>See all →</span>
-        </div>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF', textAlign: 'center' }}>{label}</p>
       </div>
-      <p style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF', textAlign: 'center' }}>Browse all</p>
-    </button>
+    </a>
   );
 }
 
@@ -193,7 +190,7 @@ export default function MusicPage() {
                   <AlbumTile key={`${a.id}-${i}`} artwork={a.artwork} title={a.title} artist={a.artist}
                     onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                 ))}
-                <SeeAllCard artworks={albums.slice(9, 13).map((a: any) => a.artwork)} />
+                <SeeAllCard artworks={albums.slice(9, 13).map((a: any) => a.artwork)} label="Browse all" href="/music" />
               </div>
             )}
           </div>
