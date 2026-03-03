@@ -18,18 +18,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [me, setMe] = useState<User | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { router.push('/login'); return; }
-      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', data.user.id).single();
+    // Use getSession() first — reads from localStorage without a network request.
+    // Avoids premature redirect when the JWT hasn't hydrated yet.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setHydrated(true);
+      if (!session?.user) { router.push('/login'); return; }
+      const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
       setMe(p as User);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const { data: p } = await supabase.from('profiles').select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
         setMe(p as User);
-      } else if (event === 'SIGNED_OUT') { setMe(null); router.push('/login'); }
+      } else if (event === 'SIGNED_OUT') {
+        // Only redirect on explicit sign-out — not on null during hydration
+        setMe(null);
+        router.push('/login');
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
