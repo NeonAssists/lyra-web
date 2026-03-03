@@ -34,10 +34,10 @@ export default function HomePage() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-36 pb-24 px-6 text-center">
-        <div className="max-w-3xl mx-auto">
+      <section className="pt-36 pb-24 px-6 text-center flex flex-col items-center">
+        <div className="max-w-3xl mx-auto w-full">
           <p className="text-xs font-bold tracking-widest text-[#6C63FF] uppercase mb-5">Now in Beta</p>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6 text-center">
             Rate music.<br />
             Build taste.<br />
             <span className="text-[#8E8E93]">Share it.</span>
