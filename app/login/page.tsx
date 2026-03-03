@@ -30,8 +30,15 @@ export default function LoginPage() {
     e?.preventDefault();
     setError(''); setLoading(true);
     if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setError(error.message); setLoading(false); return; }
+      // Ensure session is persisted before redirect
+      if (authData.session) {
+        await supabase.auth.setSession({
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+        });
+      }
       window.location.href = '/app';
     } else {
       if (handle.length < 2) { setError('Handle must be at least 2 characters'); setLoading(false); return; }
@@ -39,6 +46,13 @@ export default function LoginPage() {
       if (err) { setError(err.message); setLoading(false); return; }
       if (data.user) {
         await supabase.from('profiles' as any).upsert({ id: data.user.id, handle: handle.toLowerCase().replace(/[^a-z0-9_]/g, ''), display_name: displayName || handle, plan: 'free' });
+      }
+      // Ensure session persisted
+      if (data.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
       }
       window.location.href = '/app';
     }

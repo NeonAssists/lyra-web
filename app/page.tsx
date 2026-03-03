@@ -86,8 +86,8 @@ export default function HomePage() {
   const [showWaitlist, setShowWaitlist] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) router.replace('/app');
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) router.replace('/app');
     });
   }, []);
 
