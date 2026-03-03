@@ -26,12 +26,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         .select('id, handle, display_name, avatar_url').eq('id', data.user.id).single();
       setMe(p as User);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_ev, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const { data: p } = await supabase.from('profiles')
           .select('id, handle, display_name, avatar_url').eq('id', session.user.id).single();
         setMe(p as User);
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setMe(null);
         router.push('/login');
       }
