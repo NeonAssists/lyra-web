@@ -1,9 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) router.replace('/app');
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       {/* Navigation */}
@@ -13,7 +23,7 @@ export default function HomePage() {
           <div className="flex items-center gap-6">
             <Link href="#features" className="text-sm text-[#8E8E93] hover:text-white transition-colors hidden sm:block">Features</Link>
             <Link href="#how" className="text-sm text-[#8E8E93] hover:text-white transition-colors hidden sm:block">How it works</Link>
-            <Link href="/app" className="text-sm font-semibold bg-white text-black px-4 py-1.5 rounded-full hover:bg-white/90 transition-all">Open App</Link>
+            <Link href="/login" className="text-sm font-semibold bg-[#6C63FF] text-white px-4 py-1.5 rounded-full hover:opacity-90 transition-all">Sign In</Link>
           </div>
         </div>
       </nav>
