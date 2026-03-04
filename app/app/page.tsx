@@ -305,6 +305,19 @@ export default function AppHome() {
           </div>
         </div>
 
+        {/* Guest welcome banner — mobile only */}
+        {!isLoggedIn && !query && (
+          <div style={{ marginBottom: 20, padding: '20px', borderRadius: 18, background: 'linear-gradient(135deg, rgba(108,99,255,0.18) 0%, rgba(108,99,255,0.06) 100%)', border: '1px solid rgba(108,99,255,0.2)' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 8 }}>Welcome to Lyra</p>
+            <p style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', marginBottom: 6 }}>Rate music. Build your taste.</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, marginBottom: 16 }}>Decimal ratings from 1.0–10.0. Real opinions. No algorithm.</p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <a href="/login" style={{ padding: '9px 20px', borderRadius: 100, background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>Sign Up Free</a>
+              <a href="/u/nate7" style={{ padding: '9px 20px', borderRadius: 100, background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>See Example</a>
+            </div>
+          </div>
+        )}
+
         {query ? (
           <Box>
             <BoxHeader title={`Results for "${query}"`} />
