@@ -166,7 +166,7 @@ export default function HomePage() {
         {/* Mobile rating card */}
         <div className="lp-mobile-only" style={{ background: 'rgba(20,16,12,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: '0 20px 60px rgba(212,118,78,0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a6/6e/bf/a66ebf79-5008-8948-b352-a790fc87446b/19UM1IM04638.rgb.jpg/100x100bb.jpg" alt="Blinding Lights" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, objectFit: 'cover' }} />
+            <img src="/covers/blinding-lights.jpg" alt="Blinding Lights" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, objectFit: 'cover' }} />
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
@@ -231,9 +231,9 @@ export default function HomePage() {
           {/* Mobile mini song list */}
           <div className="lp-mobile-only" style={{ background: '#120F0B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
             {[
-              { name: 'Starboy', artist: 'The Weeknd', rating: '9.1', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b5/92/bb/b592bb72-52e3-e756-9b26-9f56d08f47ab/16UMGIM67864.rgb.jpg/100x100bb.jpg' },
-              { name: 'Levitating', artist: 'Dua Lipa', rating: '7.4', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg/100x100bb.jpg' },
-              { name: 'Peaches', artist: 'Justin Bieber', rating: '6.2', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e0/92/da/e092da2d-9f6d-11dc-7843-2021e95a2b61/21UMGIM17518.rgb.jpg/100x100bb.jpg' },
+              { name: 'Starboy', artist: 'The Weeknd', rating: '9.1', cover: '/covers/starboy.jpg' },
+              { name: 'Levitating', artist: 'Dua Lipa', rating: '7.4', cover: '/covers/levitating.jpg' },
+              { name: 'Peaches', artist: 'Justin Bieber', rating: '6.2', cover: '/covers/peaches.jpg' },
             ].map((song, i) => (
               <div key={`msong-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
                 <img src={song.cover} alt={song.name} style={{ width: 40, height: 40, borderRadius: 8, flexShrink: 0, objectFit: 'cover' }} />
@@ -370,10 +370,10 @@ export default function HomePage() {
                   <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>by @nate7 + @ari + @ethan</p>
                 </div>
                 {[
-                  { rank: 1, title: 'luther', artist: 'Kendrick Lamar', scores: ['9.2', '8.8', '9.5'], avgColor: '#22c55e', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/50/c2/cc/50c2cc95-3658-9417-0d4b-831abde44ba1/24UM1IM28978.rgb.jpg/100x100bb.jpg' },
-                  { rank: 2, title: 'Birds of a Feather', artist: 'Billie Eilish', scores: ['8.7', '9.1', '7.9'], avgColor: '#4ade80', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/100x100bb.jpg' },
-                  { rank: 3, title: 'Espresso', artist: 'Sabrina Carpenter', scores: ['7.5', '8.2', '8.0'], avgColor: '#eab308', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a1/1c/ca/a11ccab6-7d4c-e041-d028-998bcebeb709/24UMGIM61704.rgb.jpg/100x100bb.jpg' },
-                  { rank: 4, title: 'Not Like Us', artist: 'Kendrick Lamar', scores: ['9.8', '9.4', '9.6'], avgColor: '#a855f7', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/100x100bb.jpg' },
+                  { rank: 1, title: 'luther', artist: 'Kendrick Lamar', scores: ['9.2', '8.8', '9.5'], avgColor: '#22c55e', cover: '/covers/luther.jpg' },
+                  { rank: 2, title: 'Birds of a Feather', artist: 'Billie Eilish', scores: ['8.7', '9.1', '7.9'], avgColor: '#4ade80', cover: '/covers/birds-of-a-feather.jpg' },
+                  { rank: 3, title: 'Espresso', artist: 'Sabrina Carpenter', scores: ['7.5', '8.2', '8.0'], avgColor: '#eab308', cover: '/covers/espresso.jpg' },
+                  { rank: 4, title: 'Not Like Us', artist: 'Kendrick Lamar', scores: ['9.8', '9.4', '9.6'], avgColor: '#a855f7', cover: '/covers/not-like-us.jpg' },
                 ].map((s, i) => (
                   <div key={`list-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                     <span style={{ fontSize: 14, fontWeight: 900, color: 'rgba(255,255,255,0.2)', width: 20, textAlign: 'center', flexShrink: 0 }}>{s.rank}</span>
