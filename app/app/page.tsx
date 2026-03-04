@@ -237,16 +237,19 @@ export default function AppHome() {
           .dash-tri { grid-template-columns: 1fr !important; }
           .dash-quad { grid-template-columns: repeat(2, 1fr) !important; }
           .album-grid-sm { grid-template-columns: repeat(2, 1fr) !important; }
+          .home-wrap { padding: 16px 12px 80px !important; }
+          .home-header { flex-direction: column; gap: 12px; align-items: stretch !important; }
+          .home-search { width: 100% !important; }
         }
       `}</style>
-      <div style={{ padding: '24px 24px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="home-wrap" style={{ padding: '24px 24px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* ── Header ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div className="home-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>
             {me ? `${greeting()}, ${me.display_name || me.handle}` : 'Home'}
           </h1>
-          <div style={{ position: 'relative', width: 260 }}>
+          <div className="home-search" style={{ position: 'relative', width: 260 }}>
             <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', opacity: 0.35, pointerEvents: 'none' }} width="13" height="13" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search songs, albums, artists…"
               style={{ width: '100%', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100, padding: '8px 34px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }} />

@@ -72,18 +72,28 @@ export default function AlbumPage() {
 
   return (
     <AppShell>
+      <style>{`
+        .album-hero { display: flex; align-items: flex-end; gap: 24px; }
+        .album-art { width: 180px; height: 180px; }
+        .album-section { padding: 24px 32px 80px; }
+        @media (max-width: 768px) {
+          .album-hero { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+          .album-art { width: 160px; height: 160px; }
+          .album-section { padding: 16px 16px 80px; }
+        }
+      `}</style>
       <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Hero */}
-        <div style={{ position: 'relative', padding: '48px 32px 32px', background: 'linear-gradient(180deg, rgba(108,99,255,0.12) 0%, transparent 100%)' }}>
+        <div style={{ position: 'relative', padding: '48px 24px 32px', background: 'linear-gradient(180deg, rgba(108,99,255,0.12) 0%, transparent 100%)' }}>
           {loading ? (
-            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end' }}>
-              <div style={{ width: 180, height: 180, borderRadius: 16, background: '#1c1c1e' }} />
+            <div className="album-hero">
+              <div className="album-art" style={{ borderRadius: 16, background: '#1c1c1e' }} />
               <div><div style={{ width: 200, height: 20, background: '#1c1c1e', borderRadius: 4, marginBottom: 8 }} /><div style={{ width: 120, height: 14, background: '#1c1c1e', borderRadius: 4 }} /></div>
             </div>
           ) : album ? (
-            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end' }}>
-              <div style={{ width: 180, height: 180, borderRadius: 16, overflow: 'hidden', background: '#1c1c1e', position: 'relative', flexShrink: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+            <div className="album-hero">
+              <div className="album-art" style={{ borderRadius: 16, overflow: 'hidden', background: '#1c1c1e', position: 'relative', flexShrink: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
                 <Image src={getHiRes(album.artworkUrl100)} alt={album.collectionName} fill style={{ objectFit: 'cover' }} unoptimized sizes="180px" />
               </div>
               <div>
@@ -110,7 +120,7 @@ export default function AlbumPage() {
         </div>
 
         {/* Tracklist */}
-        <div style={{ padding: '24px 32px 80px' }}>
+        <div className="album-section">
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-0.3px' }}>Tracklist</h2>
           <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden' }}>
             {loading ? (

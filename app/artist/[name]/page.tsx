@@ -132,17 +132,29 @@ export default function ArtistPage() {
 
   return (
     <AppShell>
+      <style>{`
+        .artist-hero { display: flex; align-items: flex-end; gap: 24px; }
+        .artist-img { width: 140px; height: 140px; }
+        .artist-section { padding: 24px 32px; }
+        .artist-albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+        @media (max-width: 768px) {
+          .artist-hero { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+          .artist-img { width: 120px; height: 120px; }
+          .artist-section { padding: 16px 16px; }
+          .artist-albums { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+      `}</style>
       <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Hero */}
-        <div style={{ position: 'relative', padding: '60px 32px 32px', background: 'linear-gradient(180deg, rgba(108,99,255,0.15) 0%, transparent 100%)' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24 }}>
-            <div style={{ width: 140, height: 140, borderRadius: 16, overflow: 'hidden', background: '#1c1c1e', position: 'relative', flexShrink: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'relative', padding: '48px 32px 32px', background: 'linear-gradient(180deg, rgba(108,99,255,0.15) 0%, transparent 100%)' }}>
+          <div className="artist-hero">
+            <div className="artist-img" style={{ borderRadius: 16, overflow: 'hidden', background: '#1c1c1e', position: 'relative', flexShrink: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
               {artistImg && <Image src={artistImg} alt={artistName} fill style={{ objectFit: 'cover' }} unoptimized sizes="140px" />}
             </div>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>Artist</p>
-              <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>{artistName}</h1>
+              <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>{artistName}</h1>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
                 {topSongs.length > 0 ? `${topSongs.length} songs` : ''}{topSongs.length > 0 && albums.length > 0 ? ' · ' : ''}{albums.length > 0 ? `${albums.length} albums` : ''}
               </p>
@@ -151,7 +163,7 @@ export default function ArtistPage() {
         </div>
 
         {/* Top Songs */}
-        <div style={{ padding: '24px 32px' }}>
+        <div className="artist-section">
           <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-0.3px' }}>Top Songs</h2>
           <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden' }}>
             {loading ? (
@@ -191,9 +203,9 @@ export default function ArtistPage() {
 
         {/* Albums */}
         {albums.length > 0 && (
-          <div style={{ padding: '0 32px 80px' }}>
+          <div className="artist-section" style={{ paddingBottom: 80 }}>
             <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-0.3px' }}>Albums</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 16 }}>
+            <div className="artist-albums">
               {albums.map((a, i) => {
                 const rid = `itunes:alb:${a.id}`;
                 const r = ratings[rid];
