@@ -200,28 +200,45 @@ export default function HomePage() {
       {/* Rating spectrum */}
       <section style={{ padding: '60px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', padding: '0 24px' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 24, textAlign: 'center' }}>The Lyra Scale</p>
-          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 40, textAlign: 'center' }}>The Lyra Scale</p>
+          {/* Chart: ghost track + colored fill bars */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 200, paddingTop: 48 }}>
             {[
-              { score: '1.0', label: 'Skip', height: 36, color: '#7f1d1d' },
-              { score: '2.0', label: 'Weak', height: 48, color: '#991b1b' },
-              { score: '3.0', label: 'Meh', height: 60, color: '#b91c1c' },
-              { score: '4.0', label: 'Below avg', height: 72, color: '#c2410c' },
-              { score: '5.0', label: 'Average', height: 88, color: '#b45309' },
-              { score: '6.0', label: 'Decent', height: 100, color: '#a16207' },
-              { score: '7.0', label: 'Good', height: 116, color: '#4d7c0f' },
-              { score: '8.0', label: 'Great', height: 132, color: '#15803d' },
-              { score: '9.0', label: 'Elite', height: 148, color: '#0369a1' },
-              { score: '10.0', label: 'Masterpiece', height: 164, color: '#D4764E' },
+              { score: '1', label: 'Skip',        pct: 10,  color: '#dc2626' },
+              { score: '2', label: 'Weak',        pct: 19,  color: '#ea580c' },
+              { score: '3', label: 'Meh',         pct: 28,  color: '#f59e0b' },
+              { score: '4', label: 'Below avg',   pct: 38,  color: '#a3912a' },
+              { score: '5', label: 'Average',     pct: 47,  color: '#84a332' },
+              { score: '6', label: 'Decent',      pct: 57,  color: '#22863a' },
+              { score: '7', label: 'Good',        pct: 67,  color: '#059669' },
+              { score: '8', label: 'Great',       pct: 78,  color: '#0891b2' },
+              { score: '9', label: 'Elite',       pct: 89,  color: '#3b82f6' },
+              { score: '10', label: 'Masterpiece',pct: 100, color: '#8b5cf6' },
             ].map((r, i) => (
-              <div key={`rs-${i}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{r.label}</p>
-                <div style={{ width: '100%', height: r.height, borderRadius: 6, background: r.color, opacity: 0.85 }} />
-                <p style={{ fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>{r.score}</p>
+              <div key={`rs-${i}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', position: 'relative' }}>
+                {/* Rotated label above ghost bar */}
+                <div style={{
+                  position: 'absolute',
+                  top: -44,
+                  left: '50%',
+                  transformOrigin: 'bottom center',
+                  transform: 'translateX(-50%) rotate(-40deg)',
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.45)',
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '0.2px',
+                }}>{r.label}</div>
+                {/* Ghost track (full height) */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '6px 6px 0 0' }} />
+                {/* Colored fill bar */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${r.pct}%`, background: r.color, borderRadius: '6px 6px 0 0', opacity: 0.9 }} />
+                {/* Score label below */}
+                <div style={{ position: 'absolute', bottom: -24, fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>{r.score}</div>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 28 }}>Every decimal matters. There&apos;s a real difference between a 7.3 and a 7.8.</p>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 48 }}>Every decimal matters. There&apos;s a real difference between a 7.3 and a 7.8.</p>
         </div>
       </section>
 
