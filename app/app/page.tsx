@@ -71,7 +71,7 @@ function GridCard({ artwork, title, artist, rank, rating, onClick }: { artwork: 
 }
 
 function Box({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...style }}>{children}</div>;
+  return <div style={{ background: '#000', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', ...style }}>{children}</div>;
 }
 
 function BoxHeader({ label, title, href, sort, onSort, extra }: { label?: string; title: string; href?: string; sort?: SortDir; onSort?: (d: SortDir) => void; extra?: React.ReactNode }) {
@@ -231,7 +231,7 @@ export default function AppHome() {
         .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .dash-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .dash-quad { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
-        .album-grid-sm { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .album-grid-sm { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
         @media (max-width: 900px) {
           .dash-grid { grid-template-columns: 1fr !important; }
           .dash-tri { grid-template-columns: 1fr !important; }
