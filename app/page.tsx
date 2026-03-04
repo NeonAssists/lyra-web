@@ -148,8 +148,8 @@ export default function HomePage() {
           <button className="lp-cta-btn" onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
             Sign Up Free
           </button>
-          <Link className="lp-cta-btn" href="/u/nate7" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
-            See Example Profile
+          <Link className="lp-cta-btn" href="/app" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
+            Explore the App
           </Link>
         </div>
 
