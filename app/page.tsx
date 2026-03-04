@@ -247,7 +247,7 @@ export default function HomePage() {
             Rate anything.<br />Down to the decimal.
           </h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
-            Songs, albums, EPs. Score from 1.0 to 10.0 in 0.1 increments. Add notes. Build a catalog that actually reflects your taste.
+            Songs, Albums, EPs. Score from 1.0 to 10.0 in 0.1 increments. Add notes. Build a catalog that actually reflects your taste.
           </p>
         </div>
       </section>
