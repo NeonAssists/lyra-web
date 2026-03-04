@@ -196,7 +196,7 @@ export default function UserProfilePage() {
             {displayed.length === 0 ? (
               <div className="py-16 text-center text-[#8E8E93]">No rankings yet.</div>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-1" style={{ paddingBottom: 100 }}>
                 {displayed.map((item, i) => {
                   const col = ratingColor(item.rating);
                   return (

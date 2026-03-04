@@ -168,7 +168,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {me ? (
             <button onClick={() => setMobileMenuOpen(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1, padding: 0 }}>
               {me.avatar_url
-                ? <img src={me.avatar_url} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} alt="" />
+                ? <><img src={me.avatar_url} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} alt="" onError={(e) => { const img = e.target as HTMLImageElement; img.style.display = "none"; const next = img.nextElementSibling as HTMLElement; if (next) next.style.display = "flex"; }} /><div style={{ display: "none", width: 20, height: 20, borderRadius: "50%", background: "#6C63FF", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#fff" }}>{(me.display_name || me.handle || '?')[0].toUpperCase()}</div></>
                 : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#6C63FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#fff' }}>
                     {(me.display_name || me.handle || '?')[0].toUpperCase()}
                   </div>}
