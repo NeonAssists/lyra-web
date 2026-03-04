@@ -19,6 +19,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [me, setMe] = useState<User | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -164,7 +165,57 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          {me ? (
+            <button onClick={() => setMobileMenuOpen(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1, padding: 0 }}>
+              {me.avatar_url
+                ? <img src={me.avatar_url} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }} alt="" />
+                : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#6C63FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#fff' }}>
+                    {(me.display_name || me.handle || '?')[0].toUpperCase()}
+                  </div>}
+              <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Me</span>
+            </button>
+          ) : (
+            <Link href="/login" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
+              <svg width="20" height="20" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Sign In</span>
+            </Link>
+          )}
         </nav>
+
+        {/* Mobile profile bottom sheet */}
+        {mobileMenuOpen && me && (
+          <>
+            <div onClick={() => setMobileMenuOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200 }} />
+            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#1c1c1e', borderRadius: '20px 20px 0 0', padding: '20px 0 max(20px, env(safe-area-inset-bottom)) 0', zIndex: 201 }}>
+              <div style={{ width: 40, height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, margin: '0 auto 20px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px 16px' }}>
+                {me.avatar_url
+                  ? <img src={me.avatar_url} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} alt="" />
+                  : <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#6C63FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                      {(me.display_name || me.handle || '?')[0].toUpperCase()}
+                    </div>}
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{me.display_name || me.handle}</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>@{me.handle}</p>
+                </div>
+              </div>
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 24px' }} />
+              <Link href={`/u/${me.handle}`} onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 24px', color: '#fff', textDecoration: 'none', fontSize: 16 }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                View Profile
+              </Link>
+              <Link href="/account" onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 24px', color: '#fff', textDecoration: 'none', fontSize: 16 }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Account & Billing
+              </Link>
+              <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0 24px' }} />
+              <button onClick={() => { setMobileMenuOpen(false); signOut(); }} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 24px', color: '#FF453A', background: 'none', border: 'none', cursor: 'pointer', width: '100%', fontSize: 16, textAlign: 'left' }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+              </button>
+            </div>
+          </>
+        )}
 
       </div>
     </>
