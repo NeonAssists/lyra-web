@@ -53,6 +53,77 @@ function ListRow({ item, rank, onClick, compact }: { item: any; rank?: number; o
   );
 }
 
+function WelcomeStep1({ scaleTiers, onNext, onSkip }: {
+  scaleTiers: { score: number; label: string; color: string }[];
+  onNext: () => void;
+  onSkip: () => void;
+}) {
+  const [demoRating, setDemoRating] = useState(7.3);
+  const activeTier = [...scaleTiers].reverse().find(t => demoRating >= t.score) ?? scaleTiers[0];
+  const pct = ((demoRating - 1) / 9) * 100;
+
+  return (
+    <>
+      {/* Badge */}
+      <div style={{ display: 'inline-block', background: 'rgba(212,118,78,0.15)', border: '1px solid rgba(212,118,78,0.3)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#D4764E', letterSpacing: 1, textTransform: 'uppercase' as const, marginBottom: 16 }}>How Lyra Works</div>
+
+      {/* Headline */}
+      <h2 style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1.1, marginBottom: 8, marginTop: 0 }}>Rate from 1.0 to 10.0.</h2>
+      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 20, marginTop: 8 }}>Every decimal matters. A 7.3 hits different than a 7.8. Try the slider:</p>
+
+      {/* Live decimal slider demo */}
+      <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12, justifyContent: 'center' }}>
+          <span style={{ fontSize: 52, fontWeight: 900, color: activeTier.color, lineHeight: 1, letterSpacing: -2, transition: 'color 0.15s' }}>{demoRating.toFixed(1)}</span>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: activeTier.color, transition: 'color 0.15s' }}>{activeTier.label}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>out of 10.0</div>
+          </div>
+        </div>
+        {/* Slider track */}
+        <div style={{ position: 'relative', height: 28, display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)' }} />
+          <div style={{ position: 'absolute', left: 0, width: `${pct}%`, height: 6, borderRadius: 3, background: activeTier.color, transition: 'width 0.05s, background 0.15s' }} />
+          <style>{`.w-slider{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;outline:none;cursor:pointer;position:relative;z-index:1}.w-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid ${activeTier.color};box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:border-color 0.15s}.w-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid ${activeTier.color}}`}</style>
+          <input className="w-slider" type="range" min="1" max="10" step="0.1" value={demoRating}
+            onChange={e => setDemoRating(parseFloat(e.target.value))} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 600, marginTop: 4 }}>
+          <span>1.0</span><span>5.0</span><span>10.0</span>
+        </div>
+      </div>
+
+      {/* Scale bar chart — ghost + fill, rainbow */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 80, marginBottom: 4, position: 'relative' }}>
+        {scaleTiers.map(tier => {
+          const fillPct = 10 + (tier.score / 10) * 90;
+          return (
+            <div key={tier.score} style={{ flex: 1, height: '100%', position: 'relative' }}>
+              {/* Ghost track */}
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '4px 4px 0 0' }} />
+              {/* Colored fill */}
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${fillPct}%`, background: tier.color, borderRadius: '4px 4px 0 0', opacity: 0.85 }} />
+              {/* Score label */}
+              <div style={{ position: 'absolute', bottom: -18, left: 0, right: 0, textAlign: 'center' as const, fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.45)' }}>{tier.score}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ marginBottom: 24 }} />
+
+      {/* CTA */}
+      <button onClick={onNext}
+        style={{ width: '100%', marginTop: 8, padding: 16, borderRadius: 100, background: activeTier.color, color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3, transition: 'background 0.15s' }}>
+        Got it — let me rate some music →
+      </button>
+      <button onClick={onSkip}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' as const }}>
+        Skip
+      </button>
+    </>
+  );
+}
+
 function GridCard({ artwork, title, artist, rank, rating, onClick }: { artwork: string; title: string; artist: string; rank?: number; rating?: number; onClick: () => void }) {
   const [hov, setHov] = useState(false);
   const col = rating ? ratingColor(rating) : null;
@@ -554,44 +625,11 @@ export default function AppHome() {
 
                 <div style={{ padding: '0 28px 28px' }}>
                   {welcomeStep === 1 ? (
-                    <>
-                      {/* Badge */}
-                      <div style={{ display: 'inline-block', background: 'rgba(108,99,255,0.15)', border: '1px solid rgba(108,99,255,0.3)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#6C63FF', letterSpacing: 1, textTransform: 'uppercase' as const, marginBottom: 16 }}>How Lyra Works</div>
-
-                      {/* Headline */}
-                      <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1.1, marginBottom: 8, margin: 0, marginTop: 0 }}>Rate music on{'\n'}a 1–10 scale.</h2>
-
-                      {/* Subtext */}
-                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 24, marginTop: 8 }}>Every decimal matters. A 7.3 is a lot different than a 7.8. Here&apos;s what the numbers mean:</p>
-
-                      {/* Scale bar chart — horizontal, 1 left → 10 right */}
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120, marginBottom: 0 }}>
-                        {scaleTiers.map(tier => {
-                          const barH = 14 + (tier.score / 10) * 86;
-                          return (
-                            <div key={tier.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textAlign: 'center' as const, lineHeight: 1.1, letterSpacing: '-0.2px' }}>
-                                {tier.label === 'Below avg' ? 'Below\navg' : tier.label}
-                              </span>
-                              <div style={{ width: '100%', height: barH, background: `linear-gradient(180deg, ${tier.color}, ${tier.color}88)`, borderRadius: '4px 4px 2px 2px' }} />
-                              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.55)' }}>{tier.score}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* CTA button */}
-                      <button onClick={() => setWelcomeStep(2)}
-                        style={{ width: '100%', marginTop: 24, padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
-                        Got it — let me rate some music →
-                      </button>
-
-                      {/* Skip link */}
-                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' as const }}>
-                        Skip
-                      </button>
-                    </>
+                    <WelcomeStep1
+                      scaleTiers={scaleTiers}
+                      onNext={() => setWelcomeStep(2)}
+                      onSkip={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
+                    />
                   ) : welcomeStep === 2 ? (
                     <>
                       {/* Back arrow + header row */}
