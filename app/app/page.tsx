@@ -705,15 +705,15 @@ export default function AppHome() {
                       <div style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>🎴</div>
 
                       {/* Headline */}
-                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Music that fits your taste. Exactly.</h3>
-                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Lyra builds curated Packs based on what you rate. Swipe through songs — the more you rate, the better your Packs get. Underground gems included.</p>
+                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Your ratings build your playlist.</h3>
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Rate music and Lyra turns it into a personalized playlist — underground gems included. Build lists, share them, and collaborate with friends on ranked collections.</p>
 
                       {/* Feature list */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
                         {[
-                          { icon: '🎯', title: 'Built around your ratings', desc: 'Packs are generated from your actual taste, not generic charts.' },
-                          { icon: '🌍', title: 'Global & underground', desc: 'From Billboard hits to deep cuts you\'ve never heard.' },
-                          { icon: '⚡', title: 'Gets smarter over time', desc: 'Rate more, get better Packs. Simple.' },
+                          { icon: '🎵', title: 'Becomes your personalized playlist', desc: 'Packs pull from your actual taste and update as you keep rating.' },
+                          { icon: '📋', title: 'Build lists & collaborate', desc: 'Create ranked lists for any vibe — then invite friends to add and rate alongside you.' },
+                          { icon: '🌍', title: 'Global & underground', desc: 'From charts to deep cuts you\'ve never heard.' },
                         ].map((f, i) => (
                           <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: '14px 16px' }}>
                             <span style={{ fontSize: 22, flexShrink: 0 }}>{f.icon}</span>
