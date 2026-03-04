@@ -81,6 +81,85 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function RatingSliderCard() {
+  const [rating, setRating] = useState(8.7);
+
+  const getRatingColor = (r: number) => {
+    if (r < 2) return '#dc2626';
+    if (r < 3) return '#ea580c';
+    if (r < 4) return '#f59e0b';
+    if (r < 5) return '#a3912a';
+    if (r < 6) return '#84a332';
+    if (r < 7) return '#22863a';
+    if (r < 8) return '#059669';
+    if (r < 9) return '#0891b2';
+    if (r < 9.5) return '#3b82f6';
+    return '#8b5cf6';
+  };
+
+  const getRatingLabel = (r: number) => {
+    if (r < 2) return 'Skip';
+    if (r < 3) return 'Weak';
+    if (r < 4) return 'Meh';
+    if (r < 5) return 'Below avg';
+    if (r < 6) return 'Average';
+    if (r < 7) return 'Decent';
+    if (r < 8) return 'Good';
+    if (r < 9) return 'Great';
+    if (r < 9.5) return 'Elite';
+    return 'Masterpiece';
+  };
+
+  const color = getRatingColor(rating);
+  const pct = ((rating - 1) / 9) * 100;
+
+  return (
+    <div style={{ background: 'rgba(20,16,12,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: `0 20px 60px ${color}33` }}>
+      {/* Song row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <img src="/covers/blinding-lights.jpg" alt="Blinding Lights" style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0, objectFit: 'cover' }} />
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
+        </div>
+      </div>
+
+      {/* Rating display */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 16 }}>
+        <span style={{ fontSize: 40, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-1px', transition: 'color 0.2s' }}>{rating.toFixed(1)}</span>
+        <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>/ 10.0</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color, background: `${color}18`, padding: '3px 10px', borderRadius: 20, transition: 'all 0.2s' }}>{getRatingLabel(rating)}</span>
+      </div>
+
+      {/* Slider track */}
+      <div style={{ position: 'relative', marginBottom: 8 }}>
+        <style>{`
+          .lyra-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer; background: transparent; }
+          .lyra-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: pointer; border: 3px solid var(--lyra-accent, #8b5cf6); transition: border-color 0.2s; }
+          .lyra-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: pointer; border: 3px solid var(--lyra-accent, #8b5cf6); }
+        `}</style>
+        {/* Ghost track */}
+        <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)', transform: 'translateY(-50%)' }} />
+        {/* Filled track */}
+        <div style={{ position: 'absolute', top: '50%', left: 0, width: `${pct}%`, height: 6, borderRadius: 3, background: color, transform: 'translateY(-50%)', transition: 'width 0.05s, background 0.2s' }} />
+        <input
+          className="lyra-slider"
+          type="range"
+          min="1"
+          max="10"
+          step="0.1"
+          value={rating}
+          style={{ '--lyra-accent': color } as React.CSSProperties}
+          onChange={e => setRating(parseFloat(e.target.value))}
+        />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>
+        <span>1.0</span><span>5.0</span><span>10.0</span>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [showWaitlist, setShowWaitlist] = useState(false);
@@ -163,20 +242,9 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Mobile rating card */}
-        <div className="lp-mobile-only" style={{ background: 'rgba(20,16,12,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: '0 20px 60px rgba(212,118,78,0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <img src="/covers/blinding-lights.jpg" alt="Blinding Lights" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, objectFit: 'cover' }} />
-            <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <span style={{ fontSize: 32, fontWeight: 700, color: '#D4764E' }}>8.7</span>
-            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>/ 10.0</span>
-            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginLeft: 8 }}>⭐ Your rating</span>
-          </div>
+        {/* Mobile interactive rating card */}
+        <div className="lp-mobile-only">
+          <RatingSliderCard />
         </div>
       </section>
 
