@@ -81,21 +81,14 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-type LiveFeedItem = { item_id: string; title: string; artist: string; artwork_url: string; rating: number; ranked_at: string };
-
 export default function HomePage() {
   const router = useRouter();
   const [showWaitlist, setShowWaitlist] = useState(false);
-  const [liveFeed, setLiveFeed] = useState<LiveFeedItem[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) router.replace('/app');
     });
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/live-feed').then(r => r.json()).then(d => setLiveFeed(d ?? [])).catch(() => {});
   }, []);
 
   const openWaitlist = () => setShowWaitlist(true);
@@ -126,7 +119,22 @@ export default function HomePage() {
       {/* Nav — Apple minimal */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', padding: '0 22px', height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.5px' }}>Lyra</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg viewBox="0 0 1024 1024" width="24" height="24" style={{ flexShrink: 0 }}>
+              <rect width="1024" height="1024" fill="transparent"/>
+              <g transform="translate(512, 512)">
+                <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+                <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+                <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+                <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+                <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+                <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
+                <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+                <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
+              </g>
+            </svg>
+            <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.5px' }}>Lyra</span>
+          </div>
           <Link href="/login" style={{ fontSize: 13, fontWeight: 500, color: '#6C63FF', textDecoration: 'none', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(108,99,255,0.4)', transition: 'all 0.2s' }}>
             Sign In
           </Link>
@@ -135,6 +143,21 @@ export default function HomePage() {
 
       {/* Hero — full viewport, Apple style */}
       <section className="lp-hero" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
+        <div style={{ marginBottom: 28 }}>
+          <svg viewBox="0 0 1024 1024" width="52" height="52">
+            <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.12)"/>
+            <g transform="translate(512, 512)">
+              <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+              <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+              <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+              <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+              <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+              <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
+              <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+              <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
+            </g>
+          </svg>
+        </div>
         <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 24 }}>Now in Beta</p>
         <h1 style={{ fontSize: 'clamp(3rem, 10vw, 7rem)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-2px', margin: '0 0 28px', maxWidth: 900 }}>
           Rate music.<br />
@@ -189,28 +212,22 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Live feed */}
-      {liveFeed.length > 0 && (
-        <section style={{ padding: '40px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ maxWidth: 980, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 24, marginBottom: 16 }}>
-              <div style={{ width: 8, height: 8, borderRadius: 4, background: '#ef4444', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Live</span>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>Recently rated by the community</span>
+      {/* Stats strip */}
+      <section style={{ padding: '48px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, textAlign: 'center' }} className="lp-stat-grid">
+          {[
+            { value: '50,000+', label: 'Ratings given' },
+            { value: '1–10', label: 'Decimal precision' },
+            { value: '∞', label: 'Songs & albums' },
+            { value: '100%', label: 'Opinion, no algorithm' },
+          ].map((s, i) => (
+            <div key={`stat-${i}`} style={{ padding: '24px 16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18 }}>
+              <p style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-1px', marginBottom: 6 }}>{s.value}</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 500, letterSpacing: 0.2 }}>{s.label}</p>
             </div>
-            <div className="live-scroll" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingLeft: 24, paddingRight: 24, paddingBottom: 8 }}>
-              {liveFeed.map((item, i) => (
-                <div key={`lf-${i}-${item.item_id}`} style={{ flexShrink: 0, width: 150, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 12 }}>
-                  {item.artwork_url && <img src={item.artwork_url} alt={item.title} style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', marginBottom: 8 }} />}
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{item.title}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 8 }}>{item.artist}</p>
-                  <div style={{ display: 'inline-block', background: '#6C63FF', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100 }}>{Number(item.rating).toFixed(1)} ★</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+          ))}
+        </div>
+      </section>
 
       {/* Feature 1 — Rate Anything */}
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
@@ -412,7 +429,20 @@ export default function HomePage() {
       {/* Footer */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '32px 24px' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <span style={{ fontSize: 15, fontWeight: 700 }}>Lyra</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <svg viewBox="0 0 1024 1024" width="18" height="18">
+              <g transform="translate(512, 512)">
+                <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                <line x1="-50" y1="-165" x2="-50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+                <line x1="0" y1="-165" x2="0" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.7} strokeLinecap="round"/>
+                <line x1="50" y1="-165" x2="50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+              </g>
+            </svg>
+            <span style={{ fontSize: 15, fontWeight: 700 }}>Lyra</span>
+          </div>
           <div style={{ display: 'flex', gap: 24 }}>
             <Link href="/privacy" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Privacy Policy</Link>
             <a href="https://github.com/NeonAssists/lyra-web" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>GitHub</a>
