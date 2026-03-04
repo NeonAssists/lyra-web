@@ -162,7 +162,7 @@ export default function AppHome() {
 
   // Welcome modal trigger + fetch popular albums
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed') && me) {
+    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v2') && me) {
       setShowWelcome(true);
       fetch('https://itunes.apple.com/us/rss/topalbums/limit=30/json')
         .then(r => r.json())
@@ -522,10 +522,10 @@ export default function AppHome() {
       {/* Welcome Modal */}
       {showWelcome && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-          onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}>
+          onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}>
           <div style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '32px 28px', maxWidth: 520, width: '100%', position: 'relative' }}
             onClick={e => e.stopPropagation()}>
-            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
               style={{ position: 'absolute', top: 16, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
 
             {/* Header */}
@@ -537,7 +537,7 @@ export default function AppHome() {
             </div>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 12, lineHeight: 1.5 }}>Tap albums you know to rate them</p>
 
-            <LyraScale size="compact" />
+            <LyraScale size="full" />
 
             {/* Album grid */}
             <div style={{ maxHeight: 380, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10 }}>
@@ -593,7 +593,7 @@ export default function AppHome() {
             })()}
 
             {/* Footer */}
-            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
               style={{ width: '100%', marginTop: 20, background: Object.keys(welcomeRatings).length > 0 ? '#6C63FF' : 'transparent', color: Object.keys(welcomeRatings).length > 0 ? '#fff' : 'rgba(255,255,255,0.35)', border: Object.keys(welcomeRatings).length > 0 ? 'none' : '1px solid rgba(255,255,255,0.1)', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               {Object.keys(welcomeRatings).length > 0 ? `Done (${Object.keys(welcomeRatings).length} rated) →` : 'Skip for now →'}
             </button>
