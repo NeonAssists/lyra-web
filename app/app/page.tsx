@@ -58,7 +58,7 @@ function GridCard({ artwork, title, artist, rank, rating, onClick }: { artwork: 
   const col = rating ? ratingColor(rating) : null;
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 12, textAlign: 'left', transition: 'background 0.15s', width: '100%' }}>
+      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 12, textAlign: 'left', transition: 'opacity 0.15s', opacity: hov ? 0.75 : 1, width: '100%' }}>
       <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 8, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
         {artwork ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="160px" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 22 }}>♪</div>}
         {rank != null && <div style={{ position: 'absolute', top: 5, left: 5, background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 5px', borderRadius: 4 }}>#{rank}</div>}

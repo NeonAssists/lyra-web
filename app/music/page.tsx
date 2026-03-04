@@ -45,8 +45,8 @@ function AlbumTile({ artwork, title, artist, badge, onClick }: { artwork: string
   const [hov, setHov] = useState(false);
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background: hov ? '#1c1c1e' : 'transparent', border: 'none', cursor: 'pointer', padding: 10, borderRadius: 12, textAlign: 'left', width: '100%', transition: 'background 0.15s' }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 10 }}>
+      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, borderRadius: 12, textAlign: 'left', width: '100%', transition: 'opacity 0.15s', opacity: hov ? 0.75 : 1 }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
         {artwork
           ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes="200px" />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: 28 }}>♪</div>}
@@ -56,8 +56,8 @@ function AlbumTile({ artwork, title, artist, badge, onClick }: { artwork: string
           </div>
         )}
       </div>
-      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 3 }}>{title}</p>
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
+      <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2, paddingLeft: 2 }}>{title}</p>
+      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingLeft: 2 }}>{artist}</p>
     </button>
   );
 }
@@ -91,10 +91,10 @@ export default function MusicPage() {
     });
     const safeFetch = (url: string) => fetch(url).then(r => { if (!r.ok) return { feed: { entry: [] } }; return r.json(); }).catch(() => ({ feed: { entry: [] } }));
     const albumUrl = activeGenre
-      ? `https://itunes.apple.com/us/rss/topalbums/limit=25/genre=${activeGenre}/json`
-      : `https://itunes.apple.com/us/rss/topalbums/limit=50/json`;
+      ? `https://itunes.apple.com/us/rss/topalbums/limit=100/genre=${activeGenre}/json`
+      : `https://itunes.apple.com/us/rss/topalbums/limit=100/json`;
     const songUrl = activeGenre
-      ? `https://itunes.apple.com/us/rss/topsongs/limit=25/genre=${activeGenre}/json`
+      ? `https://itunes.apple.com/us/rss/topsongs/limit=100/genre=${activeGenre}/json`
       : null;
     const fetches: Promise<any>[] = [safeFetch(albumUrl)];
     if (songUrl) fetches.push(safeFetch(songUrl));
