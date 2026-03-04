@@ -423,27 +423,63 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '32px 24px' }}>
-        <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg viewBox="0 0 1024 1024" width="18" height="18">
-              <g transform="translate(512, 512)">
-                <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
-                <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
-                <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
-                <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
-                <line x1="-50" y1="-165" x2="-50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
-                <line x1="0" y1="-165" x2="0" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.7} strokeLinecap="round"/>
-                <line x1="50" y1="-165" x2="50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
-              </g>
-            </svg>
-            <span style={{ fontSize: 15, fontWeight: 700 }}>Lyra</span>
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '48px 24px 32px' }}>
+        <div style={{ maxWidth: 980, margin: '0 auto' }}>
+          {/* Top row */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
+            {/* Brand */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                <svg viewBox="0 0 1024 1024" width="20" height="20">
+                  <g transform="translate(512, 512)">
+                    <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                    <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                    <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                    <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                    <line x1="-50" y1="-165" x2="-50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+                    <line x1="0" y1="-165" x2="0" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.7} strokeLinecap="round"/>
+                    <line x1="50" y1="-165" x2="50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+                  </g>
+                </svg>
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Lyra</span>
+              </div>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', maxWidth: 220, lineHeight: 1.6 }}>Rate music. Build taste. Share it.</p>
+            </div>
+            {/* Links */}
+            <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 14 }}>Product</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <Link href="/app" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Explore App</Link>
+                  <Link href="/charts" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Charts</Link>
+                  <Link href="/music" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Music</Link>
+                  <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Sign Up Free</Link>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 14 }}>Connect</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <a href="https://x.com/Get_Lyra" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>X / Twitter</a>
+                  <a href="https://www.instagram.com/get_lyra" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Instagram</a>
+                  <a href="mailto:hello@getlyra.app" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Contact</a>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 14 }}>Legal</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <Link href="/privacy" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Privacy Policy</Link>
+                </div>
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 24 }}>
-            <Link href="/privacy" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>Privacy Policy</Link>
-            <a href="https://github.com/NeonAssists/lyra-web" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textDecoration: 'none' }}>GitHub</a>
+          {/* Bottom row */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>© 2026 Lyra. All rights reserved.</span>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <a href="https://x.com/Get_Lyra" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.3)', textDecoration: 'none', fontSize: 13 }}>𝕏</a>
+              <a href="https://www.instagram.com/get_lyra" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.3)', textDecoration: 'none', fontSize: 13 }}>📷</a>
+            </div>
           </div>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>© 2026 Lyra</span>
         </div>
       </footer>
     </div>
