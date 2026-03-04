@@ -315,7 +315,7 @@ export default function AppHome() {
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, marginBottom: 16 }}>Decimal ratings from 1.0–10.0. Real opinions. No algorithm.</p>
             <div style={{ display: 'flex', gap: 8 }}>
               <a href="/login" style={{ padding: '9px 20px', borderRadius: 100, background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>Sign Up Free</a>
-              <a href="/charts" style={{ padding: '9px 20px', borderRadius: 100, background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>Explore Charts</a>
+              <a href="/music" style={{ padding: '9px 20px', borderRadius: 100, background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: 13, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>Explore</a>
             </div>
           </div>
         )}
