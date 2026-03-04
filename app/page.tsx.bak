@@ -33,7 +33,7 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
       {/* Backdrop */}
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)' }} />
       {/* Card */}
-      <div style={{ position: 'relative', background: 'rgba(20,16,12,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 28, padding: '48px 40px', width: '100%', maxWidth: 420, textAlign: 'center' }}
+      <div style={{ position: 'relative', background: 'rgba(18,18,18,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 28, padding: '48px 40px', width: '100%', maxWidth: 420, textAlign: 'center' }}
         onClick={e => e.stopPropagation()}>
         {/* Close */}
         <button onClick={onClose} style={{ position: 'absolute', top: 18, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
@@ -44,12 +44,12 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>You're in!</h2>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: 6 }}>We'll email you the moment the app is ready to download.</p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1.5 }}>You'll be one of the first to rate, rank, and build your music taste profile.</p>
-            <button onClick={onClose} style={{ marginTop: 28, background: '#D4764E', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Done</button>
+            <button onClick={onClose} style={{ marginTop: 28, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '12px 32px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Done</button>
           </>
         ) : (
           <>
             {/* Ambient glow */}
-            <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse, rgba(212,118,78,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse, rgba(108,99,255,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 8 }}>Create Account</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 32, lineHeight: 1.5 }}>Sign up to start rating music. No spam — just the drop.</p>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -69,7 +69,7 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
               />
               {error && <p style={{ fontSize: 13, color: '#ef4444', margin: 0 }}>{error}</p>}
               <button type="submit" disabled={loading}
-                style={{ background: '#D4764E', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, marginTop: 4 }}>
+                style={{ background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, marginTop: 4 }}>
                 {loading ? 'Creating…' : 'Sign Up →'}
               </button>
             </form>
@@ -94,10 +94,8 @@ export default function HomePage() {
   const openWaitlist = () => setShowWaitlist(true);
 
   return (
-    <div className="text-white overflow-x-hidden" style={{ background: '#0C0A07', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif' }}>
+    <div className="bg-black text-white overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
-        .lp-serif { font-family: 'DM Serif Display', Georgia, serif; }
         .lp-mobile-only { display: none; }
         .lp-cta-btn { display: inline-flex; }
         @media (max-width: 768px) {
@@ -119,10 +117,10 @@ export default function HomePage() {
       {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
 
       {/* Nav — Apple minimal */}
-      <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(12,10,7,0.85)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ width: '100%', padding: '0 22px', height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
           <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.5px' }}>Lyra</span>
-          <Link href="/login" style={{ fontSize: 13, fontWeight: 500, color: '#D4764E', textDecoration: 'none', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(212,118,78,0.4)', transition: 'all 0.2s' }}>
+          <Link href="/login" style={{ fontSize: 13, fontWeight: 500, color: '#6C63FF', textDecoration: 'none', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(108,99,255,0.4)', transition: 'all 0.2s' }}>
             Sign In
           </Link>
         </div>
@@ -131,31 +129,31 @@ export default function HomePage() {
       {/* Hero — full viewport, Apple style */}
       <section className="lp-hero" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
         <div style={{ marginBottom: 32 }}>
-          <svg viewBox="0 0 1024 1024" width="108" height="108" style={{ filter: 'drop-shadow(0 0 32px rgba(212,118,78,0.55))' }}>
-            <rect width="1024" height="1024" rx="220" fill="rgba(212,118,78,0.15)"/>
+          <svg viewBox="0 0 1024 1024" width="108" height="108" style={{ filter: 'drop-shadow(0 0 32px rgba(108,99,255,0.55))' }}>
+            <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.15)"/>
             <g transform="translate(512, 512)">
-              <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#D4764E" strokeWidth="60" fill="none" strokeLinecap="round"/>
-              <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#D4764E" strokeWidth="60" fill="none" strokeLinecap="round"/>
-              <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#D4764E" strokeWidth="60" strokeLinecap="round"/>
-              <line x1="-85" y1="150" x2="85" y2="150" stroke="#D4764E" strokeWidth="60" strokeLinecap="round"/>
-              <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#D4764E" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
-              <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#D4764E" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
-              <line x1="20" y1="-165" x2="20" y2="140" stroke="#D4764E" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
-              <line x1="60" y1="-165" x2="60" y2="140" stroke="#D4764E" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
+              <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+              <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+              <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+              <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+              <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+              <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
+              <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+              <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
             </g>
           </svg>
         </div>
-        <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#D4764E', marginBottom: 24 }}>Now in Beta</p>
-        <h1 className="lp-serif" style={{ fontSize: 'clamp(3rem, 10vw, 7rem)', fontWeight: 400, lineHeight: 1.05, letterSpacing: '-1px', margin: '0 0 28px', maxWidth: 900 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 24 }}>Now in Beta</p>
+        <h1 style={{ fontSize: 'clamp(3rem, 10vw, 7rem)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-2px', margin: '0 0 28px', maxWidth: 900 }}>
           Rate music.<br />
           Build taste.<br />
-          <span style={{ color: '#D4764E', fontStyle: 'italic' }}>Share it.</span>
+          <span style={{ color: '#6C63FF' }}>Share it.</span>
         </h1>
         <p style={{ fontSize: 'clamp(1rem, 2vw, 1.3rem)', color: 'rgba(255,255,255,0.55)', maxWidth: 540, lineHeight: 1.6, marginBottom: 48, fontWeight: 400 }}>
           Decimal scores. Real opinions. No algorithm telling you what to like.
         </p>
         <div className="lp-cta-wrap" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button className="lp-cta-btn" onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#D4764E', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
+          <button className="lp-cta-btn" onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
             Sign Up Free
           </button>
           <Link className="lp-cta-btn" href="/app" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -164,7 +162,7 @@ export default function HomePage() {
         </div>
 
         {/* Mobile rating card */}
-        <div className="lp-mobile-only" style={{ background: 'rgba(20,16,12,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: '0 20px 60px rgba(212,118,78,0.2)' }}>
+        <div className="lp-mobile-only" style={{ background: 'rgba(18,18,18,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: '0 20px 60px rgba(108,99,255,0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <img src="https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a6/6e/bf/a66ebf79-5008-8948-b352-a790fc87446b/19UM1IM04638.rgb.jpg/100x100bb.jpg" alt="Blinding Lights" style={{ width: 40, height: 40, borderRadius: 10, flexShrink: 0, objectFit: 'cover' }} />
             <div>
@@ -173,7 +171,7 @@ export default function HomePage() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <span style={{ fontSize: 32, fontWeight: 700, color: '#D4764E' }}>8.7</span>
+            <span style={{ fontSize: 32, fontWeight: 700, color: '#6C63FF' }}>8.7</span>
             <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>/ 10.0</span>
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginLeft: 8 }}>⭐ Your rating</span>
           </div>
@@ -212,7 +210,7 @@ export default function HomePage() {
               { score: '7.0', label: 'Good', height: 116, color: '#4d7c0f' },
               { score: '8.0', label: 'Great', height: 132, color: '#15803d' },
               { score: '9.0', label: 'Elite', height: 148, color: '#0369a1' },
-              { score: '10.0', label: 'Masterpiece', height: 164, color: '#D4764E' },
+              { score: '10.0', label: 'Masterpiece', height: 164, color: '#6C63FF' },
             ].map((r, i) => (
               <div key={`rs-${i}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{r.label}</p>
@@ -229,7 +227,7 @@ export default function HomePage() {
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           {/* Mobile mini song list */}
-          <div className="lp-mobile-only" style={{ background: '#120F0B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
+          <div className="lp-mobile-only" style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
             {[
               { name: 'Starboy', artist: 'The Weeknd', rating: '9.1', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b5/92/bb/b592bb72-52e3-e756-9b26-9f56d08f47ab/16UMGIM67864.rgb.jpg/100x100bb.jpg' },
               { name: 'Levitating', artist: 'Dua Lipa', rating: '7.4', cover: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6c/11/d6/6c11d681-aa3a-d59e-4c2e-f77e181026ab/190295092665.jpg/100x100bb.jpg' },
@@ -241,13 +239,13 @@ export default function HomePage() {
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{song.name}</div>
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{song.artist}</div>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#D4764E', background: 'rgba(212,118,78,0.12)', padding: '3px 8px', borderRadius: 10, flexShrink: 0 }}>{song.rating}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#6C63FF', background: 'rgba(108,99,255,0.12)', padding: '3px 8px', borderRadius: 10, flexShrink: 0 }}>{song.rating}</span>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#D4764E', marginBottom: 20 }}>Precision</p>
-          <h2 className="lp-serif" style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 400, letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 24 }}>
-            Rate anything.<br /><em style={{ color: '#D4764E' }}>Down to the decimal.</em>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Precision</p>
+          <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
+            Rate anything.<br />Down to the decimal.
           </h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
             Songs, Albums, EPs. Score from 1.0 to 10.0 in 0.1 increments. Add notes. Build a catalog that actually reflects your taste.
@@ -259,9 +257,9 @@ export default function HomePage() {
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           {/* Mobile mini activity feed */}
-          <div className="lp-mobile-only" style={{ background: '#120F0B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
+          <div className="lp-mobile-only" style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
             {[
-              { initials: 'J', name: 'Jake', artist: 'Tame Impala', rating: '8.2', time: '2m ago', gradient: '135deg,#D4764E,#E8A882' },
+              { initials: 'J', name: 'Jake', artist: 'Tame Impala', rating: '8.2', time: '2m ago', gradient: '135deg,#6C63FF,#9C8FFF' },
               { initials: 'A', name: 'Ari', artist: 'Tyler, The Creator', rating: '9.0', time: '5m ago', gradient: '135deg,#FF6584,#FF8FA3' },
             ].map((item, i) => (
               <div key={`mfeed-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i === 0 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
@@ -269,15 +267,15 @@ export default function HomePage() {
                   <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{item.initials}</span>
                 </div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.name} rated {item.artist} · <span style={{ color: '#D4764E' }}>{item.rating}</span></div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.name} rated {item.artist} · <span style={{ color: '#6C63FF' }}>{item.rating}</span></div>
                   <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{item.time}</div>
                 </div>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#D4764E', marginBottom: 20 }}>Social</p>
-          <h2 className="lp-serif" style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 400, letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 24 }}>
-            See what your<br /><em style={{ color: '#D4764E' }}>friends actually like.</em>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Social</p>
+          <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
+            See what your<br />friends actually like.
           </h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
             Follow friends, see their ratings in real time. Community Picks shows you what people you trust are rating 8+. The best music filter is taste you respect.
@@ -286,7 +284,7 @@ export default function HomePage() {
       </section>
 
       {/* Feature 2b — Friend Features with app mockups */}
-      <section className="lp-section" style={{ padding: '80px 24px 100px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(212,118,78,0.03)' }}>
+      <section className="lp-section" style={{ padding: '80px 24px 100px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
         <style>{`
           .friend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
           @media (max-width: 768px) { .friend-grid { grid-template-columns: 1fr; max-width: 340px; margin: 0 auto; } }
@@ -296,7 +294,7 @@ export default function HomePage() {
 
             {/* Mock 1: Friend Activity Feed */}
             <div style={{ textAlign: 'center' }}>
-              <div style={{ background: '#0F0C09', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
                 <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Activity</p>
                   <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>Friend Ratings</p>
@@ -327,20 +325,20 @@ export default function HomePage() {
 
             {/* Mock 2: Following / People */}
             <div style={{ textAlign: 'center' }}>
-              <div style={{ background: '#0F0C09', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
                 <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Social</p>
                   <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>People on Lyra</p>
                 </div>
                 {[
-                  { handle: 'maya_c', name: 'Maya Chen', ratings: 142, following: true, accent: '#D4764E' },
-                  { handle: 'jpark', name: 'Jonathan P', ratings: 87, following: false, accent: '#D4764E' },
-                  { handle: 'musicsnob', name: 'musicsnob17', ratings: 231, following: true, accent: '#D4764E' },
-                  { handle: 'cole', name: 'Cole H', ratings: 64, following: false, accent: '#D4764E' },
+                  { handle: 'maya_c', name: 'Maya Chen', ratings: 142, following: true, accent: '#6C63FF' },
+                  { handle: 'jpark', name: 'Jonathan P', ratings: 87, following: false, accent: '#6C63FF' },
+                  { handle: 'musicsnob', name: 'musicsnob17', ratings: 231, following: true, accent: '#6C63FF' },
+                  { handle: 'cole', name: 'Cole H', ratings: 64, following: false, accent: '#6C63FF' },
                 ].map((u, i) => (
                   <div key={`ppl-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(212,118,78,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ fontSize: 14, fontWeight: 800, color: '#D4764E' }}>{u.name[0]}</span>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(108,99,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#6C63FF' }}>{u.name[0]}</span>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{u.name}</p>
@@ -348,9 +346,9 @@ export default function HomePage() {
                     </div>
                     <div style={{
                       padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0,
-                      background: u.following ? 'rgba(212,118,78,0.12)' : '#D4764E',
-                      color: u.following ? '#D4764E' : '#fff',
-                      border: u.following ? '1px solid rgba(212,118,78,0.3)' : 'none',
+                      background: u.following ? 'rgba(108,99,255,0.12)' : '#6C63FF',
+                      color: u.following ? '#6C63FF' : '#fff',
+                      border: u.following ? '1px solid rgba(108,99,255,0.3)' : 'none',
                     }}>
                       {u.following ? 'Following' : 'Follow'}
                     </div>
@@ -363,7 +361,7 @@ export default function HomePage() {
 
             {/* Mock 3: Shared List */}
             <div style={{ textAlign: 'center' }}>
-              <div style={{ background: '#0F0C09', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
+              <div style={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, overflow: 'hidden', padding: '0', marginBottom: 20 }}>
                 <div style={{ padding: '16px 16px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Collab</p>
                   <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>Summer 2026 🔥</p>
@@ -401,9 +399,9 @@ export default function HomePage() {
       {/* Feature 3 — Discovery */}
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#D4764E', marginBottom: 20 }}>Discovery</p>
-          <h2 className="lp-serif" style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 400, letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 24 }}>
-            Music that fits<br /><em style={{ color: '#D4764E' }}>your taste. Exactly.</em>
+          <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Discovery</p>
+          <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
+            Music that fits<br />your taste. Exactly.
           </h2>
           <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
             Swipe through Discovery Packs built around your ratings. Lyra learns what you love — and finds more of it. Underground artists included.
@@ -414,9 +412,9 @@ export default function HomePage() {
       {/* Bottom CTA */}
       <section className="lp-cta-section" style={{ padding: '160px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <h2 className="lp-serif" style={{ fontSize: 'clamp(3rem, 9vw, 6rem)', fontWeight: 400, letterSpacing: '-1px', lineHeight: 1.05, marginBottom: 40 }}>
+          <h2 style={{ fontSize: 'clamp(3rem, 9vw, 6rem)', fontWeight: 900, letterSpacing: '-2px', lineHeight: 1.0, marginBottom: 40 }}>
             Your taste.<br />
-            <em style={{ color: '#D4764E' }}>Defined.</em>
+            <span style={{ color: 'rgba(255,255,255,0.25)' }}>Defined.</span>
           </h2>
           <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#fff', color: '#000', fontWeight: 700, fontSize: 17, padding: '16px 40px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.3px' }}>
             Create Account →
@@ -435,13 +433,13 @@ export default function HomePage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                 <svg viewBox="0 0 1024 1024" width="20" height="20">
                   <g transform="translate(512, 512)">
-                    <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#D4764E" strokeWidth="80" fill="none" strokeLinecap="round"/>
-                    <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#D4764E" strokeWidth="80" fill="none" strokeLinecap="round"/>
-                    <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#D4764E" strokeWidth="80" strokeLinecap="round"/>
-                    <line x1="-85" y1="150" x2="85" y2="150" stroke="#D4764E" strokeWidth="80" strokeLinecap="round"/>
-                    <line x1="-50" y1="-165" x2="-50" y2="140" stroke="#D4764E" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
-                    <line x1="0" y1="-165" x2="0" y2="140" stroke="#D4764E" strokeWidth="40" opacity={0.7} strokeLinecap="round"/>
-                    <line x1="50" y1="-165" x2="50" y2="140" stroke="#D4764E" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+                    <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                    <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="80" fill="none" strokeLinecap="round"/>
+                    <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                    <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="80" strokeLinecap="round"/>
+                    <line x1="-50" y1="-165" x2="-50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
+                    <line x1="0" y1="-165" x2="0" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.7} strokeLinecap="round"/>
+                    <line x1="50" y1="-165" x2="50" y2="140" stroke="#6C63FF" strokeWidth="40" opacity={0.55} strokeLinecap="round"/>
                   </g>
                 </svg>
                 <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Lyra</span>
