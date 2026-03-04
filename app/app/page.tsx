@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -135,11 +135,12 @@ export default function AppHome() {
   const [modalOpen, setModalOpen] = useState(false);
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
 
-  // Welcome modal (Change 3)
+  // Welcome modal
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeSearch, setWelcomeSearch] = useState('');
-  const [welcomeResults, setWelcomeResults] = useState<{ id: string; title: string; artist: string; artwork: string }[]>([]);
-  const [ratedInWelcome, setRatedInWelcome] = useState<{ title: string; rating: number }[]>([]);
+  const [welcomeSongs, setWelcomeSongs] = useState<{id:string;title:string;artist:string;artwork:string}[]>([]);
+  const [selectedInWelcome, setSelectedInWelcome] = useState<Set<string>>(new Set());
+  const [welcomeRatings, setWelcomeRatings] = useState<Record<string,number>>({});
+  const [welcomeRatingTarget, setWelcomeRatingTarget] = useState<string|null>(null);
 
   // Community hot (Change 4)
   const [communityHot, setCommunityHot] = useState<{ item_id: string; title: string; artist: string; artwork_url: string; rating: number }[]>([]);
@@ -156,39 +157,36 @@ export default function AppHome() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Welcome modal trigger
+  // Welcome modal trigger + fetch popular albums
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed') && me) setShowWelcome(true);
-  }, [me]);
-
-  // Welcome search debounce
-  const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    if (!welcomeSearch.trim()) { setWelcomeResults([]); return; }
-    if (welcomeTimer.current) clearTimeout(welcomeTimer.current);
-    welcomeTimer.current = setTimeout(() => {
-      fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(welcomeSearch)}&entity=song&limit=4`)
+    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed') && me) {
+      setShowWelcome(true);
+      fetch('https://itunes.apple.com/us/rss/topalbums/limit=30/json')
         .then(r => r.json())
-        .then(d => {
-          setWelcomeResults((d?.results ?? []).map((r: any) => ({
-            id: `itunes:trk:${r.trackId ?? ''}`,
-            title: r.trackName ?? '',
-            artist: r.artistName ?? '',
-            artwork: (r.artworkUrl100 ?? '').replace('100x100bb', '300x300bb'),
-          })));
+        .then(data => {
+          const entries = (data?.feed?.entry ?? []).map((e: any, i: number) => ({
+            id: `itunes:alb:${e.id?.attributes?.['im:id'] ?? i}`,
+            title: e['im:name']?.label ?? '',
+            artist: e['im:artist']?.label ?? '',
+            artwork: (e['im:image']?.[2]?.label ?? '').replace('170x170bb', '400x400bb'),
+          }));
+          setWelcomeSongs(entries.slice(0, 24));
         })
         .catch(() => {});
-    }, 400);
-    return () => { if (welcomeTimer.current) clearTimeout(welcomeTimer.current); };
-  }, [welcomeSearch]);
-
-  const saveWelcomeRating = useCallback(async (item: { id: string; title: string; artist: string; artwork: string }, rating: number) => {
-    if (!me) return;
-    setRatedInWelcome(prev => [...prev, { title: item.title, rating }]);
-    await (supabase as any).from('user_rankings').upsert({
-      user_id: me.id, item_id: item.id, title: item.title, artist: item.artist, artwork_url: item.artwork, rating, ranked_at: new Date().toISOString(),
-    }, { onConflict: 'user_id,item_id' });
+    }
   }, [me]);
+
+  const saveAllWelcomeRatings = useCallback(async () => {
+    if (!me) return;
+    const entries = Object.entries(welcomeRatings);
+    for (const [itemId, rating] of entries) {
+      const song = welcomeSongs.find(s => s.id === itemId);
+      if (!song) continue;
+      await (supabase as any).from('user_rankings').upsert({
+        user_id: me.id, item_id: song.id, title: song.title, artist: song.artist, artwork_url: song.artwork, rating, ranked_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,item_id' });
+    }
+  }, [me, welcomeRatings, welcomeSongs]);
 
   // User data + community hot
   useEffect(() => {
@@ -508,56 +506,84 @@ export default function AppHome() {
       {/* Welcome Modal */}
       {showWelcome && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-          onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}>
-          <div style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '40px 32px', maxWidth: 480, width: '100%', position: 'relative' }}
+          onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}>
+          <div style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '32px 28px', maxWidth: 520, width: '100%', position: 'relative' }}
             onClick={e => e.stopPropagation()}>
-            <button onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
               style={{ position: 'absolute', top: 16, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: '-0.5px' }}>Welcome to Lyra ⚡</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20, lineHeight: 1.5 }}>Rate 3 songs you love to get started</p>
-            {ratedInWelcome.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-                {ratedInWelcome.map((r, i) => (
-                  <span key={`wr-${i}`} style={{ background: 'rgba(108,99,255,0.15)', color: '#6C63FF', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{r.title} · {r.rating.toFixed(1)}</span>
-                ))}
-              </div>
-            )}
-            <input
-              value={welcomeSearch} onChange={e => setWelcomeSearch(e.target.value)} placeholder="Search for a song…"
-              style={{ width: '100%', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#fff', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {welcomeResults.map((r, i) => (
-                <WelcomeResultRow key={`wres-${i}-${r.id}`} item={r} onRate={(rating) => saveWelcomeRating(r, rating)} />
-              ))}
+
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', margin: 0 }}>Welcome to Lyra ⚡</h2>
+              {Object.keys(welcomeRatings).length > 0 && (
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF' }}>{Object.keys(welcomeRatings).length} rated</span>
+              )}
             </div>
-            {ratedInWelcome.length > 0 && (
-              <button onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
-                style={{ width: '100%', marginTop: 20, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-                Done →
-              </button>
-            )}
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20, lineHeight: 1.5 }}>Tap albums you know to rate them</p>
+
+            {/* Album grid */}
+            <div style={{ maxHeight: 380, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10 }}>
+              {welcomeSongs.map(song => {
+                const isSelected = selectedInWelcome.has(song.id);
+                const rating = welcomeRatings[song.id];
+                return (
+                  <button key={song.id}
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedInWelcome(prev => { const next = new Set(prev); next.delete(song.id); return next; });
+                        setWelcomeRatings(prev => { const next = { ...prev }; delete next[song.id]; return next; });
+                        if (welcomeRatingTarget === song.id) setWelcomeRatingTarget(null);
+                      } else {
+                        setSelectedInWelcome(prev => new Set(prev).add(song.id));
+                        if (rating === undefined) setWelcomeRatingTarget(song.id);
+                      }
+                    }}
+                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.05)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                    style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 12, overflow: 'hidden', transition: 'transform 0.15s', position: 'relative' }}>
+                    <div style={{ width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: isSelected ? '2px solid #6C63FF' : '2px solid transparent', boxSizing: 'border-box', position: 'relative' }}>
+                      <img src={song.artwork} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      {isSelected && rating !== undefined && (
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ color: '#fff', fontWeight: 900, fontSize: 22 }}>{rating}</span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Inline rating picker */}
+            {welcomeRatingTarget && (() => {
+              const target = welcomeSongs.find(s => s.id === welcomeRatingTarget);
+              if (!target) return null;
+              return (
+                <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 16, marginTop: 12 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.title}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.artist}</p>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                      <button key={n} onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget]: n })); setWelcomeRatingTarget(null); }}
+                        style={{ padding: '6px 12px', borderRadius: 100, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, background: 'rgba(108,99,255,0.15)', color: '#6C63FF' }}>
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Footer */}
+            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+              style={{ width: '100%', marginTop: 20, background: Object.keys(welcomeRatings).length > 0 ? '#6C63FF' : 'transparent', color: Object.keys(welcomeRatings).length > 0 ? '#fff' : 'rgba(255,255,255,0.35)', border: Object.keys(welcomeRatings).length > 0 ? 'none' : '1px solid rgba(255,255,255,0.1)', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+              {Object.keys(welcomeRatings).length > 0 ? `Done (${Object.keys(welcomeRatings).length} rated) →` : 'Skip for now →'}
+            </button>
           </div>
         </div>
       )}
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
     </AppShell>
-  );
-}
-
-function WelcomeResultRow({ item, onRate }: { item: { id: string; title: string; artist: string; artwork: string }; onRate: (rating: number) => void }) {
-  const [val, setVal] = useState('');
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 4px' }}>
-      <img src={item.artwork} alt={item.title} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>{item.title}</p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
-      </div>
-      <input type="number" min={1} max={10} step={0.1} value={val} onChange={e => setVal(e.target.value)} placeholder="1–10"
-        style={{ width: 56, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '6px 8px', fontSize: 13, color: '#fff', outline: 'none', textAlign: 'center' }} />
-      <button onClick={() => { const n = parseFloat(val); if (n >= 1 && n <= 10) onRate(n); }}
-        style={{ background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>Rate</button>
-    </div>
   );
 }
