@@ -10,7 +10,6 @@ import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import AppShell from '@/components/AppShell';
 import { sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
 import SeeAllCard from '@/components/SeeAllCard';
-import { LyraScale } from '@/components/LyraScale';
 import { getCurrentWorldMusicWeek } from '@/lib/worldMusicSchedule';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
@@ -143,6 +142,7 @@ export default function AppHome() {
   const [selectedInWelcome, setSelectedInWelcome] = useState<Set<string>>(new Set());
   const [welcomeRatings, setWelcomeRatings] = useState<Record<string,number>>({});
   const [welcomeRatingTarget, setWelcomeRatingTarget] = useState<string|null>(null);
+  const [welcomeStep, setWelcomeStep] = useState<1|2>(1);
 
   // Community hot (Change 4)
   const [communityHot, setCommunityHot] = useState<{ item_id: string; title: string; artist: string; artwork_url: string; rating: number }[]>([]);
@@ -164,6 +164,7 @@ export default function AppHome() {
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v2') && me) {
       setShowWelcome(true);
+      setWelcomeStep(1);
       fetch('https://itunes.apple.com/us/rss/topalbums/limit=30/json')
         .then(r => r.json())
         .then(data => {
@@ -292,6 +293,7 @@ export default function AppHome() {
           .home-header { flex-direction: column; gap: 12px; align-items: stretch !important; }
           .home-search { width: 100% !important; }
         }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
       `}</style>
       <div className="home-wrap" style={{ padding: '24px 24px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
@@ -520,86 +522,163 @@ export default function AppHome() {
       </div>
 
       {/* Welcome Modal */}
-      {showWelcome && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-          onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}>
-          <div style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '32px 28px', maxWidth: 520, width: '100%', position: 'relative' }}
-            onClick={e => e.stopPropagation()}>
-            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-              style={{ position: 'absolute', top: 16, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
-
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 4 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', margin: 0 }}>Welcome to Lyra ⚡</h2>
-              {Object.keys(welcomeRatings).length > 0 && (
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF' }}>{Object.keys(welcomeRatings).length} rated</span>
-              )}
-            </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 12, lineHeight: 1.5 }}>Tap albums you know to rate them</p>
-
-            <LyraScale size="full" />
-
-            {/* Album grid */}
-            <div style={{ maxHeight: 380, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10 }}>
-              {welcomeSongs.map(song => {
-                const isSelected = selectedInWelcome.has(song.id);
-                const rating = welcomeRatings[song.id];
-                return (
-                  <button key={song.id}
-                    onClick={() => {
-                      if (isSelected) {
-                        setSelectedInWelcome(prev => { const next = new Set(prev); next.delete(song.id); return next; });
-                        setWelcomeRatings(prev => { const next = { ...prev }; delete next[song.id]; return next; });
-                        if (welcomeRatingTarget === song.id) setWelcomeRatingTarget(null);
-                      } else {
-                        setSelectedInWelcome(prev => new Set(prev).add(song.id));
-                        if (rating === undefined) setWelcomeRatingTarget(song.id);
-                      }
-                    }}
-                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.05)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                    style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 12, overflow: 'hidden', transition: 'transform 0.15s', position: 'relative' }}>
-                    <div style={{ width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: isSelected ? '2px solid #6C63FF' : '2px solid transparent', boxSizing: 'border-box', position: 'relative' }}>
-                      <img src={song.artwork} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                      {isSelected && rating !== undefined && (
-                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ color: '#fff', fontWeight: 900, fontSize: 22 }}>{rating}</span>
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Inline rating picker */}
-            {welcomeRatingTarget && (() => {
-              const target = welcomeSongs.find(s => s.id === welcomeRatingTarget);
-              if (!target) return null;
-              return (
-                <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 16, marginTop: 12 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.title}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.artist}</p>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                      <button key={n} onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget]: n })); setWelcomeRatingTarget(null); }}
-                        style={{ padding: '6px 12px', borderRadius: 100, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, background: 'rgba(108,99,255,0.15)', color: '#6C63FF' }}>
-                        {n}
-                      </button>
-                    ))}
-                  </div>
+      {showWelcome && (() => {
+        const scaleTiers = [
+          { score: 1, label: 'Skip', color: '#ef4444' },
+          { score: 2, label: 'Weak', color: '#f97316' },
+          { score: 3, label: 'Meh', color: '#f59e0b' },
+          { score: 4, label: 'Below avg', color: '#eab308' },
+          { score: 5, label: 'Average', color: '#84cc16' },
+          { score: 6, label: 'Decent', color: '#22c55e' },
+          { score: 7, label: 'Good', color: '#10b981' },
+          { score: 8, label: 'Great', color: '#06b6d4' },
+          { score: 9, label: 'Elite', color: '#6366f1' },
+          { score: 10, label: 'Masterpiece', color: '#8b5cf6' },
+        ];
+        const ratedCount = Object.keys(welcomeRatings).length;
+        return (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            {/* Gradient border wrapper */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(108,99,255,0.5) 0%, rgba(139,92,246,0.2) 50%, rgba(6,182,212,0.2) 100%)', padding: 1, borderRadius: 28, maxWidth: 520, width: '100%', position: 'relative' }}>
+              {/* Purple glow blob */}
+              <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse at center, rgba(108,99,255,0.25) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none' }} />
+              {/* Card */}
+              <div style={{ background: 'linear-gradient(135deg, #0f0f0f 0%, #0d0b1a 100%)', borderRadius: 28, width: '100%', position: 'relative' }}>
+                {/* Step indicator dots */}
+                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', paddingTop: 24, marginBottom: 20 }}>
+                  <div style={{ width: welcomeStep === 1 ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === 1 ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
+                  <div style={{ width: welcomeStep === 2 ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === 2 ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
                 </div>
-              );
-            })()}
 
-            {/* Footer */}
-            <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-              style={{ width: '100%', marginTop: 20, background: Object.keys(welcomeRatings).length > 0 ? '#6C63FF' : 'transparent', color: Object.keys(welcomeRatings).length > 0 ? '#fff' : 'rgba(255,255,255,0.35)', border: Object.keys(welcomeRatings).length > 0 ? 'none' : '1px solid rgba(255,255,255,0.1)', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-              {Object.keys(welcomeRatings).length > 0 ? `Done (${Object.keys(welcomeRatings).length} rated) →` : 'Skip for now →'}
-            </button>
+                <div style={{ padding: '0 28px 28px' }}>
+                  {welcomeStep === 1 ? (
+                    <>
+                      {/* Badge */}
+                      <div style={{ display: 'inline-block', background: 'rgba(108,99,255,0.15)', border: '1px solid rgba(108,99,255,0.3)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#6C63FF', letterSpacing: 1, textTransform: 'uppercase' as const, marginBottom: 16 }}>How Lyra Works</div>
+
+                      {/* Headline */}
+                      <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1.1, marginBottom: 8, margin: 0, marginTop: 0 }}>Rate music on{'\n'}a 1–10 scale.</h2>
+
+                      {/* Subtext */}
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 24, marginTop: 8 }}>Every decimal matters. A 7.3 hits different than a 7.8. Here&apos;s what the numbers mean:</p>
+
+                      {/* Scale bar chart */}
+                      <div style={{ marginBottom: 0 }}>
+                        {scaleTiers.map(tier => (
+                          <div key={tier.score} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
+                            <span style={{ width: 20, fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.5)', textAlign: 'right' as const, flexShrink: 0 }}>{tier.score}</span>
+                            <div style={{ flex: 1, height: 8 + (tier.score / 10) * 10, background: 'rgba(255,255,255,0.04)', borderRadius: 4, overflow: 'hidden' }}>
+                              <div style={{ width: `${tier.score * 10}%`, height: '100%', background: `linear-gradient(90deg, ${tier.color}cc, ${tier.color}80)`, borderRadius: 4 }} />
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', minWidth: 70 }}>{tier.label}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* CTA button */}
+                      <button onClick={() => setWelcomeStep(2)}
+                        style={{ width: '100%', marginTop: 24, padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
+                        Got it — let me rate some music →
+                      </button>
+
+                      {/* Skip link */}
+                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' as const }}>
+                        Skip
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Back arrow + header row */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                        <button onClick={() => setWelcomeStep(1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Rate music you know</h2>
+                      </div>
+
+                      {/* Subtext row */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Tap to select, tap again to rate</span>
+                        {ratedCount > 0 && (
+                          <span style={{ background: 'rgba(108,99,255,0.2)', color: '#6C63FF', borderRadius: 100, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>{ratedCount} rated</span>
+                        )}
+                      </div>
+
+                      {/* Album grid */}
+                      <div style={{ maxHeight: 320, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: 8 }}>
+                        {welcomeSongs.map(song => {
+                          const isSelected = selectedInWelcome.has(song.id);
+                          const rating = welcomeRatings[song.id];
+                          return (
+                            <button key={song.id}
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedInWelcome(prev => { const next = new Set(prev); next.delete(song.id); return next; });
+                                  setWelcomeRatings(prev => { const next = { ...prev }; delete next[song.id]; return next; });
+                                  if (welcomeRatingTarget === song.id) setWelcomeRatingTarget(null);
+                                } else {
+                                  setSelectedInWelcome(prev => new Set(prev).add(song.id));
+                                  if (rating === undefined) setWelcomeRatingTarget(song.id);
+                                }
+                              }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.04)'; }}
+                              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                              style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 12, overflow: 'hidden', transition: 'transform 0.15s', position: 'relative' }}>
+                              <div style={{ width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: isSelected ? '2px solid #6C63FF' : '2px solid transparent', boxSizing: 'border-box' as const, position: 'relative' }}>
+                                <img src={song.artwork} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                {isSelected && rating !== undefined && (
+                                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>{rating}</span>
+                                  </div>
+                                )}
+                                {isSelected && rating === undefined && (
+                                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(108,99,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'pulse 1.5s ease-in-out infinite' }}>
+                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>?</span>
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Inline rating picker */}
+                      {welcomeRatingTarget && (() => {
+                        const target = welcomeSongs.find(s => s.id === welcomeRatingTarget);
+                        if (!target) return null;
+                        return (
+                          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '14px 16px', marginTop: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                              <img src={target.artwork} alt={target.title} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.title}</p>
+                                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.artist}</p>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                              {scaleTiers.map(tier => (
+                                <button key={tier.score} onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget]: tier.score })); setWelcomeRatingTarget(null); }}
+                                  style={{ width: 40, height: 36, borderRadius: 10, border: `1px solid ${tier.color}44`, cursor: 'pointer', fontSize: 13, fontWeight: 800, background: tier.color + '22', color: tier.color }}>
+                                  {tier.score}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Done button */}
+                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
+                        style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, fontSize: 15, fontWeight: 800, border: ratedCount > 0 ? 'none' : '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: ratedCount > 0 ? 'linear-gradient(135deg, #6C63FF, #8b5cf6)' : 'transparent', color: ratedCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                        {ratedCount > 0 ? `Done (${ratedCount} rated) →` : 'Skip for now →'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
     </AppShell>

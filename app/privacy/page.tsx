@@ -337,7 +337,6 @@ export default function PrivacyPage() {
           <span className="font-black text-sm">Lyra</span>
           <div className="flex items-center gap-6 text-xs" style={{ color: '#48484A' }}>
             <Link href="/app" className="hover:text-white transition-colors">Web App</Link>
-            <Link href="/u/nate7" className="hover:text-white transition-colors">Profiles</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <span>© 2026</span>
           </div>
