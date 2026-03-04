@@ -29,10 +29,10 @@ body { background: #0a0a0a; min-height: 100vh; }
   .lyra-page h1 {
     font-size: 20px !important;
   }
-  /* All grids collapse to 2-col on mobile */
+  /* All grids collapse to 3-col on mobile (keeps variety, still fits) */
   .lyra-grid-responsive {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px !important;
   }
   .lyra-ranked-layout {
     grid-template-columns: 1fr !important;
