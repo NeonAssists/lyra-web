@@ -22,6 +22,7 @@ export default function RankedPage() {
   const [sort, setSort] = useState<SortMode>('rating');
   const [search, setSearch] = useState('');
   const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
+  const [suggestions, setSuggestions] = useState<{ id: string; title: string; artist: string; artwork: string }[]>([]);
 
   const fetchRankings = async (uid: string) => {
     const { data, error } = await supabase.from('user_rankings' as any)
@@ -32,6 +33,18 @@ export default function RankedPage() {
     setItems((data ?? []) as RankedItem[]);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetch("https://itunes.apple.com/us/rss/topsongs/limit=10/json").then(r => r.json()).then(data => {
+      const entries = (data?.feed?.entry ?? []).slice(0, 6).map((e: any, i: number) => ({
+        id: `itunes:trk:${e.id?.attributes?.["im:id"] ?? i}`,
+        title: e["im:name"]?.label ?? "",
+        artist: e["im:artist"]?.label ?? "",
+        artwork: (e["im:image"]?.[2]?.label ?? "").replace("170x170bb", "300x300bb"),
+      }));
+      setSuggestions(entries);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
@@ -176,6 +189,25 @@ export default function RankedPage() {
                 <p style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.5px' }}>Nothing rated yet</p>
                 <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 28, lineHeight: 1.5 }}>Rate a song or album and it'll show up here. Start with something you know.</p>
                 <a href="/music" style={{ display: 'inline-block', background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 15, padding: '14px 32px', borderRadius: 100, textDecoration: 'none' }}>Browse Music →</a>
+                {suggestions.length > 0 && (
+                  <>
+                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, marginTop: 40, marginBottom: 16 }}>Or rate something popular right now</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, maxWidth: 400, margin: '0 auto' }}>
+                      {suggestions.map((s, i) => (
+                        <div key={`sug-${i}-${s.id}`}
+                          onClick={() => openItem({ id: s.id, title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })}
+                          style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <img src={s.artwork} alt={s.title} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover' }} />
+                          <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{s.title}</p>
+                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>{s.artist}</p>
+                            <span style={{ background: '#6C63FF', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100 }}>Rate ★</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>

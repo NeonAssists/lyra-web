@@ -81,14 +81,21 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+type LiveFeedItem = { item_id: string; title: string; artist: string; artwork_url: string; rating: number; ranked_at: string };
+
 export default function HomePage() {
   const router = useRouter();
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [liveFeed, setLiveFeed] = useState<LiveFeedItem[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) router.replace('/app');
     });
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/live-feed').then(r => r.json()).then(d => setLiveFeed(d ?? [])).catch(() => {});
   }, []);
 
   const openWaitlist = () => setShowWaitlist(true);
@@ -109,6 +116,9 @@ export default function HomePage() {
           .lp-section { padding: 60px 20px !important; }
           .lp-hero { padding: 100px 20px 60px !important; }
         }
+        .live-scroll::-webkit-scrollbar { display: none; }
+        .live-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
       `}</style>
 
       {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
@@ -178,6 +188,29 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Live feed */}
+      {liveFeed.length > 0 && (
+        <section style={{ padding: '40px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ maxWidth: 980, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 24, marginBottom: 16 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 4, background: '#ef4444', animation: 'pulse 2s infinite' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>Live</span>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>Recently rated by the community</span>
+            </div>
+            <div className="live-scroll" style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingLeft: 24, paddingRight: 24, paddingBottom: 8 }}>
+              {liveFeed.map((item, i) => (
+                <div key={`lf-${i}-${item.item_id}`} style={{ flexShrink: 0, width: 150, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 12 }}>
+                  {item.artwork_url && <img src={item.artwork_url} alt={item.title} style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', marginBottom: 8 }} />}
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{item.title}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 8 }}>{item.artist}</p>
+                  <div style={{ display: 'inline-block', background: '#6C63FF', color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100 }}>{Number(item.rating).toFixed(1)} ★</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Feature 1 — Rate Anything */}
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>

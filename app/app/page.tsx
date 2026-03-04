@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -135,6 +135,15 @@ export default function AppHome() {
   const [modalOpen, setModalOpen] = useState(false);
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
 
+  // Welcome modal (Change 3)
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeSearch, setWelcomeSearch] = useState('');
+  const [welcomeResults, setWelcomeResults] = useState<{ id: string; title: string; artist: string; artwork: string }[]>([]);
+  const [ratedInWelcome, setRatedInWelcome] = useState<{ title: string; rating: number }[]>([]);
+
+  // Community hot (Change 4)
+  const [communityHot, setCommunityHot] = useState<{ item_id: string; title: string; artist: string; artwork_url: string; rating: number }[]>([]);
+
   // Auth
   useEffect(() => {
     const loadProfile = async (uid: string) => {
@@ -147,13 +156,53 @@ export default function AppHome() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // User data
+  // Welcome modal trigger
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed') && me) setShowWelcome(true);
+  }, [me]);
+
+  // Welcome search debounce
+  const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!welcomeSearch.trim()) { setWelcomeResults([]); return; }
+    if (welcomeTimer.current) clearTimeout(welcomeTimer.current);
+    welcomeTimer.current = setTimeout(() => {
+      fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(welcomeSearch)}&entity=song&limit=4`)
+        .then(r => r.json())
+        .then(d => {
+          setWelcomeResults((d?.results ?? []).map((r: any) => ({
+            id: `itunes:trk:${r.trackId ?? ''}`,
+            title: r.trackName ?? '',
+            artist: r.artistName ?? '',
+            artwork: (r.artworkUrl100 ?? '').replace('100x100bb', '300x300bb'),
+          })));
+        })
+        .catch(() => {});
+    }, 400);
+    return () => { if (welcomeTimer.current) clearTimeout(welcomeTimer.current); };
+  }, [welcomeSearch]);
+
+  const saveWelcomeRating = useCallback(async (item: { id: string; title: string; artist: string; artwork: string }, rating: number) => {
+    if (!me) return;
+    setRatedInWelcome(prev => [...prev, { title: item.title, rating }]);
+    await (supabase as any).from('user_rankings').upsert({
+      user_id: me.id, item_id: item.id, title: item.title, artist: item.artist, artwork_url: item.artwork, rating, ranked_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,item_id' });
+  }, [me]);
+
+  // User data + community hot
   useEffect(() => {
     if (!me) return;
     (supabase as any).from('user_rankings').select('item_id, title, artist, artwork_url, rating')
       .eq('user_id', me.id).gt('rating', 0).not('title', 'is', null)
       .order('rating', { ascending: false }).limit(30)
       .then(({ data }: any) => { if (data) setHotRange(data); });
+    (supabase as any).from('user_rankings').select('item_id,title,artist,artwork_url,rating')
+      .gte('rating', 8.5).order('ranked_at', { ascending: false }).limit(12)
+      .then(({ data }: any) => {
+        const seen = new Set<string>();
+        setCommunityHot((data ?? []).filter((r: any) => { if (seen.has(r.item_id)) return false; seen.add(r.item_id); return true; }));
+      });
   }, [me]);
 
   // Community picks
@@ -315,7 +364,20 @@ export default function AppHome() {
                       {sortedHot.length > 0 ? sortedHot.slice(0, 12).map((item: any, i: number) => (
                         <ListRow key={`hr-${i}`} item={item} rank={i + 1} compact
                           onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
-                      )) : <EmptyState icon="⭐" text="Rate songs and albums to build your rankings" cta="Start Rating" href="/charts" />}
+                      )) : (
+                        <>
+                          <EmptyState icon="⭐" text="Rate songs and albums to build your rankings" cta="Start Rating" href="/charts" />
+                          {communityHot.length > 0 && (
+                            <div style={{ padding: '0 8px 8px' }}>
+                              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8, paddingLeft: 8 }}>Community&apos;s Best This Week</p>
+                              {communityHot.slice(0, 6).map((item: any, i: number) => (
+                                <ListRow key={`ch-${i}-${item.item_id}`} item={item} compact
+                                  onClick={() => open({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url ?? '', type: isAlbumId(item.item_id) ? 'album' : 'song' })} />
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -443,7 +505,59 @@ export default function AppHome() {
         )}
       </div>
 
+      {/* Welcome Modal */}
+      {showWelcome && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(16px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}>
+          <div style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '40px 32px', maxWidth: 480, width: '100%', position: 'relative' }}
+            onClick={e => e.stopPropagation()}>
+            <button onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+              style={{ position: 'absolute', top: 16, right: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}>×</button>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: '-0.5px' }}>Welcome to Lyra ⚡</h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20, lineHeight: 1.5 }}>Rate 3 songs you love to get started</p>
+            {ratedInWelcome.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+                {ratedInWelcome.map((r, i) => (
+                  <span key={`wr-${i}`} style={{ background: 'rgba(108,99,255,0.15)', color: '#6C63FF', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 100 }}>{r.title} · {r.rating.toFixed(1)}</span>
+                ))}
+              </div>
+            )}
+            <input
+              value={welcomeSearch} onChange={e => setWelcomeSearch(e.target.value)} placeholder="Search for a song…"
+              style={{ width: '100%', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '12px 16px', fontSize: 14, color: '#fff', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {welcomeResults.map((r, i) => (
+                <WelcomeResultRow key={`wres-${i}-${r.id}`} item={r} onRate={(rating) => saveWelcomeRating(r, rating)} />
+              ))}
+            </div>
+            {ratedInWelcome.length > 0 && (
+              <button onClick={() => { setShowWelcome(false); localStorage.setItem('lyra_welcomed', 'true'); }}
+                style={{ width: '100%', marginTop: 20, background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 100, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+                Done →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <RatingModal open={modalOpen} onClose={() => setModalOpen(false)} item={modalItem} userId={me?.id ?? null} />
     </AppShell>
+  );
+}
+
+function WelcomeResultRow({ item, onRate }: { item: { id: string; title: string; artist: string; artwork: string }; onRate: (rating: number) => void }) {
+  const [val, setVal] = useState('');
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 4px' }}>
+      <img src={item.artwork} alt={item.title} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>{item.title}</p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.artist}</p>
+      </div>
+      <input type="number" min={1} max={10} step={0.1} value={val} onChange={e => setVal(e.target.value)} placeholder="1–10"
+        style={{ width: 56, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '6px 8px', fontSize: 13, color: '#fff', outline: 'none', textAlign: 'center' }} />
+      <button onClick={() => { const n = parseFloat(val); if (n >= 1 && n <= 10) onRate(n); }}
+        style={{ background: '#6C63FF', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>Rate</button>
+    </div>
   );
 }

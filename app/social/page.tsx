@@ -44,6 +44,7 @@ export default function SocialPage() {
   const [people, setPeople] = useState<Profile[]>([]);
   const [following, setFollowing] = useState<Set<string>>(new Set());
   const [loadingFeed, setLoadingFeed] = useState(true);
+  const [globalFeed, setGlobalFeed] = useState<Activity[]>([]);
   const [search, setSearch] = useState('');
   const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
   const open = (a: Activity) => {
@@ -74,6 +75,8 @@ export default function SocialPage() {
         const pMap: Record<string, any> = {};
         for (const p of (profiles ?? [])) pMap[p.id] = p;
         setFeed(data.map((r: any) => ({ ...r, handle: pMap[r.user_id]?.handle ?? '', display_name: pMap[r.user_id]?.display_name ?? '', avatar_url: pMap[r.user_id]?.avatar_url ?? null })));
+        const { data: gf } = await (supabase as any).from("user_rankings").select("item_id, title, artist, artwork_url, rating, user_id, ranked_at").gt("rating", 0).order("ranked_at", { ascending: false }).limit(20);
+        setGlobalFeed((gf ?? []).map((r: any) => ({ ...r, handle: pMap[r.user_id]?.handle ?? '', display_name: pMap[r.user_id]?.display_name ?? '', avatar_url: pMap[r.user_id]?.avatar_url ?? null })));
         setLoadingFeed(false);
       });
   }, []);
@@ -138,6 +141,19 @@ export default function SocialPage() {
             {loadingFeed ? (
               <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[...Array(6)].map((_, i) => <div key={i} style={{ height: 76, background: '#1a1a1a', borderRadius: 12 }} />)}
+              </div>
+            ) : feed.length === 0 && globalFeed.length > 0 ? (
+              <div style={{ padding: '16px 0' }}>
+                <div style={{ padding: '0 16px', marginBottom: 8 }}>
+                  <div style={{ background: 'rgba(108,99,255,0.15)', color: '#6C63FF', fontSize: 11, padding: '6px 14px', borderRadius: 100, marginBottom: 16, display: 'inline-block' }}>👥 Follow people to see their ratings here</div>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: 8 }}>Trending in the community</p>
+                </div>
+                {globalFeed.map((item, i) => {
+                  const col = ratingColor(item.rating);
+                  return (
+                    <FeedItem key={`gf-${i}-${item.user_id}-${item.item_id}`} item={item} col={col} onOpen={() => open(item)} />
+                  );
+                })}
               </div>
             ) : feed.length === 0 ? (
               <div style={{ padding: '60px 24px', textAlign: 'center' }}>
