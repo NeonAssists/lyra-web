@@ -94,7 +94,7 @@ export default function MusicPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+
   const [searching, setSearching] = useState(false);
   const { modalItem, modalOpen, closeModal, albumView, albumOpen, closeAlbum, openItem: open, onAlbumSongClick, onAlbumRecClick, onModalAlbumClick } = useModals();
 
@@ -186,15 +186,28 @@ export default function MusicPage() {
     return mixed.slice(0, totalSlots);
   }, [newAlbums, classicAlbums]);
 
-  // Search
+  type SearchResults = { artists: any[]; albums: any[]; songs: any[] };
+  const [searchResults, setSearchResults] = useState<SearchResults>({ artists: [], albums: [], songs: [] });
+
+  // Search — parallel fetch for artists, albums, songs
   useEffect(() => {
-    if (!query.trim()) { setResults([]); return; }
+    if (!query.trim()) { setSearchResults({ artists: [], albums: [], songs: [] }); return; }
     const t = setTimeout(async () => {
       setSearching(true);
-      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song,album&limit=30`);
-      const data = await res.json();
-      setResults(data?.results ?? []);
-      setSearching(false);
+      try {
+        const [artistRes, albumRes, songRes] = await Promise.all([
+          fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=5`).then(r => r.json()),
+          fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=12`).then(r => r.json()),
+          fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=20`).then(r => r.json()),
+        ]);
+        setSearchResults({
+          artists: artistRes?.results ?? [],
+          albums: albumRes?.results?.filter((r: any) => r.wrapperType === 'collection') ?? [],
+          songs: songRes?.results?.filter((r: any) => r.wrapperType === 'track') ?? [],
+        });
+      } finally {
+        setSearching(false);
+      }
     }, 350);
     return () => clearTimeout(t);
   }, [query]);
@@ -238,21 +251,84 @@ export default function MusicPage() {
         {/* Search results */}
         {query ? (
           <div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
-              {searching ? 'Searching…' : `${results.length} results for "${query}"`}
-            </p>
-            <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
-              {results.map((r: any, i: number) => {
-                const isAlbum = r.wrapperType === 'collection' || !r.trackId;
-                const id = String(r.trackId ?? r.collectionId ?? '');
-                const title = r.trackName ?? r.collectionName ?? '';
-                const art = getArtworkHiRes(r.artworkUrl100 ?? '');
-                return (
-                  <AlbumTile key={`sr-${i}`} artwork={art} title={title} artist={r.artistName ?? ''} size={tileSize(i)}
-                    onClick={() => open({ id: toItemId(id, isAlbum ? 'album' : 'song'), title, artist: r.artistName ?? '', artwork: art, type: isAlbum ? 'album' : 'song' })} />
-                );
-              })}
-            </div>
+            {searching ? (
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>Searching…</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+                {/* Artists */}
+                {searchResults.artists.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>Artists</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {searchResults.artists.map((a: any, i: number) => (
+                        <button key={`art-${i}`} onClick={() => { window.location.href = `/artist/${encodeURIComponent(a.artistName)}`; }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '10px 12px', borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#1c1c1e', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: 'rgba(255,255,255,0.3)', overflow: 'hidden', position: 'relative' }}>
+                            {a.artworkUrl100
+                              ? <Image src={getArtworkHiRes(a.artworkUrl100)} alt={a.artistName} fill style={{ objectFit: 'cover' }} unoptimized sizes="44px" />
+                              : '♪'}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.artistName}</p>
+                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Artist</p>
+                          </div>
+                          <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Albums */}
+                {searchResults.albums.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>Albums</h3>
+                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+                      {searchResults.albums.map((a: any, i: number) => {
+                        const art = getArtworkHiRes(a.artworkUrl100 ?? '');
+                        return (
+                          <AlbumTile key={`sal-${i}`} artwork={art} title={a.collectionName} artist={a.artistName ?? ''} size={tileSize(i)}
+                            onClick={() => open({ id: toItemId(String(a.collectionId), 'album'), title: a.collectionName, artist: a.artistName ?? '', artwork: art, type: 'album' })} />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Songs */}
+                {searchResults.songs.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>Songs</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {searchResults.songs.map((s: any, i: number) => {
+                        const art = getArtworkHiRes(s.artworkUrl100 ?? '');
+                        return (
+                          <button key={`sng-${i}`} onClick={() => open({ id: toItemId(String(s.trackId), 'song'), title: s.trackName, artist: s.artistName ?? '', artwork: art, type: 'song' })}
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
+                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                            <div style={{ width: 44, height: 44, borderRadius: 8, background: '#1c1c1e', flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
+                              {art && <Image src={art} alt={s.trackName} fill style={{ objectFit: 'cover' }} unoptimized sizes="44px" />}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.trackName}</p>
+                              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.artistName} · {s.collectionName}</p>
+                            </div>
+                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>{s.trackTimeMillis ? `${Math.floor(s.trackTimeMillis / 60000)}:${String(Math.floor((s.trackTimeMillis % 60000) / 1000)).padStart(2, '0')}` : ''}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {searchResults.artists.length === 0 && searchResults.albums.length === 0 && searchResults.songs.length === 0 && (
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', textAlign: 'center', paddingTop: 40 }}>No results for &ldquo;{query}&rdquo;</p>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div>
