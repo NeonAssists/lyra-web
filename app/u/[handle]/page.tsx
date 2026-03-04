@@ -95,7 +95,16 @@ export default function UserProfilePage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <style>{`
+        @media (max-width: 768px) {
+          .profile-wrap { padding-left: 12px !important; padding-right: 12px !important; }
+          .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; }
+          .profile-header > div:last-child { width: 100% !important; }
+          .profile-actions { justify-content: center !important; }
+          .profile-stats { justify-content: center !important; }
+        }
+      `}</style>
+      <div className="profile-wrap max-w-2xl mx-auto px-4 py-6" style={{ width: '100%', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -111,7 +120,7 @@ export default function UserProfilePage() {
         ) : (
           <>
             {/* Profile header */}
-            <div className="flex items-start gap-5 mb-6">
+            <div className="profile-header flex items-start gap-5 mb-6">
               {profile.avatar_url ? (
                 <div className="relative w-20 h-20 rounded-full overflow-hidden flex-none">
                   <Image src={profile.avatar_url} alt={profile.display_name} fill className="object-cover" unoptimized />
@@ -122,7 +131,7 @@ export default function UserProfilePage() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
+                <div className="profile-actions flex items-start justify-between gap-3">
                   <div>
                     <h1 className="text-xl font-black text-white">{profile.display_name}</h1>
                     <p className="text-sm text-[#8E8E93]">@{profile.handle}</p>
@@ -146,7 +155,7 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-5 mt-4">
+                <div className="profile-stats flex gap-5 mt-4">
                   <div className="text-center">
                     <p className="text-base font-black text-white">{rankings.length}</p>
                     <p className="text-[11px] text-[#8E8E93]">Ranked</p>
