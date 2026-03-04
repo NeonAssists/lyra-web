@@ -52,15 +52,17 @@ function AlbumTile({ artwork, title, artist, badge, onClick, size = 'small' }: {
   const [hov, setHov] = useState(false);
   const isLarge = size === 'large';
   const isWide = size === 'wide';
+  // On mobile, size classes are reset via CSS (.lyra-tile-large, .lyra-tile-wide → span 1, aspect 1:1)
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      className={isLarge ? 'lyra-tile-large' : isWide ? 'lyra-tile-wide' : ''}
       style={{
         background: 'transparent', border: 'none', cursor: 'pointer', padding: 0,
         borderRadius: 12, textAlign: 'left', width: '100%', transition: 'opacity 0.15s', opacity: hov ? 0.75 : 1,
         gridColumn: isLarge ? 'span 2' : isWide ? 'span 2' : 'span 1',
         gridRow: isLarge ? 'span 2' : 'span 1',
       }}>
-      <div style={{ position: 'relative', width: '100%', aspectRatio: isWide ? '2/1' : '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
+      <div className={isWide ? 'lyra-tile-wide-art' : ''} style={{ position: 'relative', width: '100%', aspectRatio: isWide ? '2/1' : '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
         {artwork
           ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes={isLarge ? '400px' : '200px'} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: isLarge ? 48 : 28 }}>♪</div>}

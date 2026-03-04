@@ -29,10 +29,24 @@ body { background: #0a0a0a; min-height: 100vh; }
   .lyra-page h1 {
     font-size: 20px !important;
   }
-  /* All grids collapse to 3-col on mobile (keeps variety, still fits) */
+  /* All grids collapse to 3-col on mobile, no spanning */
   .lyra-grid-responsive {
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 4px !important;
+  }
+  /* Reset featured/wide tile spans — all tiles are 1×1 on mobile */
+  .lyra-tile-large,
+  .lyra-tile-wide {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+  /* Wide tile art: restore 1:1 aspect on mobile */
+  .lyra-tile-wide-art {
+    aspect-ratio: 1 !important;
+  }
+  /* Large tile: show title/artist below art like normal tiles */
+  .lyra-tile-large > div:last-child {
+    display: block !important;
   }
   .lyra-ranked-layout {
     grid-template-columns: 1fr !important;
