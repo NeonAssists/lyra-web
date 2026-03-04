@@ -10,7 +10,7 @@ const TIERS = [
   { min: 7.0, max: 7.9, label: "Good",      color: "#10b981" },
   { min: 8.0, max: 8.9, label: "Great",     color: "#06b6d4" },
   { min: 9.0, max: 9.9, label: "Elite",     color: "#6366f1" },
-  { min: 10.0, max: 10.0, label: "GOAT",    color: "#8b5cf6" },
+  { min: 10.0, max: 10.0, label: "Masterpiece", color: "#8b5cf6" },
 ];
 
 function isActive(tier: typeof TIERS[number], rating?: number) {

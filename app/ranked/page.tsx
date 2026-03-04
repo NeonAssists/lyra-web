@@ -82,7 +82,7 @@ export default function RankedPage() {
           Rate songs and albums on a 1–10 scale. Build a catalog that actually reflects your taste.
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 }}>
-          {['10.0 — goat', '9.2 — elite', '7.8 — solid', '6.1 — decent', '4.5 — meh'].map(tag => (
+          {['10.0 — masterpiece', '9.2 — elite', '7.8 — solid', '6.1 — decent', '4.5 — meh'].map(tag => (
             <span key={tag} style={{ padding: '6px 14px', borderRadius: 100, background: 'rgba(108,99,255,0.12)', border: '1px solid rgba(108,99,255,0.25)', fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{tag}</span>
           ))}
         </div>
