@@ -461,7 +461,7 @@ export default function HomePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <a href="https://x.com/Get_Lyra" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>X / Twitter</a>
                   <a href="https://www.instagram.com/get_lyra" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Instagram</a>
-                  <a href="mailto:hello@getlyra.app" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Contact</a>
+                  <a href="mailto:neonotics@gmail.com" style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Contact</a>
                 </div>
               </div>
               <div>
