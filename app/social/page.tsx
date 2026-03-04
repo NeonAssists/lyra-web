@@ -140,7 +140,12 @@ export default function SocialPage() {
                 {[...Array(6)].map((_, i) => <div key={i} style={{ height: 76, background: '#1a1a1a', borderRadius: 12 }} />)}
               </div>
             ) : feed.length === 0 ? (
-              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>No activity yet</div>
+              <div style={{ padding: '60px 24px', textAlign: 'center' }}>
+                <div style={{ fontSize: 40, marginBottom: 14 }}>👥</div>
+                <p style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.5px' }}>No activity yet</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 24, lineHeight: 1.5 }}>Follow people to see what they're rating in real time. Find your friends below.</p>
+                <a href="/social#people" style={{ display: 'inline-block', background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 14, padding: '12px 28px', borderRadius: 100, textDecoration: 'none' }}>Find People →</a>
+              </div>
             ) : (
               <div style={{ padding: '8px 0' }}>
                 {feed.map((item, i) => {

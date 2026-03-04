@@ -164,9 +164,20 @@ export default function RankedPage() {
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(255,255,255,0.3)' }}>
-            <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{search ? 'No results' : 'Nothing ranked yet'}</p>
-            <p style={{ fontSize: 14 }}>{search ? 'Try a different search' : 'Head to Music to start rating.'}</p>
+          <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+            {search ? (
+              <>
+                <p style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>No results</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>Try a different search</p>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
+                <p style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.5px' }}>Nothing rated yet</p>
+                <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 28, lineHeight: 1.5 }}>Rate a song or album and it'll show up here. Start with something you know.</p>
+                <a href="/music" style={{ display: 'inline-block', background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 15, padding: '14px 32px', borderRadius: 100, textDecoration: 'none' }}>Browse Music →</a>
+              </>
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
