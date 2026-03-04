@@ -95,6 +95,16 @@ export default function HomePage() {
 
   return (
     <div className="bg-black text-white overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .lp-stat-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
+          .lp-feature-grid { grid-template-columns: 1fr !important; }
+          .lp-mockup { display: none !important; }
+          .lp-cta-section { padding: 60px 20px !important; }
+          .lp-section { padding: 60px 20px !important; }
+          .lp-hero { padding: 100px 20px 60px !important; }
+        }
+      `}</style>
 
       {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
 
@@ -109,7 +119,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero — full viewport, Apple style */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
+      <section className="lp-hero" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
         <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 24 }}>Now in Beta</p>
         <h1 style={{ fontSize: 'clamp(3rem, 10vw, 7rem)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-2px', margin: '0 0 28px', maxWidth: 900 }}>
           Rate music.<br />
@@ -131,7 +141,7 @@ export default function HomePage() {
 
       {/* Divider stat bar */}
       <section style={{ borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '40px 24px' }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
+        <div className="lp-stat-grid" style={{ maxWidth: 800, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, textAlign: 'center' }}>
           {[
             { val: '10.0', label: 'Rating ceiling' },
             { val: '0.1', label: 'Step precision' },
@@ -147,7 +157,7 @@ export default function HomePage() {
       </section>
 
       {/* Feature 1 — Rate Anything */}
-      <section style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Precision</p>
           <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
@@ -160,7 +170,7 @@ export default function HomePage() {
       </section>
 
       {/* Feature 2 — Social */}
-      <section style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Social</p>
           <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
@@ -173,7 +183,7 @@ export default function HomePage() {
       </section>
 
       {/* Feature 2b — Friend Features with app mockups */}
-      <section style={{ padding: '80px 24px 100px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
+      <section className="lp-section" style={{ padding: '80px 24px 100px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(108,99,255,0.03)' }}>
         <style>{`
           .friend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
           @media (max-width: 768px) { .friend-grid { grid-template-columns: 1fr; max-width: 340px; margin: 0 auto; } }
@@ -286,7 +296,7 @@ export default function HomePage() {
       </section>
 
       {/* Feature 3 — Discovery */}
-      <section style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Discovery</p>
           <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
@@ -299,7 +309,7 @@ export default function HomePage() {
       </section>
 
       {/* Bottom CTA */}
-      <section style={{ padding: '160px 24px', textAlign: 'center' }}>
+      <section className="lp-cta-section" style={{ padding: '160px 24px', textAlign: 'center' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <h2 style={{ fontSize: 'clamp(3rem, 9vw, 6rem)', fontWeight: 900, letterSpacing: '-2px', lineHeight: 1.0, marginBottom: 40 }}>
             Your taste.<br />
