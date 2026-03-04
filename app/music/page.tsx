@@ -242,10 +242,7 @@ export default function MusicPage() {
                   {activeGenre ? genreName : 'Mixed for You'}
                 </h2>
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>60% classic</span>
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>40% new</span>
-              </div>
+              <div style={{ display: 'flex', gap: 6 }}></div>
             </div>
 
             {loading && !classicAlbums.length ? (
