@@ -62,7 +62,7 @@ export default function RankedPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Page header */}
         <div style={{ marginBottom: 32 }}>
@@ -74,7 +74,7 @@ export default function RankedPage() {
 
         {/* Stats row */}
         {items.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
+          <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 32 }}>
             {[
               { label: 'Total Ranked', value: items.filter(i => i.rating > 0).length },
               { label: 'Songs', value: songs.length },
@@ -91,7 +91,7 @@ export default function RankedPage() {
 
         {/* Top 3 podium cards */}
         {!loading && sorted.length >= 3 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
+          <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
             {sorted.slice(0, 3).map((item, i) => {
               const col = ratingColor(item.rating);
               const sizes = [1.05, 1, 0.95];
@@ -154,7 +154,7 @@ export default function RankedPage() {
         </div>
 
         {/* Main 2-col: list + stats sidebar */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start' }}>
+        <div className="lyra-ranked-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, alignItems: 'start' }}>
         <div>
         {/* List */}
         {loading ? (

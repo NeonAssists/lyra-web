@@ -116,7 +116,7 @@ export default function SocialPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
@@ -125,7 +125,7 @@ export default function SocialPage() {
         </div>
 
         {/* Two-column layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }}>
+        <div className="lyra-ranked-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }}>
 
           {/* LEFT — Activity feed */}
           <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden' }}>

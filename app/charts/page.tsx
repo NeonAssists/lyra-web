@@ -84,7 +84,7 @@ export default function ChartsPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page" style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>Charts</h1>

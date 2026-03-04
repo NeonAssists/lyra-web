@@ -179,7 +179,7 @@ export default function MusicPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page" style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
@@ -217,7 +217,7 @@ export default function MusicPage() {
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 20 }}>
               {searching ? 'Searching…' : `${results.length} results for "${query}"`}
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+            <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
               {results.map((r: any, i: number) => {
                 const isAlbum = r.wrapperType === 'collection' || !r.trackId;
                 const id = String(r.trackId ?? r.collectionId ?? '');
@@ -249,7 +249,7 @@ export default function MusicPage() {
             </div>
 
             {loading && !classicAlbums.length ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                 {[...Array(25)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
               </div>
             ) : activeGenre ? (
@@ -261,7 +261,7 @@ export default function MusicPage() {
                     <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Albums</h3>
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{newAlbums.length} albums</span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+                  <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                     {newAlbums.slice(0, 24).map((a: any, i: number) => (
                       <AlbumTile key={`genre-alb-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist}
                         onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
@@ -282,7 +282,7 @@ export default function MusicPage() {
                       <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Songs</h3>
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{genreSongs.length} songs</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                       {genreSongs.map((s: any, i: number) => (
                         <AlbumTile key={`genre-sng-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
@@ -293,7 +293,7 @@ export default function MusicPage() {
               </div>
             ) : (
               /* "All" tab — 60/40 classic/new mix */
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
                 {mixedAlbums.slice(0, 25).map((a: any, i: number) => (
                   <AlbumTile key={`mix-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist}
                     badge={a.source === 'classic' ? 'classic' : undefined}

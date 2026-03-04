@@ -57,7 +57,7 @@ export default function NewAlbumsPage() {
 
   return (
     <AppShell>
-      <div style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
         <div style={{ marginBottom: 24 }}>
           <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>Browse</p>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 6 }}>New Albums</h1>
@@ -72,8 +72,8 @@ export default function NewAlbumsPage() {
           ))}
         </div>
         {loading
-          ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>{[...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}</div>
-          : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+          ? <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>{[...Array(10)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}</div>
+          : <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
               {albums.map((a, i) => (
                 <AlbumTile key={i} artwork={a.artwork} title={a.title} artist={a.artist} rank={i + 1}
                   onClick={() => { setModal({ id: toItemId(a.id), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' }); setModalOpen(true); }} />
