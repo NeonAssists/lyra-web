@@ -117,6 +117,37 @@ export default function SocialPage() {
 
   const filteredPeople = people.filter(p => p.id !== me?.id && (!search || p.handle?.toLowerCase().includes(search.toLowerCase()) || p.display_name?.toLowerCase().includes(search.toLowerCase())));
 
+  if (!me) return (
+    <AppShell>
+      <div className="lyra-page" style={{ padding: '32px 24px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', textAlign: 'center' }}>
+        <div style={{ fontSize: 56, marginBottom: 20 }}>👥</div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>Music is better with friends</h1>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', maxWidth: 300, lineHeight: 1.6, marginBottom: 32 }}>
+          See exactly what your friends are rating. Follow people with taste you trust. Discover music through your network.
+        </p>
+        {/* Mock activity feed */}
+        <div style={{ width: '100%', maxWidth: 360, marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {[
+            { user: 'alex', action: 'rated', title: 'DAMN.', artist: 'Kendrick Lamar', score: '9.4', color: '#34d399' },
+            { user: 'sophie', action: 'rated', title: 'Lover', artist: 'Taylor Swift', score: '8.1', color: '#60a5fa' },
+            { user: 'marcus', action: 'rated', title: 'Starboy', artist: 'The Weeknd', score: '7.6', color: '#a78bfa' },
+          ].map(item => (
+            <div key={item.title} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'rgba(255,255,255,0.04)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.06)', filter: 'blur(1.5px)', opacity: 0.7 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1c1c1e', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#6C63FF' }}>{item.user[0].toUpperCase()}</div>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}><span style={{ color: '#6C63FF' }}>@{item.user}</span> rated <span style={{ color: 'rgba(255,255,255,0.7)' }}>{item.title}</span></p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{item.artist}</p>
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 900, color: item.color }}>{item.score}</span>
+            </div>
+          ))}
+        </div>
+        <a href="/login" style={{ padding: '14px 36px', borderRadius: 100, background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-block' }}>Join &amp; Follow Friends</a>
+        <p style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>Already have an account? <a href="/login" style={{ color: '#6C63FF', textDecoration: 'none' }}>Sign in</a></p>
+      </div>
+    </AppShell>
+  );
+
   return (
     <AppShell>
       <div className="lyra-page" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>

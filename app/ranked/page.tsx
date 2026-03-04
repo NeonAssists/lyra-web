@@ -73,6 +73,25 @@ export default function RankedPage() {
     openItem({ id: item.item_id, title: item.title, artist: item.artist, artwork: item.artwork_url, type: item.item_id.startsWith('itunes:alb:') ? 'album' : 'song' });
   };
 
+  if (!userId) return (
+    <AppShell>
+      <div className="lyra-page" style={{ padding: '32px 24px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh', textAlign: 'center' }}>
+        <div style={{ fontSize: 56, marginBottom: 20 }}>🎵</div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>Your music, ranked</h1>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', maxWidth: 300, lineHeight: 1.6, marginBottom: 32 }}>
+          Rate songs and albums on a 1–10 scale. Build a catalog that actually reflects your taste.
+        </p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 }}>
+          {['10.0 — goat', '9.2 — elite', '7.8 — solid', '6.1 — decent', '4.5 — meh'].map(tag => (
+            <span key={tag} style={{ padding: '6px 14px', borderRadius: 100, background: 'rgba(108,99,255,0.12)', border: '1px solid rgba(108,99,255,0.25)', fontSize: 12, color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{tag}</span>
+          ))}
+        </div>
+        <a href="/login" style={{ padding: '14px 36px', borderRadius: 100, background: '#6C63FF', color: '#fff', fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-block' }}>Start Ranking Free</a>
+        <p style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>Already have an account? <a href="/login" style={{ color: '#6C63FF', textDecoration: 'none' }}>Sign in</a></p>
+      </div>
+    </AppShell>
+  );
+
   return (
     <AppShell>
       <div className="lyra-page" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
