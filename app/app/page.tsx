@@ -561,7 +561,7 @@ export default function AppHome() {
                       <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1.1, marginBottom: 8, margin: 0, marginTop: 0 }}>Rate music on{'\n'}a 1–10 scale.</h2>
 
                       {/* Subtext */}
-                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 24, marginTop: 8 }}>Every decimal matters. A 7.3 hits different than a 7.8. Here&apos;s what the numbers mean:</p>
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 24, marginTop: 8 }}>Every decimal matters. A 7.3 is a lot different than a 7.8. Here&apos;s what the numbers mean:</p>
 
                       {/* Scale bar chart — horizontal, 1 left → 10 right */}
                       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120, marginBottom: 0 }}>
