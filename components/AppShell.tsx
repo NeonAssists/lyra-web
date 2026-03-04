@@ -66,7 +66,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
         }}>
           <div style={{ padding: '28px 24px 20px' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <svg viewBox="0 0 1024 1024" width="26" height="26" style={{ flexShrink: 0, filter: 'drop-shadow(0 0 8px rgba(108,99,255,0.5))' }}>
+                <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.15)"/>
+                <g transform="translate(512, 512)">
+                  <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+                  <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
+                  <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+                  <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
+                  <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+                  <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
+                  <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
+                  <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
+                </g>
+              </svg>
               <span style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>Lyra</span>
             </Link>
           </div>
