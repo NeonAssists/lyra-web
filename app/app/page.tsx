@@ -237,6 +237,7 @@ export default function AppHome() {
           .dash-tri { grid-template-columns: 1fr !important; }
           .dash-quad { grid-template-columns: repeat(2, 1fr) !important; }
           .album-grid-sm { grid-template-columns: repeat(2, 1fr) !important; }
+          .dash-grid-asymmetric { grid-template-columns: 1fr !important; }
           .home-wrap { padding: 16px 12px 80px !important; }
           .home-header { flex-direction: column; gap: 12px; align-items: stretch !important; }
           .home-search { width: 100% !important; }
@@ -395,13 +396,13 @@ export default function AppHome() {
             </Box>
 
             {/* ═══ ROW 4: New Music + Tabbed Charts ═══ */}
-            <div className="dash-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }} className="dash-grid-asymmetric">
               <Box>
                 <BoxHeader label="Just Released" title="New Music" href="/new-music" />
-                <div className="album-grid-sm" style={{ padding: 0 }}>
-                  {loading ? [...Array(8)].map((_, i) => <div key={`nm-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : newSongs.slice(0, 8).map((s: any, i: number) => (
-                        <GridCard key={`nm-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {loading ? [...Array(8)].map((_, i) => <div key={`nm-sk-${i}`} style={{ height: 52, margin: '2px 0', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : newSongs.slice(0, 10).map((s: any, i: number) => (
+                        <ListRow key={`nm-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
                 </div>
@@ -418,10 +419,10 @@ export default function AppHome() {
                       ))}
                     </div>
                   } />
-                <div style={{ padding: '4px 0' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', padding: '4px 0' }}>
                   {loading
-                    ? [...Array(8)].map((_, i) => <div key={`csk-${i}`} style={{ height: 40, margin: '3px 14px', background: '#1c1c1e', borderRadius: 8 }} />)
-                    : (chartTab === 'us' ? topSongs : globalSongs).slice(0, 10).map((s: any, i: number) => (
+                    ? [...Array(20)].map((_, i) => <div key={`csk-${i}`} style={{ height: 52, margin: '2px 8px', background: '#1c1c1e', borderRadius: 8 }} />)
+                    : (chartTab === 'us' ? topSongs : globalSongs).slice(0, 20).map((s: any, i: number) => (
                         <ListRow key={`ch-${chartTab}-${i}-${s.id}`} item={{ title: s.title, artist: s.artist, artwork_url: s.artwork, rating: 0 }} rank={i + 1} compact
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
                       ))}
