@@ -142,6 +142,7 @@ export default function AppHome() {
   const [selectedInWelcome, setSelectedInWelcome] = useState<Set<string>>(new Set());
   const [welcomeRatings, setWelcomeRatings] = useState<Record<string,number>>({});
   const [welcomeRatingTarget, setWelcomeRatingTarget] = useState<string|null>(null);
+  const [welcomeSliderValue, setWelcomeSliderValue] = useState<number>(7.0);
   const [welcomeStep, setWelcomeStep] = useState<1|2|3|4>(1);
 
   // Community hot (Change 4)
@@ -621,7 +622,7 @@ export default function AppHome() {
                                   if (welcomeRatingTarget === song.id) setWelcomeRatingTarget(null);
                                 } else {
                                   setSelectedInWelcome(prev => new Set(prev).add(song.id));
-                                  if (rating === undefined) setWelcomeRatingTarget(song.id);
+                                  if (rating === undefined) { setWelcomeRatingTarget(song.id); setWelcomeSliderValue(7.0); }
                                 }
                               }}
                               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.04)'; }}
@@ -658,14 +659,30 @@ export default function AppHome() {
                                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.artist}</p>
                               </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                              {scaleTiers.map(tier => (
-                                <button key={tier.score} onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget]: tier.score })); setWelcomeRatingTarget(null); }}
-                                  style={{ width: 40, height: 36, borderRadius: 10, border: `1px solid ${tier.color}44`, cursor: 'pointer', fontSize: 13, fontWeight: 800, background: tier.color + '22', color: tier.color }}>
-                                  {tier.score}
-                                </button>
-                              ))}
-                            </div>
+                            {(() => {
+                              const activeTier = scaleTiers.slice().reverse().find(t => welcomeSliderValue >= t.score) ?? scaleTiers[0];
+                              return (
+                                <div>
+                                  {/* Score display */}
+                                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, marginBottom: 10 }}>
+                                    <span style={{ fontSize: 48, fontWeight: 900, color: activeTier.color, lineHeight: 1, letterSpacing: -2 }}>{welcomeSliderValue.toFixed(1)}</span>
+                                    <span style={{ fontSize: 14, fontWeight: 700, color: activeTier.color, opacity: 0.8 }}>{activeTier.label}</span>
+                                  </div>
+                                  {/* Slider */}
+                                  <input
+                                    type="range" min="1" max="10" step="0.1"
+                                    value={welcomeSliderValue}
+                                    onChange={e => setWelcomeSliderValue(parseFloat(e.target.value))}
+                                    style={{ width: '100%', accentColor: activeTier.color, height: 4, cursor: 'pointer', marginBottom: 12 }}
+                                  />
+                                  {/* Confirm */}
+                                  <button onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget!]: welcomeSliderValue })); setWelcomeRatingTarget(null); }}
+                                    style={{ width: '100%', padding: '10px', borderRadius: 100, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 800, background: activeTier.color, color: '#fff' }}>
+                                    Set {welcomeSliderValue.toFixed(1)} →
+                                  </button>
+                                </div>
+                              );
+                            })()}
                           </div>
                         );
                       })()}
