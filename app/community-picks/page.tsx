@@ -18,7 +18,7 @@ export default function CommunityPicksPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => { setUserId(session?.user?.id ?? null); }); return () => subscription.unsubscribe();
     (supabase as any).from('user_rankings').select('item_id, title, artist, artwork_url, rating, user_id')
       .gte('rating', 7).not('title', 'is', null).order('rating', { ascending: false }).limit(100)
       .then(({ data }: any) => {

@@ -38,7 +38,7 @@ export default function NewAlbumsPage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => { setUserId(session?.user?.id ?? null); }); return () => subscription.unsubscribe();
     const params = new URLSearchParams(window.location.search);
     const g = params.get('genre');
     if (g) setActiveGenre(g);

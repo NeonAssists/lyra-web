@@ -31,7 +31,7 @@ export default function NewMusicPage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => { setUserId(session?.user?.id ?? null); }); return () => subscription.unsubscribe();
     fetch('https://itunes.apple.com/us/rss/newmusic/limit=50/json').then(r => r.json()).then(d => {
       setSongs((d?.feed?.entry ?? []).map((e: any) => ({ id: e.id?.attributes?.['im:id'] ?? '', title: e['im:name']?.label ?? '', artist: e['im:artist']?.label ?? '', artwork: getHiRes(e['im:image']?.[2]?.label ?? '') })));
       setLoading(false);
