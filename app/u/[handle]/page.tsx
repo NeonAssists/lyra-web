@@ -102,7 +102,9 @@ export default function UserProfilePage() {
           .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; }
           .profile-header > div:last-child { width: 100% !important; }
           .profile-actions { justify-content: center !important; }
-          .profile-stats { justify-content: center !important; }
+          .profile-wrap { padding-top: 20px !important; }
+          .profile-stats { justify-content: center !important; gap: 20px !important; flex-wrap: wrap !important; }
+          .profile-tabs::-webkit-scrollbar { display: none; }
         }
       `}</style>
       <div className="profile-wrap max-w-2xl mx-auto px-4 py-6" style={{ width: '100%', boxSizing: 'border-box' }}>
@@ -178,7 +180,7 @@ export default function UserProfilePage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-5">
+            <div className="profile-tabs flex gap-2 mb-5" style={{ overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" as any, msOverflowStyle: "none" as any, scrollbarWidth: "none" as any }}>
               {(['top', 'songs', 'albums'] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)}
                   className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${tab === t ? 'bg-[#6C63FF] text-white' : 'bg-[#141414] text-[#8E8E93] hover:text-white'}`}>

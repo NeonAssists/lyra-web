@@ -207,7 +207,7 @@ export default function MusicPage() {
 
   return (
     <AppShell>
-      <div className="lyra-page" style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
+      <div className="lyra-page music-page-wrap" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
@@ -226,7 +226,7 @@ export default function MusicPage() {
 
         {/* Genre chips — only when not searching */}
         {!query && (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
+          <div className="music-genre-pills" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
             {GENRES.map(g => (
               <button key={g.id ?? 'all'} onClick={() => setActiveGenre(g.id)}
                 style={{ padding: '8px 18px', borderRadius: 100, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all 0.15s',
@@ -276,7 +276,7 @@ export default function MusicPage() {
                 {searchResults.albums.length > 0 && (
                   <div>
                     <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>Albums</h3>
-                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                    <div className="lyra-grid-responsive music-album-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                       {searchResults.albums.map((a: any, i: number) => {
                         const art = getArtworkHiRes(a.artworkUrl100 ?? '');
                         return (
@@ -297,7 +297,8 @@ export default function MusicPage() {
                         const art = getArtworkHiRes(s.artworkUrl100 ?? '');
                         return (
                           <button key={`sng-${i}`} onClick={() => open({ id: toItemId(String(s.trackId), 'song'), title: s.trackName, artist: s.artistName ?? '', artwork: art, type: 'song' })}
-                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
+                            className="music-song-row"
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s', width: '100%' }}
                             onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
                             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                             <div style={{ width: 44, height: 44, borderRadius: 8, background: '#1c1c1e', flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
@@ -337,7 +338,7 @@ export default function MusicPage() {
             </div>
 
             {loading && !classicAlbums.length ? (
-              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              <div className="lyra-grid-responsive music-album-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                 {[...Array(25)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
               </div>
             ) : activeGenre ? (
@@ -349,7 +350,7 @@ export default function MusicPage() {
                     <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Albums</h3>
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{newAlbums.length} albums</span>
                   </div>
-                  <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                  <div className="lyra-grid-responsive music-album-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                     {newAlbums.slice(0, 24).map((a: any, i: number) => (
                       <AlbumTile key={`genre-alb-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} size={tileSize(i)}
                         onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
@@ -370,7 +371,7 @@ export default function MusicPage() {
                       <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Songs</h3>
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{genreSongs.length} songs</span>
                     </div>
-                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                    <div className="lyra-grid-responsive music-album-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                       {genreSongs.map((s: any, i: number) => (
                         <AlbumTile key={`genre-sng-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist} size={tileSize(i)}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
@@ -381,7 +382,7 @@ export default function MusicPage() {
               </div>
             ) : (
               /* "All" tab — 60/40 classic/new mix */
-              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              <div className="lyra-grid-responsive music-album-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                 {mixedAlbums.slice(0, 25).map((a: any, i: number) => (
                   <AlbumTile key={`mix-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} size={tileSize(i)}
 
