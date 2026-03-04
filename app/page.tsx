@@ -119,22 +119,7 @@ export default function HomePage() {
       {/* Nav — Apple minimal */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'saturate(180%) blur(20px)', WebkitBackdropFilter: 'saturate(180%) blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', padding: '0 22px', height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <svg viewBox="0 0 1024 1024" width="24" height="24" style={{ flexShrink: 0 }}>
-              <rect width="1024" height="1024" fill="transparent"/>
-              <g transform="translate(512, 512)">
-                <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
-                <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
-                <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
-                <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" strokeWidth="60" strokeLinecap="round"/>
-                <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
-                <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.75} strokeLinecap="round"/>
-                <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.6} strokeLinecap="round"/>
-                <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" strokeWidth="28" opacity={0.5} strokeLinecap="round"/>
-              </g>
-            </svg>
-            <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.5px' }}>Lyra</span>
-          </div>
+          <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.5px' }}>Lyra</span>
           <Link href="/login" style={{ fontSize: 13, fontWeight: 500, color: '#6C63FF', textDecoration: 'none', padding: '6px 16px', borderRadius: 20, border: '1px solid rgba(108,99,255,0.4)', transition: 'all 0.2s' }}>
             Sign In
           </Link>
