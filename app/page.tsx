@@ -96,7 +96,12 @@ export default function HomePage() {
   return (
     <div className="bg-black text-white overflow-x-hidden" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif' }}>
       <style>{`
+        .lp-mobile-only { display: none; }
+        .lp-cta-btn { display: inline-flex; }
         @media (max-width: 768px) {
+          .lp-mobile-only { display: block; }
+          .lp-cta-btn { width: 100%; display: block; text-align: center; box-sizing: border-box; }
+          .lp-cta-wrap { flex-direction: column; }
           .lp-stat-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
           .lp-feature-grid { grid-template-columns: 1fr !important; }
           .lp-mockup { display: none !important; }
@@ -129,13 +134,31 @@ export default function HomePage() {
         <p style={{ fontSize: 'clamp(1rem, 2vw, 1.3rem)', color: 'rgba(255,255,255,0.55)', maxWidth: 540, lineHeight: 1.6, marginBottom: 48, fontWeight: 400 }}>
           Decimal scores. Real opinions. No algorithm telling you what to like.
         </p>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
+        <div className="lp-cta-wrap" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <button className="lp-cta-btn" onClick={openWaitlist} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#6C63FF', color: '#fff', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, border: 'none', cursor: 'pointer', letterSpacing: '-0.2px' }}>
             Sign Up Free
           </button>
-          <Link href="/u/nate7" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <Link className="lp-cta-btn" href="/u/nate7" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 16, padding: '14px 32px', borderRadius: 100, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)' }}>
             See Example Profile
           </Link>
+        </div>
+
+        {/* Mobile rating card */}
+        <div className="lp-mobile-only" style={{ background: 'rgba(18,18,18,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, maxWidth: 300, margin: '40px auto 0', boxShadow: '0 20px 60px rgba(108,99,255,0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg,#6C63FF,#9C8FFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontSize: 18 }}>🎵</span>
+            </div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ fontSize: 32, fontWeight: 700, color: '#6C63FF' }}>8.7</span>
+            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>/ 10.0</span>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginLeft: 8 }}>⭐ Your rating</span>
+          </div>
         </div>
       </section>
 
@@ -159,6 +182,20 @@ export default function HomePage() {
       {/* Feature 1 — Rate Anything */}
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          {/* Mobile mini song list */}
+          <div className="lp-mobile-only" style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
+            {[
+              { name: 'Starboy', rating: '9.1', gradient: '135deg,#6C63FF,#9C8FFF' },
+              { name: 'Levitating', rating: '7.4', gradient: '135deg,#FF6584,#FF8FA3' },
+              { name: 'Peaches', rating: '6.2', gradient: '135deg,#43E97B,#38F9D7' },
+            ].map((song, i) => (
+              <div key={`msong-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(${song.gradient})`, flexShrink: 0 }} />
+                <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#fff', textAlign: 'left' }}>{song.name}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#6C63FF', background: 'rgba(108,99,255,0.12)', padding: '3px 8px', borderRadius: 10 }}>{song.rating}</span>
+              </div>
+            ))}
+          </div>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Precision</p>
           <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
             Rate anything.<br />Down to the decimal.
@@ -172,6 +209,23 @@ export default function HomePage() {
       {/* Feature 2 — Social */}
       <section className="lp-section" style={{ padding: '120px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          {/* Mobile mini activity feed */}
+          <div className="lp-mobile-only" style={{ background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16, maxWidth: 280, margin: '0 auto 32px' }}>
+            {[
+              { initials: 'J', name: 'Jake', artist: 'Tame Impala', rating: '8.2', time: '2m ago', gradient: '135deg,#6C63FF,#9C8FFF' },
+              { initials: 'A', name: 'Ari', artist: 'Tyler, The Creator', rating: '9.0', time: '5m ago', gradient: '135deg,#FF6584,#FF8FA3' },
+            ].map((item, i) => (
+              <div key={`mfeed-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i === 0 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                <div style={{ width: 32, height: 32, borderRadius: 16, background: `linear-gradient(${item.gradient})`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{item.initials}</span>
+                </div>
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.name} rated {item.artist} · <span style={{ color: '#6C63FF' }}>{item.rating}</span></div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{item.time}</div>
+                </div>
+              </div>
+            ))}
+          </div>
           <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 20 }}>Social</p>
           <h2 style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, letterSpacing: '-1.5px', lineHeight: 1.06, marginBottom: 24 }}>
             See what your<br />friends actually like.
