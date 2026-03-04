@@ -227,7 +227,7 @@ export default function HomePage() {
               { score: '7.0', label: 'Good', height: 116, color: '#4d7c0f' },
               { score: '8.0', label: 'Great', height: 132, color: '#15803d' },
               { score: '9.0', label: 'Elite', height: 148, color: '#0369a1' },
-              { score: '10.0', label: 'GOAT', height: 164, color: '#6C63FF' },
+              { score: '10.0', label: 'Masterpiece', height: 164, color: '#6C63FF' },
             ].map((r, i) => (
               <div key={`rs-${i}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{r.label}</p>
