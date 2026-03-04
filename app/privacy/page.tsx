@@ -207,8 +207,8 @@ export default function PrivacyPage() {
 
             <p className="text-sm text-[#8E8E93] leading-relaxed">
               To exercise any of these rights, contact us at{' '}
-              <Link href="mailto:neonotics@gmail.com" className="text-[#6C63FF] hover:underline font-semibold">
-                neonotics@gmail.com
+              <Link href="mailto:hello@getlyra.app" className="text-[#6C63FF] hover:underline font-semibold">
+                hello@getlyra.app
               </Link>.
             </p>
           </section>
@@ -218,8 +218,8 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-black mb-5 tracking-tight">How to Delete Your Account</h2>
             <p className="text-sm text-[#8E8E93] leading-relaxed mb-4">
               You can request complete deletion of your Lyra account and all associated data at any time by emailing{' '}
-              <Link href="mailto:neonotics@gmail.com" className="text-[#6C63FF] hover:underline font-semibold">
-                neonotics@gmail.com
+              <Link href="mailto:hello@getlyra.app" className="text-[#6C63FF] hover:underline font-semibold">
+                hello@getlyra.app
               </Link>.
             </p>
             <p className="text-sm text-[#8E8E93] leading-relaxed mb-4">
@@ -303,8 +303,8 @@ export default function PrivacyPage() {
               <p className="text-sm font-semibold text-white mb-2">Lyra / Neonotics</p>
               <p className="text-sm text-[#8E8E93]">
                 Email:{' '}
-                <Link href="mailto:neonotics@gmail.com" className="text-[#6C63FF] hover:underline font-semibold">
-                  neonotics@gmail.com
+                <Link href="mailto:hello@getlyra.app" className="text-[#6C63FF] hover:underline font-semibold">
+                  hello@getlyra.app
                 </Link>
               </p>
               <p className="text-xs text-[#8E8E93] mt-3">
