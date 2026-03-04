@@ -81,9 +81,10 @@ export default function UserProfilePage() {
     setIsFollowing(!isFollowing);
   };
 
-  const songs = rankings.filter(r => !r.item_id.startsWith('itunes:alb:'));
-  const albums = rankings.filter(r => r.item_id.startsWith('itunes:alb:'));
-  const displayed = tab === 'top' ? rankings.slice(0, 20) : tab === 'songs' ? songs : albums;
+  const songs = rankings.filter(r => !r.item_id.startsWith('itunes:alb:') && (r.rating ?? 0) > 0);
+  const albums = rankings.filter(r => r.item_id.startsWith('itunes:alb:') && (r.rating ?? 0) > 0);
+  const topRanked = [...rankings].filter(r => (r.rating ?? 0) > 0).sort((a, b) => b.rating - a.rating);
+  const displayed = tab === 'top' ? topRanked.slice(0, 20) : tab === 'songs' ? songs : albums;
   const avgRating = rankings.length ? (rankings.reduce((s, r) => s + r.rating, 0) / rankings.length) : 0;
 
   const openModal = (item: RankedItem) => {
