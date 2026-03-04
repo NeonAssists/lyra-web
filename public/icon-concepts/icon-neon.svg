@@ -1,0 +1,17 @@
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Neon's lyre concept — clean geometric, glow-friendly -->
+  <rect width="1024" height="1024" rx="220" fill="#0A0A0F"/>
+  <g transform="translate(512, 512)">
+    <!-- Arms -->
+    <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" stroke-width="60" fill="none" stroke-linecap="round"/>
+    <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" stroke-width="60" fill="none" stroke-linecap="round"/>
+    <!-- Top + bottom bridges -->
+    <line x1="-110" y1="-180" x2="110" y2="-180" stroke="#6C63FF" stroke-width="60" stroke-linecap="round"/>
+    <line x1="-85" y1="150" x2="85" y2="150" stroke="#6C63FF" stroke-width="60" stroke-linecap="round"/>
+    <!-- Strings (4, varied opacity) -->
+    <line x1="-60" y1="-165" x2="-60" y2="140" stroke="#6C63FF" stroke-width="28" opacity="0.6" stroke-linecap="round"/>
+    <line x1="-20" y1="-165" x2="-20" y2="140" stroke="#6C63FF" stroke-width="28" opacity="0.75" stroke-linecap="round"/>
+    <line x1="20" y1="-165" x2="20" y2="140" stroke="#6C63FF" stroke-width="28" opacity="0.6" stroke-linecap="round"/>
+    <line x1="60" y1="-165" x2="60" y2="140" stroke="#6C63FF" stroke-width="28" opacity="0.5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -144,7 +144,7 @@ export default function HomePage() {
       {/* Hero — full viewport, Apple style */}
       <section className="lp-hero" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
         <div style={{ marginBottom: 32 }}>
-          <svg viewBox="0 0 1024 1024" width="88" height="88" style={{ filter: 'drop-shadow(0 0 24px rgba(108,99,255,0.5))' }}>
+          <svg viewBox="0 0 1024 1024" width="108" height="108" style={{ filter: 'drop-shadow(0 0 32px rgba(108,99,255,0.55))' }}>
             <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.15)"/>
             <g transform="translate(512, 512)">
               <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
