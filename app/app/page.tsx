@@ -562,17 +562,20 @@ export default function AppHome() {
                       {/* Subtext */}
                       <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 24, marginTop: 8 }}>Every decimal matters. A 7.3 hits different than a 7.8. Here&apos;s what the numbers mean:</p>
 
-                      {/* Scale bar chart */}
-                      <div style={{ marginBottom: 0 }}>
-                        {scaleTiers.map(tier => (
-                          <div key={tier.score} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-                            <span style={{ width: 20, fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.5)', textAlign: 'right' as const, flexShrink: 0 }}>{tier.score}</span>
-                            <div style={{ flex: 1, height: 8 + (tier.score / 10) * 10, background: 'rgba(255,255,255,0.04)', borderRadius: 4, overflow: 'hidden' }}>
-                              <div style={{ width: `${tier.score * 10}%`, height: '100%', background: `linear-gradient(90deg, ${tier.color}cc, ${tier.color}80)`, borderRadius: 4 }} />
+                      {/* Scale bar chart — horizontal, 1 left → 10 right */}
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 120, marginBottom: 0 }}>
+                        {scaleTiers.map(tier => {
+                          const barH = 14 + (tier.score / 10) * 86;
+                          return (
+                            <div key={tier.score} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textAlign: 'center' as const, lineHeight: 1.1, letterSpacing: '-0.2px' }}>
+                                {tier.label === 'Below avg' ? 'Below\navg' : tier.label}
+                              </span>
+                              <div style={{ width: '100%', height: barH, background: `linear-gradient(180deg, ${tier.color}, ${tier.color}88)`, borderRadius: '4px 4px 2px 2px' }} />
+                              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.55)' }}>{tier.score}</span>
                             </div>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', minWidth: 70 }}>{tier.label}</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {/* CTA button */}
