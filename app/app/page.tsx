@@ -670,7 +670,7 @@ export default function AppHome() {
                                 <img src={song.artwork} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                 {isSelected && rating !== undefined && (
                                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>{rating}</span>
+                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
                                   </div>
                                 )}
                                 {isSelected && rating === undefined && (

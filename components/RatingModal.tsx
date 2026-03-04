@@ -28,12 +28,15 @@ const RATING_TAGS = ['Chill', 'Hype', 'Emotional', 'Classic', 'Underrated', 'Ove
 
 function getRatingLabel(r: number): string {
   if (r === 0) return 'Tap to rate';
-  if (r <= 2) return 'Poor';
-  if (r <= 4) return 'Below Average';
-  if (r <= 5.5) return 'Decent';
-  if (r <= 7) return 'Good';
-  if (r <= 8.5) return 'Great';
-  if (r <= 9.5) return 'Excellent';
+  if (r < 2) return 'Skip';
+  if (r < 3) return 'Weak';
+  if (r < 4) return 'Meh';
+  if (r < 5) return 'Below avg';
+  if (r < 6) return 'Average';
+  if (r < 7) return 'Decent';
+  if (r < 8) return 'Good';
+  if (r < 9) return 'Great';
+  if (r < 10) return 'Elite';
   return 'Masterpiece';
 }
 
