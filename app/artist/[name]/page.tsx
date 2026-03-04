@@ -36,47 +36,75 @@ export default function ArtistPage() {
     const fetchArtist = async () => {
       setLoading(true);
       try {
-        // Search iTunes for songs by this artist
-        const songRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&limit=25&attribute=artistTerm`);
-        const songData = await songRes.json();
-        const songs = (songData.results ?? []).filter((r: any) => r.wrapperType === 'track');
+        // Step 1: Find the exact artistId via search
+        const artistRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=musicArtist&limit=5`);
+        const artistData = await artistRes.json();
+        // Match by exact name (case-insensitive) or take first result
+        const exactMatch = (artistData.results ?? []).find((a: any) =>
+          a.artistName?.toLowerCase() === artistName.toLowerCase()
+        );
+        const artistMatch = exactMatch || artistData.results?.[0];
 
-        // Search iTunes for albums by this artist
-        const albumRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=album&limit=20&attribute=artistTerm`);
-        const albumData = await albumRes.json();
-        const albs = (albumData.results ?? []).filter((r: any) => r.wrapperType === 'collection');
+        if (artistMatch?.artistId) {
+          // Step 2: Use Lookup API for exact catalog — songs and albums
+          const [songLookup, albumLookup] = await Promise.all([
+            fetch(`https://itunes.apple.com/lookup?id=${artistMatch.artistId}&entity=song&limit=50`).then(r => r.json()),
+            fetch(`https://itunes.apple.com/lookup?id=${artistMatch.artistId}&entity=album&limit=50`).then(r => r.json()),
+          ]);
 
-        // Artist image from first result
-        if (songs.length > 0) {
-          setArtistImg(getHiRes(songs[0].artworkUrl100));
-        } else if (albs.length > 0) {
-          setArtistImg(getHiRes(albs[0].artworkUrl100));
+          const songs = (songLookup.results ?? []).filter((r: any) => r.wrapperType === 'track');
+          const albs = (albumLookup.results ?? []).filter((r: any) => r.wrapperType === 'collection');
+
+          if (songs.length > 0) setArtistImg(getHiRes(songs[0].artworkUrl100));
+          else if (albs.length > 0) setArtistImg(getHiRes(albs[0].artworkUrl100));
+          else if (artistMatch.artworkUrl100) setArtistImg(getHiRes(artistMatch.artworkUrl100));
+
+          setTopSongs(songs.map((s: any) => ({
+            id: String(s.trackId),
+            title: s.trackName,
+            artist: s.artistName,
+            album: s.collectionName,
+            artwork: getHiRes(s.artworkUrl100),
+          })));
+
+          const seen = new Set<number>();
+          const uniqueAlbs = albs.filter((a: any) => {
+            if (seen.has(a.collectionId)) return false;
+            seen.add(a.collectionId);
+            return true;
+          });
+
+          setAlbums(uniqueAlbs.map((a: any) => ({
+            id: String(a.collectionId),
+            title: a.collectionName,
+            artist: a.artistName,
+            artwork: getHiRes(a.artworkUrl100),
+            year: a.releaseDate ? new Date(a.releaseDate).getFullYear() : null,
+            trackCount: a.trackCount,
+          })));
+        } else {
+          // Fallback: fuzzy search if no artist match found
+          const songRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&limit=25&attribute=artistTerm`);
+          const songData = await songRes.json();
+          const songs = (songData.results ?? []).filter((r: any) => r.wrapperType === 'track');
+          const albumRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=album&limit=20&attribute=artistTerm`);
+          const albumData = await albumRes.json();
+          const albs = (albumData.results ?? []).filter((r: any) => r.wrapperType === 'collection');
+
+          if (songs.length > 0) setArtistImg(getHiRes(songs[0].artworkUrl100));
+          else if (albs.length > 0) setArtistImg(getHiRes(albs[0].artworkUrl100));
+
+          setTopSongs(songs.map((s: any) => ({
+            id: String(s.trackId), title: s.trackName, artist: s.artistName, album: s.collectionName, artwork: getHiRes(s.artworkUrl100),
+          })));
+
+          const seen = new Set<number>();
+          const uniqueAlbs = albs.filter((a: any) => { if (seen.has(a.collectionId)) return false; seen.add(a.collectionId); return true; });
+          setAlbums(uniqueAlbs.map((a: any) => ({
+            id: String(a.collectionId), title: a.collectionName, artist: a.artistName, artwork: getHiRes(a.artworkUrl100),
+            year: a.releaseDate ? new Date(a.releaseDate).getFullYear() : null, trackCount: a.trackCount,
+          })));
         }
-
-        setTopSongs(songs.map((s: any) => ({
-          id: String(s.trackId),
-          title: s.trackName,
-          artist: s.artistName,
-          album: s.collectionName,
-          artwork: getHiRes(s.artworkUrl100),
-        })));
-
-        // Deduplicate albums by collectionId
-        const seen = new Set<number>();
-        const uniqueAlbs = albs.filter((a: any) => {
-          if (seen.has(a.collectionId)) return false;
-          seen.add(a.collectionId);
-          return true;
-        });
-
-        setAlbums(uniqueAlbs.map((a: any) => ({
-          id: String(a.collectionId),
-          title: a.collectionName,
-          artist: a.artistName,
-          artwork: getHiRes(a.artworkUrl100),
-          year: a.releaseDate ? new Date(a.releaseDate).getFullYear() : null,
-          trackCount: a.trackCount,
-        })));
       } catch (e) {
         console.error('Artist fetch failed', e);
       }
