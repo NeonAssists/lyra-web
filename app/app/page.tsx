@@ -113,6 +113,7 @@ function EmptyState({ icon, text, cta, href }: { icon: string; text: string; cta
 
 export default function AppHome() {
   const [me, setMe] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
@@ -152,6 +153,7 @@ export default function AppHome() {
       setMe(p as User);
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (ev, session) => {
+      setAuthReady(true);
       if (session?.user) loadProfile(session.user.id);
     });
     return () => subscription.unsubscribe();
@@ -305,8 +307,8 @@ export default function AppHome() {
           </div>
         </div>
 
-        {/* Guest welcome banner — mobile only */}
-        {!isLoggedIn && !query && (
+        {/* Guest welcome banner — only show after auth is confirmed */}
+        {authReady && !isLoggedIn && !query && (
           <div style={{ marginBottom: 20, padding: '20px', borderRadius: 18, background: 'linear-gradient(135deg, rgba(108,99,255,0.18) 0%, rgba(108,99,255,0.06) 100%)', border: '1px solid rgba(108,99,255,0.2)' }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', color: '#6C63FF', marginBottom: 8 }}>Welcome to Lyra</p>
             <p style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', marginBottom: 6 }}>Rate music. Build your taste.</p>
