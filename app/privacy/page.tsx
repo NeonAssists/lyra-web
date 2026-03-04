@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           <div className="mb-12">
             <h1 className="text-4xl font-black tracking-tight mb-3">Privacy Policy</h1>
             <p className="text-sm text-[#8E8E93]">Effective Date: March 1, 2026</p>
-            <p className="text-sm text-[#8E8E93]">Last Updated: March 1, 2026</p>
+            <p className="text-sm text-[#8E8E93]">Last Updated: March 4, 2026</p>
           </div>
 
           {/* Introduction */}
@@ -55,13 +55,19 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="text-sm font-semibold text-white mb-2">Optional Spotify Connection</h3>
                 <p className="text-sm text-[#8E8E93] leading-relaxed">
-                  Connecting your Spotify account is entirely optional. If you choose to do so, we use OAuth to authenticate your identity — we do not store your Spotify password. Spotify connection allows for enhanced features and data sync (exact scope depends on features released).
+                  Connecting your Spotify account is entirely optional. If you choose to do so, we use OAuth to authenticate your identity — we do not store your Spotify password. We request only the <span className="text-white font-medium">user-read-private</span> and <span className="text-white font-medium">user-read-email</span> scopes to verify your Spotify identity. We do not access your playlists, listening history, or any other Spotify data.
                 </p>
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-white mb-2">Technical Information</h3>
                 <p className="text-sm text-[#8E8E93] leading-relaxed">
                   We automatically collect IP addresses, browser type, device information, and usage patterns through standard web server logs and analytics. This helps us understand how Lyra is used and improve performance and security.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-2">Cookies & Local Storage</h3>
+                <p className="text-sm text-[#8E8E93] leading-relaxed">
+                  Lyra uses cookies and browser local storage solely to maintain your authenticated session and remember your preferences. We do not use advertising cookies or third-party tracking cookies. Session cookies expire when you sign out or close your browser. You can disable cookies in your browser settings, but doing so may prevent you from logging in.
                 </p>
               </div>
             </div>
@@ -76,6 +82,25 @@ export default function PrivacyPage() {
             </p>
             <p className="text-sm text-[#8E8E93] leading-relaxed">
               Your data is encrypted end-to-end for sensitive operations. Authentication is handled securely using industry-standard protocols. We do not store passwords in plain text; all passwords are hashed.
+            </p>
+          </section>
+
+          {/* Data Retention */}
+          <section className="mb-10 pb-10 border-b border-white/[0.06]">
+            <h2 className="text-2xl font-black mb-5 tracking-tight">Data Retention</h2>
+            <p className="text-sm text-[#8E8E93] leading-relaxed mb-4">
+              We retain your personal data for as long as your account is active. If you delete your account, all associated data — including your email, rankings, lists, and profile — is permanently removed from our systems within 7 business days.
+            </p>
+            <p className="text-sm text-[#8E8E93] leading-relaxed">
+              Anonymized, aggregated analytics data (with no personally identifiable information) may be retained indefinitely for product improvement purposes.
+            </p>
+          </section>
+
+          {/* International Transfers */}
+          <section className="mb-10 pb-10 border-b border-white/[0.06]">
+            <h2 className="text-2xl font-black mb-5 tracking-tight">International Data Transfers</h2>
+            <p className="text-sm text-[#8E8E93] leading-relaxed">
+              Lyra is operated from the United States. If you access Lyra from outside the United States, your data may be transferred to and processed in the United States. Supabase, our database provider, processes data under standard contractual clauses and applicable data protection agreements. By using Lyra, you consent to this transfer. We take appropriate safeguards to ensure your data is treated securely and in accordance with this Privacy Policy.
             </p>
           </section>
 
@@ -203,7 +228,7 @@ export default function PrivacyPage() {
             <ul className="space-y-2 ml-4 text-sm text-[#8E8E93] mb-4">
               <li className="flex gap-3">
                 <span className="flex-shrink-0 text-[#6C63FF] font-semibold">1.</span>
-                <span>Verify your identity</span>
+                <span>Verify your identity via reply from your registered email address</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 text-[#6C63FF] font-semibold">2.</span>
@@ -240,7 +265,7 @@ export default function PrivacyPage() {
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
-                <span>Regular security audits and monitoring</span>
+                <span>Periodic security reviews and monitoring</span>
               </li>
               <li className="flex gap-3">
                 <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
@@ -314,7 +339,7 @@ export default function PrivacyPage() {
             <Link href="/app" className="hover:text-white transition-colors">Web App</Link>
             <Link href="/u/nate7" className="hover:text-white transition-colors">Profiles</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <span>© 2025</span>
+            <span>© 2026</span>
           </div>
         </div>
       </footer>
