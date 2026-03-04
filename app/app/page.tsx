@@ -142,7 +142,7 @@ export default function AppHome() {
   const [selectedInWelcome, setSelectedInWelcome] = useState<Set<string>>(new Set());
   const [welcomeRatings, setWelcomeRatings] = useState<Record<string,number>>({});
   const [welcomeRatingTarget, setWelcomeRatingTarget] = useState<string|null>(null);
-  const [welcomeStep, setWelcomeStep] = useState<1|2>(1);
+  const [welcomeStep, setWelcomeStep] = useState<1|2|3|4>(1);
 
   // Community hot (Change 4)
   const [communityHot, setCommunityHot] = useState<{ item_id: string; title: string; artist: string; artwork_url: string; rating: number }[]>([]);
@@ -546,8 +546,9 @@ export default function AppHome() {
               <div style={{ background: 'linear-gradient(135deg, #0f0f0f 0%, #0d0b1a 100%)', borderRadius: 28, width: '100%', position: 'relative' }}>
                 {/* Step indicator dots */}
                 <div style={{ display: 'flex', gap: 6, justifyContent: 'center', paddingTop: 24, marginBottom: 20 }}>
-                  <div style={{ width: welcomeStep === 1 ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === 1 ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
-                  <div style={{ width: welcomeStep === 2 ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === 2 ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
+                  {([1,2,3,4] as const).map(s => (
+                    <div key={s} style={{ width: welcomeStep === s ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === s ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
+                  ))}
                 </div>
 
                 <div style={{ padding: '0 28px 28px' }}>
@@ -590,7 +591,7 @@ export default function AppHome() {
                         Skip
                       </button>
                     </>
-                  ) : (
+                  ) : welcomeStep === 2 ? (
                     <>
                       {/* Back arrow + header row */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
@@ -669,12 +670,98 @@ export default function AppHome() {
                         );
                       })()}
 
-                      {/* Done button */}
-                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-                        style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, fontSize: 15, fontWeight: 800, border: ratedCount > 0 ? 'none' : '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', background: ratedCount > 0 ? 'linear-gradient(135deg, #6C63FF, #8b5cf6)' : 'transparent', color: ratedCount > 0 ? '#fff' : 'rgba(255,255,255,0.3)' }}>
-                        {ratedCount > 0 ? `Done (${ratedCount} rated) →` : 'Skip for now →'}
+                      {/* Next button */}
+                      <button onClick={() => { saveAllWelcomeRatings(); setWelcomeStep(3); }}
+                        style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff' }}>
+                        {ratedCount > 0 ? `Next (${ratedCount} rated) →` : 'Next →'}
                       </button>
                     </>
+                  ) : welcomeStep === 3 ? (
+                    <div style={{ padding: '24px 28px 28px' }}>
+                      {/* Back + header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                        <button onClick={() => setWelcomeStep(2)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Discovery Packs</h2>
+                      </div>
+
+                      {/* Big icon */}
+                      <div style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>🎴</div>
+
+                      {/* Headline */}
+                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Music that fits your taste. Exactly.</h3>
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Lyra builds curated Packs based on what you rate. Swipe through songs — the more you rate, the better your Packs get. Underground gems included.</p>
+
+                      {/* Feature list */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+                        {[
+                          { icon: '🎯', title: 'Built around your ratings', desc: 'Packs are generated from your actual taste, not generic charts.' },
+                          { icon: '🌍', title: 'Global & underground', desc: 'From Billboard hits to deep cuts you\'ve never heard.' },
+                          { icon: '⚡', title: 'Gets smarter over time', desc: 'Rate more, get better Packs. Simple.' },
+                        ].map((f, i) => (
+                          <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: '14px 16px' }}>
+                            <span style={{ fontSize: 22, flexShrink: 0 }}>{f.icon}</span>
+                            <div>
+                              <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{f.title}</p>
+                              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{f.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* CTA */}
+                      <button onClick={() => setWelcomeStep(4)}
+                        style={{ width: '100%', padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
+                        Next →
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ padding: '24px 28px 28px' }}>
+                      {/* Back + header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                        <button onClick={() => setWelcomeStep(3)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Head 2 Head</h2>
+                      </div>
+
+                      {/* Big icon */}
+                      <div style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>⚔️</div>
+
+                      {/* Headline */}
+                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Let your music battle it out.</h3>
+                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Head 2 Head runs a single-elimination tournament with your rated songs. Pick a winner each round. One champion survives — your true #1.</p>
+
+                      {/* Mock bracket visual */}
+                      <div style={{ background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.2)', borderRadius: 16, padding: 16, marginBottom: 24 }}>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>Example bracket</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {[
+                            { a: 'Voodoo', aScore: '10.0', b: 'Black Messiah', bScore: '9.7', winner: true },
+                            { a: 'Kind of Blue', aScore: '9.6', b: 'Illmatic', bScore: '9.5', winner: false },
+                          ].map((match, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div style={{ flex: 1, background: match.winner ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '8px 12px', border: match.winner ? '1px solid rgba(108,99,255,0.4)' : '1px solid transparent' }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: match.winner ? '#fff' : 'rgba(255,255,255,0.4)', margin: 0 }}>{match.a}</p>
+                                <p style={{ fontSize: 10, color: match.winner ? '#6C63FF' : 'rgba(255,255,255,0.25)', margin: 0 }}>{match.aScore}</p>
+                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>vs</span>
+                              <div style={{ flex: 1, background: !match.winner ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '8px 12px', border: !match.winner ? '1px solid rgba(108,99,255,0.4)' : '1px solid transparent' }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: !match.winner ? '#fff' : 'rgba(255,255,255,0.4)', margin: 0 }}>{match.b}</p>
+                                <p style={{ fontSize: 10, color: !match.winner ? '#6C63FF' : 'rgba(255,255,255,0.25)', margin: 0 }}>{match.bScore}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Final CTA */}
+                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
+                        style={{ width: '100%', padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
+                        Let&apos;s go →
+                      </button>
+                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' }}>
+                        Skip intro
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
