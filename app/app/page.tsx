@@ -10,6 +10,7 @@ import RatingModal, { type ModalItem } from '@/components/RatingModal';
 import AppShell from '@/components/AppShell';
 import { sessionOffset, sessionShuffle } from '@/lib/sessionSeed';
 import SeeAllCard from '@/components/SeeAllCard';
+import { LyraScale } from '@/components/LyraScale';
 import { getCurrentWorldMusicWeek } from '@/lib/worldMusicSchedule';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
@@ -534,7 +535,9 @@ export default function AppHome() {
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#6C63FF' }}>{Object.keys(welcomeRatings).length} rated</span>
               )}
             </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 20, lineHeight: 1.5 }}>Tap albums you know to rate them</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginBottom: 12, lineHeight: 1.5 }}>Tap albums you know to rate them</p>
+
+            <LyraScale size="compact" />
 
             {/* Album grid */}
             <div style={{ maxHeight: 380, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10 }}>

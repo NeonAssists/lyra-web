@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
+import { LyraScale } from '@/components/LyraScale';
 
 export interface ModalItem {
   id: string;
@@ -380,6 +381,9 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>10.0</span>
             </div>
           </div>
+
+          {/* Lyra Scale */}
+          <LyraScale size="compact" currentRating={rating} />
 
           {/* Action pills — always visible, functional when logged in */}
           <div style={{ display: 'flex', gap: 6, paddingTop: 14, paddingBottom: 8 }}>
