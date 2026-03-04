@@ -41,49 +41,35 @@ function toItemId(id: string, type: 'song' | 'album') {
   return type === 'album' ? `itunes:alb:${id}` : `itunes:trk:${id}`;
 }
 
-// Returns 'large' (2×2), 'wide' (2×1), or 'small' (1×1) based on position
-function tileSize(i: number): 'large' | 'wide' | 'small' {
-  if (i % 11 === 0) return 'large';   // every 11th: featured 2×2
-  if (i % 7 === 3) return 'wide';     // occasional wide tile
-  return 'small';
+// Every 9th tile (0, 9, 18...) is a 2×2 featured tile. Everything else is 1×1.
+function tileSize(i: number): 'large' | 'small' {
+  return i % 9 === 0 ? 'large' : 'small';
 }
 
-function AlbumTile({ artwork, title, artist, badge, onClick, size = 'small' }: { artwork: string; title: string; artist: string; badge?: string; onClick: () => void; size?: 'large' | 'wide' | 'small' }) {
+function AlbumTile({ artwork, title, artist, badge, onClick, size = 'small' }: { artwork: string; title: string; artist: string; badge?: string; onClick: () => void; size?: 'large' | 'small' }) {
   const [hov, setHov] = useState(false);
   const isLarge = size === 'large';
-  const isWide = size === 'wide';
-  // On mobile, size classes are reset via CSS (.lyra-tile-large, .lyra-tile-wide → span 1, aspect 1:1)
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      className={isLarge ? 'lyra-tile-large' : isWide ? 'lyra-tile-wide' : ''}
+      className={isLarge ? 'lyra-tile-large' : ''}
       style={{
         background: 'transparent', border: 'none', cursor: 'pointer', padding: 0,
         borderRadius: 12, textAlign: 'left', width: '100%', transition: 'opacity 0.15s', opacity: hov ? 0.75 : 1,
-        gridColumn: isLarge ? 'span 2' : isWide ? 'span 2' : 'span 1',
+        gridColumn: isLarge ? 'span 2' : 'span 1',
         gridRow: isLarge ? 'span 2' : 'span 1',
       }}>
-      <div className={isWide ? 'lyra-tile-wide-art' : ''} style={{ position: 'relative', width: '100%', aspectRatio: isWide ? '2/1' : '1', borderRadius: 10, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', background: '#1c1c1e', marginBottom: 6 }}>
         {artwork
-          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes={isLarge ? '400px' : '200px'} />
+          ? <Image src={artwork} alt={title} fill style={{ objectFit: 'cover' }} unoptimized sizes={isLarge ? '560px' : '280px'} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a3a3c', fontSize: isLarge ? 48 : 28 }}>♪</div>}
         {badge && (
           <div style={{ position: 'absolute', top: 6, left: 6, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', color: 'rgba(255,255,255,0.7)', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 5, letterSpacing: 0.5, textTransform: 'uppercase' }}>
             {badge}
           </div>
         )}
-        {isLarge && (
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 12px 10px', background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)' }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2 }}>{title}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{artist}</p>
-          </div>
-        )}
       </div>
-      {!isLarge && (
-        <>
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2, paddingLeft: 2 }}>{title}</p>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingLeft: 2 }}>{artist}</p>
-        </>
-      )}
+      <p style={{ fontSize: isLarge ? 13 : 12, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 2, paddingLeft: 2 }}>{title}</p>
+      <p style={{ fontSize: isLarge ? 12 : 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingLeft: 2 }}>{artist}</p>
     </button>
   );
 }
@@ -287,7 +273,7 @@ export default function MusicPage() {
                 {searchResults.albums.length > 0 && (
                   <div>
                     <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 14 }}>Albums</h3>
-                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                       {searchResults.albums.map((a: any, i: number) => {
                         const art = getArtworkHiRes(a.artworkUrl100 ?? '');
                         return (
@@ -348,7 +334,7 @@ export default function MusicPage() {
             </div>
 
             {loading && !classicAlbums.length ? (
-              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                 {[...Array(25)].map((_, i) => <div key={i} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 10 }} />)}
               </div>
             ) : activeGenre ? (
@@ -360,7 +346,7 @@ export default function MusicPage() {
                     <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Albums</h3>
                     <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{newAlbums.length} albums</span>
                   </div>
-                  <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+                  <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                     {newAlbums.slice(0, 24).map((a: any, i: number) => (
                       <AlbumTile key={`genre-alb-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} size={tileSize(i)}
                         onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
@@ -381,7 +367,7 @@ export default function MusicPage() {
                       <h3 style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>Top Songs</h3>
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '4px 10px', background: '#1a1a1a', borderRadius: 8 }}>{genreSongs.length} songs</span>
                     </div>
-                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+                    <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                       {genreSongs.map((s: any, i: number) => (
                         <AlbumTile key={`genre-sng-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist} size={tileSize(i)}
                           onClick={() => open({ id: toItemId(s.id, 'song'), title: s.title, artist: s.artist, artwork: s.artwork, type: 'song' })} />
@@ -392,7 +378,7 @@ export default function MusicPage() {
               </div>
             ) : (
               /* "All" tab — 60/40 classic/new mix */
-              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
+              <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
                 {mixedAlbums.slice(0, 25).map((a: any, i: number) => (
                   <AlbumTile key={`mix-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} size={tileSize(i)}
 
