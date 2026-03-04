@@ -143,9 +143,9 @@ export default function HomePage() {
 
       {/* Hero — full viewport, Apple style */}
       <section className="lp-hero" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px' }}>
-        <div style={{ marginBottom: 28 }}>
-          <svg viewBox="0 0 1024 1024" width="52" height="52">
-            <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.12)"/>
+        <div style={{ marginBottom: 32 }}>
+          <svg viewBox="0 0 1024 1024" width="88" height="88" style={{ filter: 'drop-shadow(0 0 24px rgba(108,99,255,0.5))' }}>
+            <rect width="1024" height="1024" rx="220" fill="rgba(108,99,255,0.15)"/>
             <g transform="translate(512, 512)">
               <path d="M -120 -180 Q -160 -100 -140 0 Q -130 80 -90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
               <path d="M 120 -180 Q 160 -100 140 0 Q 130 80 90 140" stroke="#6C63FF" strokeWidth="60" fill="none" strokeLinecap="round"/>
@@ -212,20 +212,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats strip */}
-      <section style={{ padding: '48px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 860, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, textAlign: 'center' }} className="lp-stat-grid">
-          {[
-            { value: '50,000+', label: 'Ratings given' },
-            { value: '1–10', label: 'Decimal precision' },
-            { value: '∞', label: 'Songs & albums' },
-            { value: '100%', label: 'Opinion, no algorithm' },
-          ].map((s, i) => (
-            <div key={`stat-${i}`} style={{ padding: '24px 16px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18 }}>
-              <p style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-1px', marginBottom: 6 }}>{s.value}</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 500, letterSpacing: 0.2 }}>{s.label}</p>
-            </div>
-          ))}
+      {/* Rating spectrum */}
+      <section style={{ padding: '60px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+        <div style={{ maxWidth: 980, margin: '0 auto', padding: '0 24px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 24, textAlign: 'center' }}>The Lyra Scale</p>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+            {[
+              { score: '1.0', label: 'Skip', height: 36, color: '#7f1d1d' },
+              { score: '2.0', label: 'Weak', height: 48, color: '#991b1b' },
+              { score: '3.0', label: 'Meh', height: 60, color: '#b91c1c' },
+              { score: '4.0', label: 'Below avg', height: 72, color: '#c2410c' },
+              { score: '5.0', label: 'Average', height: 88, color: '#b45309' },
+              { score: '6.0', label: 'Decent', height: 100, color: '#a16207' },
+              { score: '7.0', label: 'Good', height: 116, color: '#4d7c0f' },
+              { score: '8.0', label: 'Great', height: 132, color: '#15803d' },
+              { score: '9.0', label: 'Elite', height: 148, color: '#0369a1' },
+              { score: '10.0', label: 'GOAT', height: 164, color: '#6C63FF' },
+            ].map((r, i) => (
+              <div key={`rs-${i}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{r.label}</p>
+                <div style={{ width: '100%', height: r.height, borderRadius: 6, background: r.color, opacity: 0.85 }} />
+                <p style={{ fontSize: 11, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>{r.score}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 28 }}>Every decimal matters. There&apos;s a real difference between a 7.3 and a 7.8.</p>
         </div>
       </section>
 
