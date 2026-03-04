@@ -317,7 +317,7 @@ export default function MusicPage() {
               <div className="lyra-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4 }}>
                 {mixedAlbums.slice(0, 25).map((a: any, i: number) => (
                   <AlbumTile key={`mix-${i}-${a.id}`} artwork={a.artwork} title={a.title} artist={a.artist} size={tileSize(i)}
-                    badge={a.source === 'classic' ? 'classic' : undefined}
+
                     onClick={() => open({ id: toItemId(a.id, 'album'), title: a.title, artist: a.artist, artwork: a.artwork, type: 'album' })} />
                 ))}
               </div>
