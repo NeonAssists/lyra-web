@@ -380,7 +380,7 @@ export default function AppHome() {
             {/* ═══ ROW 3: New Albums (visual grid) ═══ */}
             <Box>
               <BoxHeader label="Browse" title="New Albums" href="/new-albums" />
-              <div className="album-grid-sm" style={{ padding: 10 }}>
+              <div className="album-grid-sm" style={{ padding: 0 }}>
                 {loading
                   ? [...Array(8)].map((_, i) => <div key={`na-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                   : <>
@@ -398,7 +398,7 @@ export default function AppHome() {
             <div className="dash-grid">
               <Box>
                 <BoxHeader label="Just Released" title="New Music" href="/new-music" />
-                <div className="album-grid-sm" style={{ padding: 10 }}>
+                <div className="album-grid-sm" style={{ padding: 0 }}>
                   {loading ? [...Array(8)].map((_, i) => <div key={`nm-sk-${i}`} style={{ aspectRatio: '1', background: '#1c1c1e', borderRadius: 8 }} />)
                     : newSongs.slice(0, 8).map((s: any, i: number) => (
                         <GridCard key={`nm-${i}-${s.id}`} artwork={s.artwork} title={s.title} artist={s.artist}
