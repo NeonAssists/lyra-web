@@ -212,7 +212,7 @@ export default function AppHome() {
 
   // Welcome modal trigger
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v2') && me) {
+    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v3') && me) {
       setShowWelcome(true);
       setWelcomeStep(1);
     }
@@ -549,7 +549,7 @@ export default function AppHome() {
 
       {/* Welcome Modal */}
       {showWelcome && (() => {
-        const dismissWelcome = () => { setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); };
+        const dismissWelcome = () => { setShowWelcome(false); localStorage.setItem('lyra_welcomed_v3', 'true'); };
         const STEPS = 4;
         const stepLabel = ['Welcome', 'Ranking System', 'How to Rank', 'Packs', 'Head 2 Head'];
         return (
