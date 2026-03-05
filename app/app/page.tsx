@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -53,74 +53,57 @@ function ListRow({ item, rank, onClick, compact }: { item: any; rank?: number; o
   );
 }
 
-function WelcomeStep1({ scaleTiers, onNext, onSkip }: {
-  scaleTiers: { score: number; label: string; color: string }[];
-  onNext: () => void;
-  onSkip: () => void;
-}) {
-  const [demoRating, setDemoRating] = useState(7.3);
-  const activeTier = [...scaleTiers].reverse().find(t => demoRating >= t.score) ?? scaleTiers[0];
-  const pct = ((demoRating - 1) / 9) * 100;
+const WELCOME_SCALE_TIERS = [
+  { score: 1,  label: 'Skip',        color: '#dc2626' },
+  { score: 2,  label: 'Weak',        color: '#ea580c' },
+  { score: 3,  label: 'Meh',         color: '#f59e0b' },
+  { score: 4,  label: 'Below avg',   color: '#a3912a' },
+  { score: 5,  label: 'Average',     color: '#84a332' },
+  { score: 6,  label: 'Decent',      color: '#22863a' },
+  { score: 7,  label: 'Good',        color: '#059669' },
+  { score: 8,  label: 'Great',       color: '#0891b2' },
+  { score: 9,  label: 'Elite',       color: '#3b82f6' },
+  { score: 10, label: 'Masterpiece', color: '#8b5cf6' },
+];
 
+function WelcomeRatingCard() {
+  const [rating, setRating] = useState(8.7);
+  const tier = [...WELCOME_SCALE_TIERS].reverse().find(t => rating >= t.score) ?? WELCOME_SCALE_TIERS[0];
+  const pct = ((rating - 1) / 9) * 100;
   return (
-    <>
-      {/* Badge */}
-      <div style={{ display: 'inline-block', background: 'rgba(212,118,78,0.15)', border: '1px solid rgba(212,118,78,0.3)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#D4764E', letterSpacing: 1, textTransform: 'uppercase' as const, marginBottom: 16 }}>How Lyra Works</div>
-
-      {/* Headline */}
-      <h2 style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1.1, marginBottom: 8, marginTop: 0 }}>Rate from 1.0 to 10.0.</h2>
-      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 20, marginTop: 8 }}>Every decimal matters. A 7.3 hits different than a 7.8. Try the slider:</p>
-
-      {/* Live decimal slider demo */}
-      <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px', marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 12, justifyContent: 'center' }}>
-          <span style={{ fontSize: 52, fontWeight: 900, color: activeTier.color, lineHeight: 1, letterSpacing: -2, transition: 'color 0.15s' }}>{demoRating.toFixed(1)}</span>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: activeTier.color, transition: 'color 0.15s' }}>{activeTier.label}</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>out of 10.0</div>
-          </div>
+    <div style={{ background: 'rgba(20,16,12,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, boxShadow: `0 20px 60px ${tier.color}33` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
         </div>
-        {/* Slider track */}
-        <div style={{ position: 'relative', height: 28, display: 'flex', alignItems: 'center' }}>
-          <div style={{ position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ position: 'absolute', left: 0, width: `${pct}%`, height: 6, borderRadius: 3, background: activeTier.color, transition: 'width 0.05s, background 0.15s' }} />
-          <style>{`.w-slider{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;outline:none;cursor:pointer;position:relative;z-index:1}.w-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid ${activeTier.color};box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:border-color 0.15s}.w-slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid ${activeTier.color}}`}</style>
-          <input className="w-slider" type="range" min="1" max="10" step="0.1" value={demoRating}
-            onChange={e => setDemoRating(parseFloat(e.target.value))} />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 600, marginTop: 4 }}>
-          <span>1.0</span><span>5.0</span><span>10.0</span>
+        <div style={{ background: `${tier.color}18`, borderRadius: 12, padding: '6px 12px', textAlign: 'center' as const }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: tier.color, lineHeight: 1 }}>{rating.toFixed(1)}</div>
+          <div style={{ fontSize: 9, fontWeight: 700, color: tier.color, textTransform: 'uppercase' as const, letterSpacing: 0.5 }}>{tier.label}</div>
         </div>
       </div>
-
-      {/* Scale bar chart — ghost + fill, rainbow */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 80, marginBottom: 4, position: 'relative' }}>
-        {scaleTiers.map(tier => {
-          const fillPct = 10 + (tier.score / 10) * 90;
+      <div style={{ position: 'relative', marginBottom: 12 }}>
+        <style>{`.lw-slider{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;outline:none;cursor:pointer;position:relative;z-index:1}.lw-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--lw-accent,#8b5cf6);box-shadow:0 2px 8px rgba(0,0,0,0.4);transition:border-color 0.2s}.lw-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--lw-accent,#8b5cf6)}`}</style>
+        <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)', transform: 'translateY(-50%)' }} />
+        <div style={{ position: 'absolute', top: '50%', left: 0, width: `${pct}%`, height: 6, borderRadius: 3, background: tier.color, transform: 'translateY(-50%)', transition: 'width 0.05s, background 0.2s' }} />
+        <input className="lw-slider" type="range" min="1" max="10" step="0.1" value={rating}
+          style={{ '--lw-accent': tier.color } as React.CSSProperties}
+          onChange={e => setRating(parseFloat(e.target.value))} />
+      </div>
+      {/* Bar chart — same as marketing page */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 64 }}>
+        {WELCOME_SCALE_TIERS.map(t => {
+          const h = 10 + (t.score / 10) * 90;
           return (
-            <div key={tier.score} style={{ flex: 1, height: '100%', position: 'relative' }}>
-              {/* Ghost track */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '4px 4px 0 0' }} />
-              {/* Colored fill */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${fillPct}%`, background: tier.color, borderRadius: '4px 4px 0 0', opacity: 0.85 }} />
-              {/* Score label */}
-              <div style={{ position: 'absolute', bottom: -18, left: 0, right: 0, textAlign: 'center' as const, fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.45)' }}>{tier.score}</div>
+            <div key={t.score} style={{ flex: 1, height: '100%', position: 'relative' }}>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px 3px 0 0' }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${h}%`, background: t.color, borderRadius: '3px 3px 0 0', opacity: 0.85 }} />
             </div>
           );
         })}
       </div>
-      <div style={{ marginBottom: 24 }} />
-
-      {/* CTA */}
-      <button onClick={onNext}
-        style={{ width: '100%', marginTop: 8, padding: 16, borderRadius: 100, background: activeTier.color, color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3, transition: 'background 0.15s' }}>
-        Got it — let me rate some music →
-      </button>
-      <button onClick={onSkip}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' as const }}>
-        Skip
-      </button>
-    </>
+    </div>
   );
 }
 
@@ -209,11 +192,6 @@ export default function AppHome() {
 
   // Welcome modal
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeSongs, setWelcomeSongs] = useState<{id:string;title:string;artist:string;artwork:string}[]>([]);
-  const [selectedInWelcome, setSelectedInWelcome] = useState<Set<string>>(new Set());
-  const [welcomeRatings, setWelcomeRatings] = useState<Record<string,number>>({});
-  const [welcomeRatingTarget, setWelcomeRatingTarget] = useState<string|null>(null);
-  const [welcomeSliderValue, setWelcomeSliderValue] = useState<number>(7.0);
   const [welcomeStep, setWelcomeStep] = useState<1|2|3|4>(1);
 
   // Community hot (Change 4)
@@ -232,37 +210,13 @@ export default function AppHome() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Welcome modal trigger + fetch popular albums
+  // Welcome modal trigger
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v2') && me) {
       setShowWelcome(true);
       setWelcomeStep(1);
-      fetch('https://itunes.apple.com/us/rss/topalbums/limit=30/json')
-        .then(r => r.json())
-        .then(data => {
-          const entries = (data?.feed?.entry ?? []).map((e: any, i: number) => ({
-            id: `itunes:alb:${e.id?.attributes?.['im:id'] ?? i}`,
-            title: e['im:name']?.label ?? '',
-            artist: e['im:artist']?.label ?? '',
-            artwork: (e['im:image']?.[2]?.label ?? '').replace('170x170bb', '400x400bb'),
-          }));
-          setWelcomeSongs(entries.slice(0, 24));
-        })
-        .catch(() => {});
     }
   }, [me]);
-
-  const saveAllWelcomeRatings = useCallback(async () => {
-    if (!me) return;
-    const entries = Object.entries(welcomeRatings);
-    for (const [itemId, rating] of entries) {
-      const song = welcomeSongs.find(s => s.id === itemId);
-      if (!song) continue;
-      await (supabase as any).from('user_rankings').upsert({
-        user_id: me.id, item_id: song.id, title: song.title, artist: song.artist, artwork_url: song.artwork, rating, ranked_at: new Date().toISOString(),
-      }, { onConflict: 'user_id,item_id' });
-    }
-  }, [me, welcomeRatings, welcomeSongs]);
 
   // User data + community hot
   useEffect(() => {
@@ -595,228 +549,126 @@ export default function AppHome() {
 
       {/* Welcome Modal */}
       {showWelcome && (() => {
-        const scaleTiers = [
-          { score: 1, label: 'Skip', color: '#ef4444' },
-          { score: 2, label: 'Weak', color: '#f97316' },
-          { score: 3, label: 'Meh', color: '#f59e0b' },
-          { score: 4, label: 'Below avg', color: '#eab308' },
-          { score: 5, label: 'Average', color: '#84cc16' },
-          { score: 6, label: 'Decent', color: '#22c55e' },
-          { score: 7, label: 'Good', color: '#10b981' },
-          { score: 8, label: 'Great', color: '#06b6d4' },
-          { score: 9, label: 'Elite', color: '#6366f1' },
-          { score: 10, label: 'Masterpiece', color: '#8b5cf6' },
-        ];
-        const ratedCount = Object.keys(welcomeRatings).length;
+        const dismissWelcome = () => { setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); };
+        const STEPS = 4;
+        const stepLabel = ['Welcome', 'Ranking System', 'How to Rank', 'Packs', 'Head 2 Head'];
         return (
           <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            {/* Gradient border wrapper */}
-            <div style={{ background: 'linear-gradient(135deg, rgba(108,99,255,0.5) 0%, rgba(139,92,246,0.2) 50%, rgba(6,182,212,0.2) 100%)', padding: 1, borderRadius: 28, maxWidth: 520, width: '100%', position: 'relative' }}>
-              {/* Purple glow blob */}
-              <div style={{ position: 'absolute', top: -80, left: '50%', transform: 'translateX(-50%)', width: 300, height: 200, background: 'radial-gradient(ellipse at center, rgba(108,99,255,0.25) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: -1, pointerEvents: 'none' }} />
-              {/* Card */}
+            <div style={{ background: 'linear-gradient(135deg, rgba(108,99,255,0.5) 0%, rgba(139,92,246,0.2) 50%, rgba(6,182,212,0.2) 100%)', padding: 1, borderRadius: 28, maxWidth: 480, width: '100%', position: 'relative' }}>
               <div style={{ background: 'linear-gradient(135deg, #0f0f0f 0%, #0d0b1a 100%)', borderRadius: 28, width: '100%', position: 'relative' }}>
-                {/* Step indicator dots */}
-                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', paddingTop: 24, marginBottom: 20 }}>
+                {/* Step dots */}
+                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', paddingTop: 24, marginBottom: 8 }}>
                   {([1,2,3,4] as const).map(s => (
                     <div key={s} style={{ width: welcomeStep === s ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === s ? '#6C63FF' : 'rgba(255,255,255,0.15)', transition: 'width 0.2s' }} />
                   ))}
                 </div>
 
-                <div style={{ padding: '0 28px 28px' }}>
+                <div style={{ padding: '16px 28px 28px' }}>
                   {welcomeStep === 1 ? (
-                    <WelcomeStep1
-                      scaleTiers={scaleTiers}
-                      onNext={() => setWelcomeStep(2)}
-                      onSkip={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-                    />
+                    <>
+                      <div style={{ textAlign: 'center' as const, marginBottom: 16 }}>
+                        <div style={{ fontSize: 36, marginBottom: 10 }}>⚡</div>
+                        <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: '0 0 8px' }}>Welcome to Lyra</h2>
+                        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, margin: 0 }}>Rate music with precision — from 1.0 to 10.0. Every decimal point matters.</p>
+                      </div>
+                      <WelcomeRatingCard />
+                      <button onClick={() => setWelcomeStep(2)}
+                        style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                        Next →
+                      </button>
+                      <button onClick={dismissWelcome}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' as const }}>
+                        Skip intro
+                      </button>
+                    </>
                   ) : welcomeStep === 2 ? (
                     <>
-                      {/* Back arrow + header row */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                         <button onClick={() => setWelcomeStep(1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Rate music you know</h2>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>The ranking system</h2>
                       </div>
-
-                      {/* Subtext row */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Tap to select, tap again to rate</span>
-                        {ratedCount > 0 && (
-                          <span style={{ background: 'rgba(108,99,255,0.2)', color: '#6C63FF', borderRadius: 100, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>{ratedCount} rated</span>
-                        )}
-                      </div>
-
-                      {/* Album grid */}
-                      <div style={{ maxHeight: 320, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))', gap: 8 }}>
-                        {welcomeSongs.map(song => {
-                          const isSelected = selectedInWelcome.has(song.id);
-                          const rating = welcomeRatings[song.id];
-                          return (
-                            <button key={song.id}
-                              onClick={() => {
-                                if (isSelected) {
-                                  setSelectedInWelcome(prev => { const next = new Set(prev); next.delete(song.id); return next; });
-                                  setWelcomeRatings(prev => { const next = { ...prev }; delete next[song.id]; return next; });
-                                  if (welcomeRatingTarget === song.id) setWelcomeRatingTarget(null);
-                                } else {
-                                  setSelectedInWelcome(prev => new Set(prev).add(song.id));
-                                  if (rating === undefined) { setWelcomeRatingTarget(song.id); setWelcomeSliderValue(7.0); }
-                                }
-                              }}
-                              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.04)'; }}
-                              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                              style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', borderRadius: 12, overflow: 'hidden', transition: 'transform 0.15s', position: 'relative' }}>
-                              <div style={{ width: '100%', aspectRatio: '1', borderRadius: 12, overflow: 'hidden', border: isSelected ? '2px solid #6C63FF' : '2px solid transparent', boxSizing: 'border-box' as const, position: 'relative' }}>
-                                <img src={song.artwork} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                {isSelected && rating !== undefined && (
-                                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
-                                  </div>
-                                )}
-                                {isSelected && rating === undefined && (
-                                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(108,99,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'pulse 1.5s ease-in-out infinite' }}>
-                                    <span style={{ color: '#fff', fontWeight: 900, fontSize: 20 }}>?</span>
-                                  </div>
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Inline rating picker */}
-                      {welcomeRatingTarget && (() => {
-                        const target = welcomeSongs.find(s => s.id === welcomeRatingTarget);
-                        if (!target) return null;
-                        return (
-                          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '14px 16px', marginTop: 10 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                              <img src={target.artwork} alt={target.title} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.title}</p>
-                                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{target.artist}</p>
-                              </div>
-                            </div>
-                            {(() => {
-                              const activeTier = scaleTiers.slice().reverse().find(t => welcomeSliderValue >= t.score) ?? scaleTiers[0];
-                              return (
-                                <div>
-                                  {/* Score display */}
-                                  <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 8, marginBottom: 10 }}>
-                                    <span style={{ fontSize: 48, fontWeight: 900, color: activeTier.color, lineHeight: 1, letterSpacing: -2 }}>{welcomeSliderValue.toFixed(1)}</span>
-                                    <span style={{ fontSize: 14, fontWeight: 700, color: activeTier.color, opacity: 0.8 }}>{activeTier.label}</span>
-                                  </div>
-                                  {/* Slider */}
-                                  <input
-                                    type="range" min="1" max="10" step="0.1"
-                                    value={welcomeSliderValue}
-                                    onChange={e => setWelcomeSliderValue(parseFloat(e.target.value))}
-                                    style={{ width: '100%', accentColor: activeTier.color, height: 4, cursor: 'pointer', marginBottom: 12 }}
-                                  />
-                                  {/* Confirm */}
-                                  <button onClick={() => { setWelcomeRatings(prev => ({ ...prev, [welcomeRatingTarget!]: welcomeSliderValue })); setWelcomeRatingTarget(null); }}
-                                    style={{ width: '100%', padding: '10px', borderRadius: 100, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 800, background: activeTier.color, color: '#fff' }}>
-                                    Set {welcomeSliderValue.toFixed(1)} →
-                                  </button>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        );
-                      })()}
-
-                      {/* Next button */}
-                      <button onClick={() => { saveAllWelcomeRatings(); setWelcomeStep(3); }}
-                        style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff' }}>
-                        {ratedCount > 0 ? `Next (${ratedCount} rated) →` : 'Next →'}
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 16 }}>10 tiers from Skip to Masterpiece — each with a color. Drag the slider and watch your rating come alive.</p>
+                      <WelcomeRatingCard />
+                      <button onClick={() => setWelcomeStep(3)}
+                        style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                        Next →
+                      </button>
+                      <button onClick={dismissWelcome}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' as const }}>
+                        Skip intro
                       </button>
                     </>
                   ) : welcomeStep === 3 ? (
-                    <div style={{ padding: '24px 28px 28px' }}>
-                      {/* Back + header */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                         <button onClick={() => setWelcomeStep(2)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Discovery Packs</h2>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>How to rank</h2>
                       </div>
-
-                      {/* Big icon */}
-                      <div style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>🎴</div>
-
-                      {/* Headline */}
-                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Your ratings build your playlist.</h3>
-                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Rate music and Lyra turns it into a personalized playlist — underground gems included. Build lists, share them, and collaborate with friends on ranked collections.</p>
-
-                      {/* Feature list */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
-                        {[
-                          { icon: '🎵', title: 'Becomes your personalized playlist', desc: 'Packs pull from your actual taste and update as you keep rating.' },
-                          { icon: '📋', title: 'Build lists & collaborate', desc: 'Create ranked lists for any vibe — then invite friends to add and rate alongside you.' },
-                          { icon: '🌍', title: 'Global & underground', desc: 'From charts to deep cuts you\'ve never heard.' },
-                        ].map((f, i) => (
-                          <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: '14px 16px' }}>
-                            <span style={{ fontSize: 22, flexShrink: 0 }}>{f.icon}</span>
-                            <div>
-                              <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{f.title}</p>
-                              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{f.desc}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* CTA */}
-                      <button onClick={() => setWelcomeStep(4)}
-                        style={{ width: '100%', padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
-                        Next →
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ padding: '24px 28px 28px' }}>
-                      {/* Back + header */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                        <button onClick={() => setWelcomeStep(3)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Head 2 Head</h2>
-                      </div>
-
-                      {/* Big icon */}
-                      <div style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>⚔️</div>
-
-                      {/* Headline */}
-                      <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', textAlign: 'center', marginBottom: 8, letterSpacing: -0.5 }}>Let your music battle it out.</h3>
-                      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', textAlign: 'center', lineHeight: 1.6, marginBottom: 24 }}>Head 2 Head runs a single-elimination tournament with your rated songs. Pick a winner each round. One champion survives — your true #1.</p>
-
-                      {/* Mock bracket visual */}
-                      <div style={{ background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.2)', borderRadius: 16, padding: 16, marginBottom: 24 }}>
-                        <p style={{ fontSize: 11, fontWeight: 700, color: '#6C63FF', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 }}>Example bracket</p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          {[
-                            { a: 'Voodoo', aScore: '10.0', b: 'Black Messiah', bScore: '9.7', winner: true },
-                            { a: 'Kind of Blue', aScore: '9.6', b: 'Illmatic', bScore: '9.5', winner: false },
-                          ].map((match, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <div style={{ flex: 1, background: match.winner ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '8px 12px', border: match.winner ? '1px solid rgba(108,99,255,0.4)' : '1px solid transparent' }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: match.winner ? '#fff' : 'rgba(255,255,255,0.4)', margin: 0 }}>{match.a}</p>
-                                <p style={{ fontSize: 10, color: match.winner ? '#6C63FF' : 'rgba(255,255,255,0.25)', margin: 0 }}>{match.aScore}</p>
-                              </div>
-                              <span style={{ fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>vs</span>
-                              <div style={{ flex: 1, background: !match.winner ? 'rgba(108,99,255,0.2)' : 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '8px 12px', border: !match.winner ? '1px solid rgba(108,99,255,0.4)' : '1px solid transparent' }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: !match.winner ? '#fff' : 'rgba(255,255,255,0.4)', margin: 0 }}>{match.b}</p>
-                                <p style={{ fontSize: 10, color: !match.winner ? '#6C63FF' : 'rgba(255,255,255,0.25)', margin: 0 }}>{match.bScore}</p>
-                              </div>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 16 }}>Tap any song or album. A rating slider appears — drag it to your score and save it to your collection.</p>
+                      {/* Mock: click song → slider */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16 }}>
+                        <div style={{ display: 'flex', gap: 8, marginBottom: 12, justifyContent: 'center' }}>
+                          {['#1c1c2e','#1e1c2e','#1a1c28','#1c1e2c'].map((bg, i) => (
+                            <div key={i} style={{ width: 56, height: 56, borderRadius: 10, background: bg, border: i === 0 ? '2px solid #6C63FF' : '2px solid transparent', position: 'relative' }}>
+                              {i === 0 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(108,99,255,0.3)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👆</div>}
                             </div>
                           ))}
                         </div>
+                        <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: '12px 14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                            <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Blinding Lights</div>
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
+                            </div>
+                            <span style={{ fontSize: 22, fontWeight: 900, color: '#0891b2' }}>8.7</span>
+                          </div>
+                          <div style={{ position: 'relative', height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3, marginBottom: 6 }}>
+                            <div style={{ position: 'absolute', left: 0, width: '77%', height: '100%', background: '#0891b2', borderRadius: 3 }} />
+                            <div style={{ position: 'absolute', left: '77%', top: '50%', width: 18, height: 18, background: '#0891b2', borderRadius: '50%', transform: 'translate(-50%, -50%)', border: '2.5px solid #fff' }} />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>
+                            <span>1.0</span><span>10.0</span>
+                          </div>
+                        </div>
                       </div>
-
-                      {/* Final CTA */}
-                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-                        style={{ width: '100%', padding: 16, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 16, fontWeight: 800, border: 'none', cursor: 'pointer', letterSpacing: -0.3 }}>
-                        Let&apos;s go →
+                      <button onClick={() => setWelcomeStep(4)}
+                        style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                        Next →
                       </button>
-                      <button onClick={() => { saveAllWelcomeRatings(); setShowWelcome(false); localStorage.setItem('lyra_welcomed_v2', 'true'); }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 12, display: 'block', width: '100%', textAlign: 'center' }}>
+                      <button onClick={dismissWelcome}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' as const }}>
                         Skip intro
                       </button>
-                    </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                        <button onClick={() => setWelcomeStep(3)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
+                        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: -0.5, margin: 0 }}>Packs + Head 2 Head</h2>
+                      </div>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 16 }}>Rate new music fast with curated Packs — then use Head 2 Head to pit your favorites against each other until one true #1 remains.</p>
+                      <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
+                        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: 24, flexShrink: 0 }}>📦</span>
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>Discovery Packs</p>
+                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, margin: 0 }}>Curated sets of songs. Swipe through, rate what you know, skip what you don&apos;t.</p>
+                          </div>
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: 24, flexShrink: 0 }}>⚔️</span>
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>Head 2 Head</p>
+                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, margin: 0 }}>Tournament mode. Your top songs battle it out head to head until one champion survives.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <button onClick={dismissWelcome}
+                        style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                        Let&apos;s go →
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
