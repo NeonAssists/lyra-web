@@ -338,6 +338,7 @@ export default function PrivacyPage() {
           <div className="flex items-center gap-6 text-xs" style={{ color: '#48484A' }}>
             <Link href="/app" className="hover:text-white transition-colors">Web App</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <span>© 2026</span>
           </div>
         </div>
