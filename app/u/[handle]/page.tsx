@@ -115,6 +115,7 @@ export default function UserProfilePage() {
   return (
     <AppShell>
       <style>{`
+        .profile-wrap { margin-left: auto !important; margin-right: auto !important; }
         @media (max-width: 768px) {
           .profile-wrap { padding-left: 20px !important; padding-right: 20px !important; padding-top: 24px !important; }
           .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; gap: 16px !important; }
@@ -124,7 +125,7 @@ export default function UserProfilePage() {
         }
         .profile-tabs::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="profile-wrap" style={{ width: '100%', maxWidth: 720, margin: '0 auto', padding: '40px 32px 100px', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 720, padding: '40px 32px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
