@@ -2,6 +2,24 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+// Avatar helper — falls back to initials if image fails to load
+function Avatar({ src, alt, initials, size = 80 }: { src: string | null; alt: string; initials: string; size?: number }) {
+  const [err, setErr] = useState(false);
+  if (src && !err) {
+    return (
+      <img
+        src={src} alt={alt}
+        onError={() => setErr(true)}
+        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+      />
+    );
+  }
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', background: 'linear-gradient(135deg, #6C63FF, #4f46e5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.28, fontWeight: 900, color: '#fff', flexShrink: 0 }}>
+      {initials}
+    </div>
+  );
+}
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
@@ -107,7 +125,7 @@ export default function UserProfilePage() {
           .profile-tabs::-webkit-scrollbar { display: none; }
         }
       `}</style>
-      <div className="profile-wrap max-w-2xl mx-auto px-4 py-6" style={{ width: '100%', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 760, margin: '0 auto', padding: '24px 20px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -124,15 +142,7 @@ export default function UserProfilePage() {
           <>
             {/* Profile header */}
             <div className="profile-header flex items-start gap-5 mb-6">
-              {profile.avatar_url ? (
-                <div className="relative w-20 h-20 rounded-full overflow-hidden flex-none">
-                  <Image src={profile.avatar_url} alt={profile.display_name} fill className="object-cover" unoptimized />
-                </div>
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#6C63FF] to-[#4f46e5] flex items-center justify-center text-2xl font-black text-white flex-none">
-                  {initials}
-                </div>
-              )}
+              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={80} />
               <div className="flex-1 min-w-0">
                 <div className="profile-actions flex items-start justify-between gap-3">
                   <div>
