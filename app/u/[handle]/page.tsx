@@ -115,16 +115,16 @@ export default function UserProfilePage() {
   return (
     <AppShell>
       <style>{`
-        @media (max-width: 640px) {
-          .profile-wrap { padding-left: 16px !important; padding-right: 16px !important; padding-top: 20px !important; }
-          .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; }
+        @media (max-width: 768px) {
+          .profile-wrap { padding-left: 20px !important; padding-right: 20px !important; padding-top: 24px !important; }
+          .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; gap: 16px !important; }
           .profile-header > div:last-child { width: 100% !important; }
-          .profile-actions { justify-content: center !important; }
+          .profile-actions { flex-direction: column !important; align-items: center !important; gap: 12px !important; }
           .profile-stats { justify-content: center !important; gap: 24px !important; flex-wrap: wrap !important; }
         }
         .profile-tabs::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="profile-wrap" style={{ width: '100%', maxWidth: 960, margin: '0 auto', padding: '32px 32px 100px', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 720, margin: '0 auto', padding: '40px 32px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
