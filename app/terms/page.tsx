@@ -92,13 +92,19 @@ export default function TermsPage() {
               <div>
                 <h3 className="text-sm font-semibold text-white mb-2">Your Content</h3>
                 <p className="text-sm text-[#8E8E93] leading-relaxed">
-                  You retain ownership of any content you submit to Lyra (ratings, notes, lists, profile information). By submitting content, you grant Neonotics a non-exclusive, royalty-free, worldwide license to display and use that content to operate and improve the Service.
+                  You retain ownership of any content you submit to Lyra (ratings, notes, lists, profile information). By submitting content, you grant Neonotics a non-exclusive, royalty-free, worldwide, sublicensable license to display, store, and use that content solely to operate and improve the Service.
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white mb-2">Responsibility</h3>
+                <h3 className="text-sm font-semibold text-white mb-2">Responsibility & Indemnification</h3>
                 <p className="text-sm text-[#8E8E93] leading-relaxed">
-                  You are solely responsible for the content you submit. We do not endorse or verify user-submitted content and are not liable for any content posted by users.
+                  You are solely responsible for all content you submit. You agree to indemnify, defend, and hold harmless Neonotics and its officers, employees, and agents from any claims, damages, liabilities, costs, or expenses (including reasonable legal fees) arising from your content, your use of the Service, or your violation of these Terms. We do not endorse or verify user-submitted content and are not liable for any content posted by users.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-2">Opinions & Reviews</h3>
+                <p className="text-sm text-[#8E8E93] leading-relaxed">
+                  All music ratings, scores, rankings, and reviews on Lyra constitute the personal opinions of individual users. They are not statements of fact and should not be relied upon as objective assessments. Neonotics is not liable for any claim arising from a user&apos;s expressed opinion, rating, or review. Users who post content that is false, defamatory, or intentionally harmful may have their accounts suspended or terminated.
                 </p>
               </div>
             </div>
@@ -190,8 +196,9 @@ export default function TermsPage() {
           </section>
 
           {/* Footer links */}
-          <div className="pt-8 border-t border-white/[0.06] flex items-center gap-6">
+          <div className="pt-8 border-t border-white/[0.06] flex items-center gap-6 flex-wrap">
             <Link href="/privacy" className="text-sm text-[#8E8E93] hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/dmca" className="text-sm text-[#8E8E93] hover:text-white transition-colors">DMCA Policy</Link>
             <Link href="/" className="text-sm text-[#8E8E93] hover:text-white transition-colors">Home</Link>
           </div>
 

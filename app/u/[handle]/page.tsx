@@ -115,17 +115,16 @@ export default function UserProfilePage() {
   return (
     <AppShell>
       <style>{`
-        @media (max-width: 768px) {
-          .profile-wrap { padding-left: 12px !important; padding-right: 12px !important; }
+        @media (max-width: 640px) {
+          .profile-wrap { padding-left: 16px !important; padding-right: 16px !important; padding-top: 20px !important; }
           .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; }
           .profile-header > div:last-child { width: 100% !important; }
           .profile-actions { justify-content: center !important; }
-          .profile-wrap { padding-top: 20px !important; }
-          .profile-stats { justify-content: center !important; gap: 20px !important; flex-wrap: wrap !important; }
-          .profile-tabs::-webkit-scrollbar { display: none; }
+          .profile-stats { justify-content: center !important; gap: 24px !important; flex-wrap: wrap !important; }
         }
+        .profile-tabs::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="profile-wrap" style={{ width: '100%', maxWidth: 760, margin: '0 auto', padding: '24px 20px 100px', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 960, margin: '0 auto', padding: '32px 32px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -142,7 +141,7 @@ export default function UserProfilePage() {
           <>
             {/* Profile header */}
             <div className="profile-header flex items-start gap-5 mb-6">
-              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={80} />
+              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={96} />
               <div className="flex-1 min-w-0">
                 <div className="profile-actions flex items-start justify-between gap-3">
                   <div>

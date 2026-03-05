@@ -161,6 +161,35 @@ export default function PrivacyPage() {
             </ul>
           </section>
 
+          {/* GDPR Legal Basis */}
+          <section className="mb-10 pb-10 border-b border-white/[0.06]">
+            <h2 className="text-2xl font-black mb-5 tracking-tight">Legal Basis for Processing (EU & UK)</h2>
+            <p className="text-sm text-[#8E8E93] leading-relaxed mb-4">
+              For users located in the European Economic Area or United Kingdom, we process personal data under the following legal bases:
+            </p>
+            <ul className="space-y-3 text-sm text-[#8E8E93]">
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
+                <span><span className="font-semibold text-white">Performance of a contract</span> — to provide the Lyra service you signed up for, including storing rankings and enabling profiles.</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
+                <span><span className="font-semibold text-white">Legitimate interests</span> — to maintain platform security, prevent abuse, and improve Lyra through analytics.</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
+                <span><span className="font-semibold text-white">Consent</span> — for optional integrations such as connecting your Spotify account.</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 text-[#6C63FF] font-semibold">•</span>
+                <span><span className="font-semibold text-white">Legal obligations</span> — where required by applicable law or regulatory authority.</span>
+              </li>
+            </ul>
+            <p className="text-sm text-[#8E8E93] leading-relaxed mt-4">
+              Neonotics is the data controller responsible for personal data collected through Lyra.
+            </p>
+          </section>
+
           {/* Your Rights */}
           <section className="mb-10 pb-10 border-b border-white/[0.06]">
             <h2 className="text-2xl font-black mb-5 tracking-tight">Your Rights & Controls</h2>
@@ -313,6 +342,22 @@ export default function PrivacyPage() {
             </div>
           </section>
 
+          {/* Data Breach Response */}
+          <section className="mb-10 pb-10 border-b border-white/[0.06]">
+            <h2 className="text-2xl font-black mb-5 tracking-tight">Data Breach Response</h2>
+            <p className="text-sm text-[#8E8E93] leading-relaxed">
+              In the event of a data breach that affects your personal information, Lyra will notify affected users and relevant authorities as required by applicable law (including GDPR Article 33/34 where applicable). Notification will occur without undue delay and, where feasible, within 72 hours of becoming aware of the breach. We will communicate the nature of the breach, data affected, likely consequences, and steps taken to address it.
+            </p>
+          </section>
+
+          {/* Do Not Track */}
+          <section className="mb-10 pb-10 border-b border-white/[0.06]">
+            <h2 className="text-2xl font-black mb-5 tracking-tight">Do Not Track</h2>
+            <p className="text-sm text-[#8E8E93] leading-relaxed">
+              Some browsers transmit &quot;Do Not Track&quot; (DNT) signals. Lyra does not currently alter its data collection practices in response to DNT signals, as there is no industry-standard interpretation of these signals. We do not use advertising trackers regardless of DNT status.
+            </p>
+          </section>
+
           {/* Changes */}
           <section className="mb-10 pb-10 border-b border-white/[0.06]">
             <h2 className="text-2xl font-black mb-5 tracking-tight">Changes to This Policy</h2>
@@ -339,6 +384,7 @@ export default function PrivacyPage() {
             <Link href="/app" className="hover:text-white transition-colors">Web App</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/dmca" className="hover:text-white transition-colors">DMCA</Link>
             <span>© 2026</span>
           </div>
         </div>

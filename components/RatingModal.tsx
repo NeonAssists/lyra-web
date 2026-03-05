@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ratingColor } from '@/lib/ratingColor';
-import { LyraScale } from '@/components/LyraScale';
 
 export interface ModalItem {
   id: string;
@@ -275,6 +274,12 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
         .rm-sheet { max-height: 90vh; width: 100%; max-width: 520px; }
         @media (min-width: 769px) { .rm-sheet { align-self: center; border-radius: 24px !important; max-height: 85vh; } }
         .rm-pill:hover { background: rgba(255,255,255,0.1) !important; }
+        .rm-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 6px; outline: none; cursor: pointer; background: transparent; }
+        .rm-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.1); }
+        .rm-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 26px; height: 26px; border-radius: 50%; margin-top: -10px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.1s; }
+        .rm-slider::-webkit-slider-thumb:active { transform: scale(1.2); }
+        .rm-slider::-moz-range-track { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.1); }
+        .rm-slider::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; border: none; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer; }
       `}</style>
       <div className="rm-sheet" style={{
         background: '#141414', borderTopLeftRadius: 24, borderTopRightRadius: 24,
@@ -374,19 +379,29 @@ export default function RatingModal({ open, onClose, item, userId, onSaved, onOp
           </div>
 
           {/* Slider */}
-          <div style={{ padding: '12px 4px 0' }}>
-            <input type="range" min={1} max={10} step={0.1} value={rating || 5}
-              onChange={e => { const v = parseFloat(e.target.value); setRating(v); setRatingInput(v.toFixed(1)); }}
-              style={{ width: '100%', cursor: 'pointer', accentColor: col, height: 4 }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+          <div style={{ padding: '16px 4px 4px' }}>
+            <div style={{ position: 'relative', padding: '8px 0' }}>
+              {/* Colored track fill */}
+              <div style={{
+                position: 'absolute', top: '50%', left: 0,
+                width: `${((rating || 5) - 1) / 9 * 100}%`,
+                height: 6, borderRadius: 6,
+                background: col, transform: 'translateY(-50%)',
+                pointerEvents: 'none', transition: 'background 0.15s',
+              }} />
+              <input
+                type="range" min={1} max={10} step={0.1} value={rating || 5}
+                className="rm-slider"
+                onChange={e => { const v = parseFloat(e.target.value); setRating(v); setRatingInput(v.toFixed(1)); }}
+                style={{ accentColor: col } as React.CSSProperties}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>1.0</span>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>5.0</span>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>10.0</span>
             </div>
           </div>
-
-          {/* Lyra Scale */}
-          <LyraScale size="compact" currentRating={rating} />
 
           {/* Action pills — always visible, functional when logged in */}
           <div style={{ display: 'flex', gap: 6, paddingTop: 14, paddingBottom: 8 }}>
