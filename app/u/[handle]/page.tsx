@@ -116,23 +116,35 @@ export default function UserProfilePage() {
     <AppShell>
       <style>{`
         .profile-wrap { margin-left: auto !important; margin-right: auto !important; }
+        .profile-tabs { justify-content: center !important; }
         @media (max-width: 768px) {
-          .profile-wrap { padding-left: 20px !important; padding-right: 20px !important; padding-top: 24px !important; max-width: 100% !important; }
+          .profile-wrap { padding: 24px 20px 100px !important; max-width: 100% !important; }
           .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; gap: 16px !important; }
           .profile-header > div:last-child { width: 100% !important; }
           .profile-actions { flex-direction: column !important; align-items: center !important; gap: 12px !important; }
-          .profile-stats { justify-content: center !important; gap: 24px !important; flex-wrap: wrap !important; }
+          .profile-stats { justify-content: center !important; gap: 20px !important; flex-wrap: wrap !important; }
+          .profile-rank-num { width: 28px !important; font-size: 13px !important; }
+          .profile-rank-art { width: 56px !important; height: 56px !important; }
+          .profile-rank-title { font-size: 14px !important; }
+        }
+        @media (min-width: 769px) {
+          .profile-rank-item { padding: 14px 20px !important; border-radius: 16px !important; }
+          .profile-rank-num { width: 40px !important; font-size: 16px !important; }
+          .profile-rank-art { width: 72px !important; height: 72px !important; border-radius: 12px !important; }
+          .profile-rank-title { font-size: 16px !important; }
+          .profile-rank-artist { font-size: 13px !important; }
+          .profile-rank-badge { font-size: 15px !important; padding: 8px 14px !important; border-radius: 10px !important; }
         }
         .profile-tabs::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="profile-wrap" style={{ width: '100%', maxWidth: 900, padding: '40px 48px 100px', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 1080, padding: '40px 48px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-[#141414] animate-pulse" />
+              <div className="w-24 h-24 rounded-full bg-[#141414] animate-pulse" />
               <div className="flex-1 space-y-2">
-                <div className="h-5 bg-[#141414] rounded animate-pulse w-1/3" />
-                <div className="h-3.5 bg-[#141414] rounded animate-pulse w-1/4" />
+                <div className="h-6 bg-[#141414] rounded animate-pulse w-1/3" />
+                <div className="h-4 bg-[#141414] rounded animate-pulse w-1/4" />
               </div>
             </div>
           </div>
@@ -140,64 +152,72 @@ export default function UserProfilePage() {
           <div className="py-20 text-center text-[#8E8E93]">User not found.</div>
         ) : (
           <>
-            {/* Profile header */}
-            <div className="profile-header flex items-start gap-5 mb-6">
-              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={112} />
+            {/* Profile header card */}
+            <div className="profile-header flex items-center gap-7 mb-8" style={{
+              background: 'linear-gradient(135deg, rgba(108,99,255,0.1) 0%, rgba(108,99,255,0.03) 50%, transparent 100%)',
+              border: '1px solid rgba(108,99,255,0.15)',
+              borderRadius: 20,
+              padding: '28px 32px',
+            }}>
+              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={120} />
               <div className="flex-1 min-w-0">
-                <div className="profile-actions flex items-start justify-between gap-3">
+                <div className="profile-actions flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <h1 className="text-xl font-black text-white">{profile.display_name}</h1>
-                    <p className="text-sm text-[#8E8E93]">@{profile.handle}</p>
+                    <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.2 }}>{profile.display_name}</h1>
+                    <p style={{ fontSize: 14, color: '#8E8E93', marginTop: 4 }}>@{profile.handle}</p>
                     {profile.plan === 'beta' && (
-                      <span className="inline-block mt-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#6C63FF]/20 text-[#6C63FF] border border-[#6C63FF]/30">
+                      <span style={{ display: 'inline-block', marginTop: 8, fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 100, background: 'rgba(108,99,255,0.15)', color: '#6C63FF', border: '1px solid rgba(108,99,255,0.3)' }}>
                         BETA
                       </span>
                     )}
                   </div>
                   {me && me.id !== profile.id && (
-                    <button onClick={handleFollow}
-                      className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors flex-none ${isFollowing ? 'bg-[#1c1c1e] text-[#8E8E93] border border-white/[0.08] hover:text-red-400' : 'bg-[#6C63FF] text-white hover:bg-[#5a52e0]'}`}>
+                    <button onClick={handleFollow} style={{
+                      flexShrink: 0, padding: '10px 24px', borderRadius: 100, fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
+                      background: isFollowing ? 'rgba(255,255,255,0.06)' : '#6C63FF',
+                      color: isFollowing ? '#8E8E93' : '#fff',
+                      border: isFollowing ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                    }}>
                       {isFollowing ? 'Following' : 'Follow'}
                     </button>
                   )}
                   {me && me.id === profile.id && (
-                    <Link href="/settings" className="px-4 py-2 rounded-full text-sm font-semibold bg-[#141414] text-[#8E8E93] border border-white/[0.08] hover:text-white transition-colors">
-                      Edit
+                    <Link href="/settings" style={{ flexShrink: 0, padding: '10px 20px', borderRadius: 100, fontSize: 14, fontWeight: 600, background: 'rgba(255,255,255,0.06)', color: '#8E8E93', border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none', transition: 'color 0.15s' }}>
+                      Edit Profile
                     </Link>
                   )}
                 </div>
-
-                {/* Stats */}
-                <div className="profile-stats flex gap-5 mt-4">
-                  <div className="text-center">
-                    <p className="text-base font-black text-white">{rankings.length}</p>
-                    <p className="text-[11px] text-[#8E8E93]">Ranked</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-base font-black text-white">{followerCount}</p>
-                    <p className="text-[11px] text-[#8E8E93]">Followers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-base font-black text-white">{followingCount}</p>
-                    <p className="text-[11px] text-[#8E8E93]">Following</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-base font-black" style={{ color: ratingColor(avgRating) }}>{avgRating.toFixed(1)}</p>
-                    <p className="text-[11px] text-[#8E8E93]">Avg Rating</p>
-                  </div>
+                {/* Stats row */}
+                <div className="profile-stats flex gap-6">
+                  {[
+                    { value: rankings.length, label: 'Ranked' },
+                    { value: followerCount, label: 'Followers' },
+                    { value: followingCount, label: 'Following' },
+                    { value: avgRating.toFixed(1), label: 'Avg Rating', color: ratingColor(avgRating) },
+                  ].map(({ value, label, color }) => (
+                    <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: 22, fontWeight: 900, color: color ?? '#fff', lineHeight: 1 }}>{value}</span>
+                      <span style={{ fontSize: 11, color: '#8E8E93', marginTop: 4, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="profile-tabs flex gap-2 mb-5" style={{ overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" as any, msOverflowStyle: "none" as any, scrollbarWidth: "none" as any }}>
+            {/* Tabs — centered */}
+            <div className="profile-tabs flex gap-2 mb-6" style={{ paddingBottom: 4 }}>
               {(['top', 'songs', 'albums'] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${tab === t ? 'bg-[#6C63FF] text-white' : 'text-[#8E8E93] hover:text-white'}`}
-                  style={tab !== t ? { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' } : {}}>
-                  {t === 'top' ? 'Top Ranked' : t}
-                  <span className="opacity-60 text-xs ml-1">
-                    ({t === 'top' ? Math.min(rankings.length, 20) : t === 'songs' ? songs.length : albums.length})
+                  className="transition-colors"
+                  style={{
+                    padding: '9px 20px', borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                    background: tab === t ? '#6C63FF' : 'rgba(255,255,255,0.07)',
+                    color: tab === t ? '#fff' : '#8E8E93',
+                    border: tab === t ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                  }}>
+                  {t === 'top' ? 'Top Ranked' : t === 'songs' ? 'Songs' : 'Albums'}
+                  <span style={{ opacity: 0.6, fontSize: 12, marginLeft: 6 }}>
+                    {t === 'top' ? Math.min(rankings.length, 20) : t === 'songs' ? songs.length : albums.length}
                   </span>
                 </button>
               ))}
@@ -205,26 +225,29 @@ export default function UserProfilePage() {
 
             {/* Rankings list */}
             {displayed.length === 0 ? (
-              <div className="py-16 text-center text-[#8E8E93]">No rankings yet.</div>
+              <div style={{ padding: '64px 0', textAlign: 'center', color: '#8E8E93' }}>No rankings yet.</div>
             ) : (
-              <div className="space-y-1" style={{ paddingBottom: 100 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingBottom: 100 }}>
                 {displayed.map((item, i) => {
                   const col = ratingColor(item.rating);
                   return (
                     <button key={`up-${i}-${item.id}`} onClick={() => openModal(item)}
-                      className="flex items-center gap-3 w-full px-3 py-3.5 hover:bg-white/[0.03] rounded-xl transition-colors text-left group">
-                      <span className="text-sm font-black text-[#48484A] w-7 text-right flex-none">{i + 1}</span>
-                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#141414] flex-none">
+                      className="profile-rank-item flex items-center gap-4 w-full text-left group"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', borderRadius: 12, transition: 'background 0.15s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                      <span className="profile-rank-num" style={{ fontWeight: 900, color: '#48484A', textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
+                      <div className="profile-rank-art relative rounded-lg overflow-hidden flex-none" style={{ background: '#141414' }}>
                         {item.artwork_url
-                          ? <Image src={item.artwork_url} alt={item.title} fill className="object-cover" unoptimized sizes="56px" />
-                          : <div className="w-full h-full flex items-center justify-center text-[#48484A]">♪</div>}
+                          ? <Image src={item.artwork_url} alt={item.title} fill className="object-cover" unoptimized sizes="72px" />
+                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#48484A' }}>♪</div>}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate group-hover:text-[#6C63FF] transition-colors">{item.title}</p>
-                        <p className="text-xs text-[#8E8E93] truncate">{item.artist}</p>
-                        {item.note && <p className="text-[11px] text-[#48484A] italic truncate">&ldquo;{item.note}&rdquo;</p>}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p className="profile-rank-title" style={{ fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
+                        <p className="profile-rank-artist" style={{ fontSize: 12, color: '#8E8E93', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>{item.artist}</p>
+                        {item.note && <p style={{ fontSize: 11, color: '#48484A', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>&ldquo;{item.note}&rdquo;</p>}
                       </div>
-                      <div className="flex-none rounded-lg px-2.5 py-1 text-sm font-black" style={{ backgroundColor: col + '22', color: col, border: `1px solid ${col}44` }}>
+                      <div className="profile-rank-badge flex-none" style={{ fontWeight: 900, background: col + '22', color: col, border: `1px solid ${col}44`, borderRadius: 8, padding: '6px 12px', fontSize: 14 }}>
                         {(item.rating ?? 0).toFixed(1)}
                       </div>
                     </button>
