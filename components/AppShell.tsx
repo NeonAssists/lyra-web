@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import WelcomeOnboarding from './WelcomeOnboarding';
 
 type User = { id: string; handle: string; display_name: string; avatar_url: string | null };
 
@@ -55,6 +56,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           .lyra-shell { flex-direction: column; }
         }
       `}</style>
+
+      <WelcomeOnboarding />
 
       <div className="lyra-shell" style={{ display: 'flex', minHeight: '100vh', background: '#000', color: '#fff' }}>
 

@@ -1,296 +1,358 @@
 'use client';
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+const WELCOME_KEY = 'lyra_welcomed_v5';
 
-const WELCOME_KEY = 'lyra_welcomed_v4';
+const TIER_COLORS: Record<number, { color: string; label: string }> = {
+  1: { color: '#dc2626', label: 'Skip' },
+  2: { color: '#ea580c', label: 'Weak' },
+  3: { color: '#f59e0b', label: 'Meh' },
+  4: { color: '#a3912a', label: 'Below Avg' },
+  5: { color: '#84a332', label: 'Average' },
+  6: { color: '#22863a', label: 'Decent' },
+  7: { color: '#059669', label: 'Good' },
+  8: { color: '#0891b2', label: 'Great' },
+  9: { color: '#3b82f6', label: 'Elite' },
+  10: { color: '#8b5cf6', label: 'Masterpiece' },
+};
 
-const WELCOME_SCALE_TIERS = [
-  { score: 1,  label: 'Skip',        color: '#dc2626' },
-  { score: 2,  label: 'Weak',        color: '#ea580c' },
-  { score: 3,  label: 'Meh',         color: '#f59e0b' },
-  { score: 4,  label: 'Below avg',   color: '#a3912a' },
-  { score: 5,  label: 'Average',     color: '#84a332' },
-  { score: 6,  label: 'Decent',      color: '#22863a' },
-  { score: 7,  label: 'Good',        color: '#059669' },
-  { score: 8,  label: 'Great',       color: '#0891b2' },
-  { score: 9,  label: 'Elite',       color: '#3b82f6' },
-  { score: 10, label: 'Masterpiece', color: '#8b5cf6' },
-];
+type SlideData = {
+  title: string;
+  body: string;
+  content?: React.ReactNode;
+  hideSkip?: boolean;
+};
 
-function WelcomeRatingCard() {
-  const [rating, setRating] = useState(8.7);
-  const tier = [...WELCOME_SCALE_TIERS].reverse().find(t => rating >= t.score) ?? WELCOME_SCALE_TIERS[0];
-  const pct = ((rating - 1) / 9) * 100;
-  return (
-    <div style={{ background: 'rgba(20,16,12,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: 20, boxShadow: `0 20px 60px ${tier.color}33` }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Blinding Lights</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>The Weeknd</div>
-        </div>
-        <div style={{ background: `${tier.color}18`, borderRadius: 12, padding: '6px 12px', textAlign: 'center' as const }}>
-          <div style={{ fontSize: 20, fontWeight: 900, color: tier.color, lineHeight: 1 }}>{rating.toFixed(1)}</div>
-          <div style={{ fontSize: 9, fontWeight: 700, color: tier.color, textTransform: 'uppercase' as const, letterSpacing: 0.5 }}>{tier.label}</div>
-        </div>
-      </div>
-      <div style={{ position: 'relative', marginBottom: 12 }}>
-        <style>{`.lw-slider{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;outline:none;cursor:pointer;position:relative;z-index:1}.lw-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--lw-accent,#8b5cf6);box-shadow:0 2px 8px rgba(0,0,0,0.4);transition:border-color 0.2s}.lw-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--lw-accent,#8b5cf6)}`}</style>
-        <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.08)', transform: 'translateY(-50%)' }} />
-        <div style={{ position: 'absolute', top: '50%', left: 0, width: `${pct}%`, height: 6, borderRadius: 3, background: tier.color, transform: 'translateY(-50%)', transition: 'width 0.05s, background 0.2s' }} />
-        <input className="lw-slider" type="range" min="1" max="10" step="0.1" value={rating}
-          style={{ '--lw-accent': tier.color } as React.CSSProperties}
-          onChange={e => setRating(parseFloat(e.target.value))} />
-      </div>
-      {/* Bar chart — same as marketing page */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 64 }}>
-        {WELCOME_SCALE_TIERS.map(t => {
-          const h = 10 + (t.score / 10) * 90;
-          return (
-            <div key={t.score} style={{ flex: 1, height: '100%', position: 'relative' }}>
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px 3px 0 0' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${h}%`, background: t.color, borderRadius: '3px 3px 0 0', opacity: 0.85 }} />
+const SLIDES: SlideData[] = [
+  {
+    title: 'Your music. Ranked.',
+    body: 'Build your personal music canon. Every song, album, and artist you love — rated and ranked. This is what separates a 10.0 from a 9.8.',
+    content: (
+      <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {[
+          { rank: 1, title: 'Voodoo', artist: 'D\'Angelo', rating: 10.0, color: '#8b5cf6', label: 'MASTERPIECE' },
+          { rank: 2, title: 'DUCKWORTH.', artist: 'Kendrick Lamar', rating: 9.8, color: '#3b82f6', label: 'ELITE' },
+          { rank: 3, title: 'Blinding Lights', artist: 'The Weeknd', rating: 8.7, color: '#0891b2', label: 'GREAT' },
+          { rank: 4, title: 'The Art of Loving', artist: 'Olivia Dean', rating: 7.4, color: '#059669', label: 'GOOD' },
+        ].map(item => (
+          <div key={item.rank} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.3)', width: 20, textAlign: 'right' }}>#{item.rank}</span>
+            <div style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.08)', borderRadius: 4 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', margin: '0 0 2px 0' }}>{item.title}</p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{item.artist}</p>
             </div>
-          );
-        })}
+            <div style={{ background: item.color + '1a', border: `1px solid ${item.color}30`, borderRadius: 6, padding: '4px 8px', textAlign: 'center', flexShrink: 0 }}>
+              <p style={{ fontSize: 10, fontWeight: 900, color: item.color, margin: '0 0 1px 0' }}>{item.rating.toFixed(1)}</p>
+              <p style={{ fontSize: 7, fontWeight: 700, color: item.color, letterSpacing: 0.5, margin: 0 }}>{item.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  );
-}
+    ),
+  },
+  {
+    title: 'Not stars. Not likes. Decimals.',
+    body: 'Lyra gives you a precise 10-tier scale. Your 8.7 and your 9.2 actually mean something different. Granular. Intentional. Yours.',
+    content: (
+      <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Large 8.7 display */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: 48, fontWeight: 900, color: '#0891b2' }}>8.7</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#0891b2', letterSpacing: 1 }}>GREAT</div>
+        </div>
+        {/* 10-tier grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(tier => {
+            const { color, label } = TIER_COLORS[tier];
+            return (
+              <div key={tier} style={{ padding: '8px 12px', borderRadius: 8, background: color + '1a', border: `1px solid ${color}30`, textAlign: 'center' }}>
+                <p style={{ fontSize: 9, fontWeight: 900, color, margin: 0 }}>{tier}</p>
+                <p style={{ fontSize: 9, fontWeight: 600, color, margin: '2px 0 0 0' }}>{label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: 'Swipe Packs.',
+    body: 'Swipe right on artists you love. Swipe left to skip. Lyra builds your Personalization Pack from every swipe — music picked specifically for you. The more you swipe, the sharper it gets.',
+    content: (
+      <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Hint row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+          <span style={{ color: '#ef4444' }}>← Not My Style</span>
+          <span>Swipe artists you know</span>
+          <span style={{ color: '#F59E0B' }}>My Style →</span>
+        </div>
+
+        {/* Artist card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{
+            height: 100,
+            background: 'rgba(139,92,246,0.2)',
+            borderRadius: 12,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 32,
+          }}>
+            🎵
+          </div>
+
+          <div>
+            <div style={{ fontSize: 9, color: '#8b5cf6', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>R&B / SOUL</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: '#fff' }}>D'Angelo</div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button style={{
+              flex: 1,
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 12,
+              padding: '10px',
+              color: 'rgba(255,255,255,0.5)',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontSize: 12,
+            }}>
+              ✕ Skip
+            </button>
+            <button style={{
+              flex: 1,
+              background: '#F59E0B',
+              borderRadius: 12,
+              padding: '10px',
+              color: '#000',
+              fontWeight: 800,
+              cursor: 'pointer',
+              fontSize: 12,
+              border: 'none',
+            }}>
+              ✓ My Style
+            </button>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: 'Head to Head.',
+    body: "Can't choose between two 9s? Head to Head settles it. Battle songs, albums, or artists until one champion rises. Find it in the Ranked tab.",
+    content: (
+      <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Mode tabs */}
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 12 }}>
+          {['Songs', 'Albums', 'Artists'].map(mode => (
+            <button
+              key={mode}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 11,
+                fontWeight: 600,
+                border: 'none',
+                background: mode === 'Songs' ? '#F59E0B' : 'rgba(255,255,255,0.06)',
+                color: mode === 'Songs' ? '#000' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+              }}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+
+        {/* VS cards */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Left card */}
+          <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+            <div style={{ height: 60, background: 'rgba(255,255,255,0.08)', borderRadius: 8, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>♪</div>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#fff', margin: '0 0 2px 0' }}>DUCKWORTH.</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#3b82f6', margin: 0 }}>9.8 Elite</p>
+          </div>
+
+          {/* VS badge */}
+          <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: '#000', flexShrink: 0 }}>
+            VS
+          </div>
+
+          {/* Right card */}
+          <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 12, textAlign: 'center' }}>
+            <div style={{ height: 60, background: 'rgba(255,255,255,0.08)', borderRadius: 8, marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>♪</div>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#fff', margin: '0 0 2px 0' }}>Blinding Lights</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#0891b2', margin: 0 }}>8.7 Great</p>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: 'Music tastes better together.',
+    body: 'See what friends are rating. Compare tastes. Find your people. The feed gets better every time you rate.',
+    hideSkip: true,
+    content: (
+      <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {[
+          { name: 'A', song: 'Voodoo', rating: 10.0, label: 'Masterpiece', color: '#8b5cf6' },
+          { name: 'B', song: 'Blinding Lights', rating: 8.7, label: 'Great', color: '#0891b2' },
+          { name: 'C', song: 'DUCKWORTH.', rating: 9.8, label: 'Elite', color: '#3b82f6' },
+        ].map((item, idx) => (
+          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: item.color + '30', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: item.color, flexShrink: 0 }}>
+              {item.name}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', margin: 0 }}>just rated</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#fff', margin: '2px 0 0 0' }}>{item.song}</p>
+            </div>
+            <div style={{ background: item.color + '1a', border: `1px solid ${item.color}30`, borderRadius: 6, padding: '4px 8px', textAlign: 'center', flexShrink: 0 }}>
+              <p style={{ fontSize: 10, fontWeight: 900, color: item.color, margin: '0 0 1px 0' }}>{item.rating.toFixed(1)}</p>
+              <p style={{ fontSize: 7, fontWeight: 700, color: item.color, letterSpacing: 0.5, margin: 0 }}>{item.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+];
 
 export default function WelcomeOnboarding() {
   const [show, setShow] = useState(false);
-  const [welcomeStep, setWelcomeStep] = useState<1|2|3|4|5>(1);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user && !localStorage.getItem(WELCOME_KEY)) {
-        setShow(true);
-        setWelcomeStep(1);
-      }
-    });
-    // Also check immediately on mount (handles page refresh while logged in)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !localStorage.getItem(WELCOME_KEY)) {
-        setShow(true);
-        setWelcomeStep(1);
-      }
-    });
-    return () => subscription.unsubscribe();
+    if (typeof window === 'undefined') return;
+    const welcomed = localStorage.getItem(WELCOME_KEY);
+    if (!welcomed) {
+      setShow(true);
+      setStep(0);
+    }
   }, []);
 
   if (!show) return null;
 
-  return (() => {
-        const TOTAL = 5;
-        const dismissWelcome = () => { setShow(false); localStorage.setItem('lyra_welcomed_v4', 'true'); };
-        const goNext = () => setWelcomeStep(s => Math.min(s + 1, TOTAL) as any);
-        const goBack = () => setWelcomeStep(s => Math.max(s - 1, 1) as any);
+  const slide = SLIDES[step];
+  const isLast = step === SLIDES.length - 1;
 
-        const TIERS = [
-          { score: 1,  label: 'Skip',        color: '#dc2626' },
-          { score: 2,  label: 'Weak',        color: '#ea580c' },
-          { score: 3,  label: 'Meh',         color: '#f59e0b' },
-          { score: 4,  label: 'Below Avg',   color: '#a3912a' },
-          { score: 5,  label: 'Average',     color: '#84a332' },
-          { score: 6,  label: 'Decent',      color: '#22863a' },
-          { score: 7,  label: 'Good',        color: '#059669' },
-          { score: 8,  label: 'Great',       color: '#0891b2' },
-          { score: 9,  label: 'Elite',       color: '#3b82f6' },
-          { score: 10, label: 'Masterpiece', color: '#8b5cf6' },
-        ];
+  const handleSkip = () => {
+    localStorage.setItem(WELCOME_KEY, 'true');
+    setShow(false);
+    window.location.href = '/music';
+  };
 
-        const MOCK_TRACKS = [
-          { title: 'Voodoo',            artist: "D'Angelo",        rating: 10.0, tier: 'Masterpiece', color: '#8b5cf6' },
-          { title: 'DUCKWORTH.',        artist: 'Kendrick Lamar',   rating: 9.2,  tier: 'Elite',       color: '#3b82f6' },
-          { title: 'Blinding Lights',   artist: 'The Weeknd',       rating: 8.7,  tier: 'Great',       color: '#0891b2' },
-          { title: 'The Art of Loving', artist: 'Olivia Dean',      rating: 7.4,  tier: 'Good',        color: '#059669' },
-        ];
+  const handleNext = () => {
+    if (isLast) {
+      localStorage.setItem(WELCOME_KEY, 'true');
+      setShow(false);
+      window.location.href = '/packs';
+    } else {
+      setStep(step + 1);
+    }
+  };
 
-        const MOCK_FRIENDS = [
-          { initials: 'AL', color: '#6C63FF', name: 'Alex',  track: 'Voodoo',          score: 10.0, tier: 'Masterpiece', tc: '#8b5cf6' },
-          { initials: 'BN', color: '#0891b2', name: 'Ben',   track: 'Blinding Lights', score: 8.7,  tier: 'Great',       tc: '#0891b2' },
-          { initials: 'CO', color: '#059669', name: 'Cole',  track: 'DUCKWORTH.',      score: 9.2,  tier: 'Elite',       tc: '#3b82f6' },
-        ];
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+      background: '#080808',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
+    }}>
+      {/* Modal */}
+      <div style={{
+        position: 'relative',
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: 20,
+        padding: '44px 32px 32px',
+        width: '100%',
+        maxWidth: 420,
+        textAlign: 'center',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+      }}>
+        {/* LYRA wordmark */}
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 16, fontWeight: 900, color: '#F59E0B', letterSpacing: '-0.3px', margin: 0 }}>LYRA</p>
+        </div>
 
-        const cardStyle: React.CSSProperties = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 16 };
-        const rowStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 10 };
-        const artStyle: React.CSSProperties = { width: 38, height: 38, borderRadius: 8, background: 'rgba(255,255,255,0.08)', flexShrink: 0 };
+        {/* Progress dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 28 }}>
+          {SLIDES.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: i <= step ? '#F59E0B' : 'rgba(255,255,255,0.15)',
+                transition: 'background 0.3s',
+              }}
+            />
+          ))}
+        </div>
 
-        return (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <div style={{ background: 'linear-gradient(135deg, rgba(108,99,255,0.5) 0%, rgba(139,92,246,0.2) 50%, rgba(6,182,212,0.2) 100%)', padding: 1, borderRadius: 28, maxWidth: 480, width: '100%' }}>
-              <div style={{ background: 'linear-gradient(160deg, #0f0f0f 0%, #0d0b1a 100%)', borderRadius: 28, padding: '24px 28px 28px' }}>
+        {/* Content */}
+        <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12, margin: 0 }}>
+          {slide.title}
+        </h2>
+        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: slide.content ? 12 : 28 }}>
+          {slide.body}
+        </p>
 
-                {/* Progress dots */}
-                <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 24 }}>
-                  {([1,2,3,4,5] as const).map(s => (
-                    <div key={s} style={{ width: welcomeStep === s ? 24 : 6, height: 6, borderRadius: 3, background: welcomeStep === s ? '#6C63FF' : 'rgba(255,255,255,0.12)', transition: 'width 0.2s' }} />
-                  ))}
-                </div>
+        {slide.content && <div style={{ marginBottom: 28 }}>{slide.content}</div>}
 
-                {/* ── Step 1: What is Lyra ── */}
-                {welcomeStep === 1 && (
-                  <>
-                    <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', margin: '0 0 8px' }}>Your music, ranked.</h2>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: '0 0 20px' }}>Lyra isn't just a music app. It's where you build your personal music canon — every song, album, and artist you've ever loved, rated and ranked in order.</p>
-                    <div style={cardStyle}>
-                      {MOCK_TRACKS.map((t, i) => (
-                        <div key={i} style={{ ...rowStyle, paddingBlock: 9, borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                          <span style={{ fontSize: 11, fontWeight: 900, color: '#3a3a3c', width: 16, textAlign: 'right', flexShrink: 0 }}>{i+1}</span>
-                          <div style={artStyle} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{t.artist}</div>
-                          </div>
-                          <div style={{ background: t.color + '18', borderRadius: 9, padding: '5px 9px', textAlign: 'center', flexShrink: 0 }}>
-                            <div style={{ fontSize: 15, fontWeight: 900, color: t.color, lineHeight: 1 }}>{t.rating.toFixed(1)}</div>
-                            <div style={{ fontSize: 7, fontWeight: 800, color: t.color, textTransform: 'uppercase', letterSpacing: 0.4, marginTop: 2 }}>{t.tier}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <button onClick={goNext} style={{ width: '100%', marginTop: 20, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>Next →</button>
-                    <button onClick={dismissWelcome} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.2)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' }}>Skip for now</button>
-                  </>
-                )}
-
-                {/* ── Step 2: The Scale ── */}
-                {welcomeStep === 2 && (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                      <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px', margin: 0 }}>10 tiers. 90 decimal points.</h2>
-                    </div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: '0 0 16px' }}>Not a thumbs up. Not a star. Every tier has a name, a color, and a meaning. Drag the slider and feel the difference.</p>
-                    {/* Tier chips */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
-                      {TIERS.map(t => (
-                        <div key={t.score} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 9px', borderRadius: 8, background: t.color + '16', border: '1px solid' + t.color + '35' }}>
-                          <span style={{ fontSize: 11, fontWeight: 900, color: t.color }}>{t.score}</span>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: t.color }}>{t.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <WelcomeRatingCard />
-                    <button onClick={goNext} style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>Next →</button>
-                    <button onClick={dismissWelcome} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.2)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' }}>Skip for now</button>
-                  </>
-                )}
-
-                {/* ── Step 3: Packs ── */}
-                {welcomeStep === 3 && (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                      <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px', margin: 0 }}>Rate more. Know your taste.</h2>
-                    </div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: '0 0 16px' }}>Packs are themed sets of music built to get you rating fast. The more you rate, the sharper your Personalization Pack gets — music picked specifically for you.</p>
-                    <div style={cardStyle}>
-                      {/* Pack rows */}
-                      {[{name:'Hip-Hop Classics',color:'#8b5cf6'},{name:'R&B Essentials',color:'#0891b2'},{name:'Pop Hits',color:'#ea580c'},{name:'Jazz & Soul',color:'#059669'}].map((p,i) => (
-                        <div key={i} style={{ ...rowStyle, paddingBlock: 9, borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 8, background: p.color + '25', flexShrink: 0 }} />
-                          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#fff' }}>{p.name}</div>
-                          <div style={{ fontSize: 11, color: p.color, fontWeight: 700 }}>Rate →</div>
-                        </div>
-                      ))}
-                      {/* Personalization Pack */}
-                      <div style={{ marginTop: 12, background: 'rgba(108,99,255,0.1)', borderRadius: 12, border: '1px solid rgba(108,99,255,0.3)', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 9, fontWeight: 800, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 }}>✦ Your Style Pack</div>
-                          <div style={{ fontSize: 14, fontWeight: 900, color: '#fff' }}>Built for you</div>
-                          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Gets smarter every time you rate</div>
-                        </div>
-                        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(108,99,255,0.25)', flexShrink: 0 }} />
-                      </div>
-                    </div>
-                    <button onClick={goNext} style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>Next →</button>
-                    <button onClick={dismissWelcome} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.2)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' }}>Skip for now</button>
-                  </>
-                )}
-
-                {/* ── Step 4: Head 2 Head ── */}
-                {welcomeStep === 4 && (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                      <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.4px', margin: 0 }}>Head 2 Head.</h2>
-                    </div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: '0 0 16px' }}>Two songs both rated 9.0? Head 2 Head settles it. Pick between songs, albums, or artists — head to head — until one true champion remains.</p>
-                    <div style={cardStyle}>
-                      {/* Mode tabs */}
-                      <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: 3, marginBottom: 14 }}>
-                        {['Songs','Albums','Artists'].map((mo,i) => (
-                          <div key={mo} style={{ flex: 1, padding: '6px 0', borderRadius: 8, background: i===0 ? 'rgba(255,255,255,0.1)' : 'transparent', textAlign: 'center', fontSize: 11, fontWeight: i===0 ? 800 : 600, color: i===0 ? '#fff' : 'rgba(255,255,255,0.4)' }}>{mo}</div>
-                        ))}
-                      </div>
-                      {/* VS cards */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ flex: 1, background: 'rgba(108,99,255,0.1)', borderRadius: 14, border: '1px solid rgba(108,99,255,0.4)', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                          <div style={{ width: 52, height: 52, borderRadius: 10, background: 'rgba(108,99,255,0.25)' }} />
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', textAlign: 'center' }}>DUCKWORTH.</div>
-                          <div style={{ background: '#3b82f620', borderRadius: 8, padding: '4px 10px', textAlign: 'center' }}>
-                            <div style={{ fontSize: 14, fontWeight: 900, color: '#3b82f6' }}>9.2</div>
-                            <div style={{ fontSize: 7, fontWeight: 800, color: '#3b82f6', textTransform: 'uppercase' }}>ELITE</div>
-                          </div>
-                        </div>
-                        <div style={{ background: 'rgba(108,99,255,0.15)', borderRadius: 10, padding: '8px 10px', flexShrink: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 900, color: '#6C63FF' }}>VS</div>
-                        </div>
-                        <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                          <div style={{ width: 52, height: 52, borderRadius: 10, background: 'rgba(255,255,255,0.08)' }} />
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', textAlign: 'center' }}>Blinding Lights</div>
-                          <div style={{ background: '#0891b220', borderRadius: 8, padding: '4px 10px', textAlign: 'center' }}>
-                            <div style={{ fontSize: 14, fontWeight: 900, color: '#0891b2' }}>8.7</div>
-                            <div style={{ fontSize: 7, fontWeight: 800, color: '#0891b2', textTransform: 'uppercase' }}>GREAT</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textAlign: 'center', marginTop: 12, fontWeight: 600 }}>← Tap to pick your favorite →</div>
-                    </div>
-                    <button onClick={goNext} style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>Next →</button>
-                    <button onClick={dismissWelcome} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.2)', marginTop: 10, display: 'block', width: '100%', textAlign: 'center' }}>Skip for now</button>
-                  </>
-                )}
-
-                {/* ── Step 5: Friends ── */}
-                {welcomeStep === 5 && (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                      <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 20, padding: 0, lineHeight: 1 }}>←</button>
-                      <h2 style={{ fontSize: 20, fontWeight: 900, color: '#fff', letterSpacing: '-0.3px', margin: 0 }}>The more you rank, the more Lyra is yours.</h2>
-                    </div>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: '0 0 16px' }}>Add friends and see what they're rating in real time. The more you and your friends rank, the more your feed, your picks, and your app revolve around your actual taste.</p>
-                    <div style={cardStyle}>
-                      {MOCK_FRIENDS.map((f,i) => (
-                        <div key={i} style={{ ...rowStyle, paddingBlock: 10, borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                          <div style={{ width: 34, height: 34, borderRadius: 17, background: f.color + '30', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <span style={{ fontSize: 12, fontWeight: 900, color: f.color }}>{f.initials}</span>
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{f.name} <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>just rated</span></div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.track}</div>
-                          </div>
-                          <div style={{ background: f.tc + '18', borderRadius: 8, padding: '4px 9px', textAlign: 'center', flexShrink: 0 }}>
-                            <div style={{ fontSize: 14, fontWeight: 900, color: f.tc, lineHeight: 1 }}>{f.score.toFixed(1)}</div>
-                            <div style={{ fontSize: 7, fontWeight: 800, color: f.tc, textTransform: 'uppercase', letterSpacing: 0.4 }}>{f.tier}</div>
-                          </div>
-                        </div>
-                      ))}
-                      <div style={{ marginTop: 12, background: 'rgba(108,99,255,0.1)', borderRadius: 10, border: '1px solid rgba(108,99,255,0.3)', padding: '10px 14px', textAlign: 'center', fontSize: 13, fontWeight: 800, color: '#8b5cf6' }}>
-                        + Add friends
-                      </div>
-                    </div>
-                    <button onClick={dismissWelcome} style={{ width: '100%', marginTop: 16, padding: 14, borderRadius: 100, background: 'linear-gradient(135deg, #6C63FF, #8b5cf6)', color: '#fff', fontSize: 15, fontWeight: 800, border: 'none', cursor: 'pointer' }}>Let's go →</button>
-                  </>
-                )}
-
-              </div>
-            </div>
-          </div>
-        );
-
-  })();
+        {/* Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 32 }}>
+          <button
+            onClick={handleNext}
+            style={{
+              width: '100%',
+              background: '#F59E0B',
+              color: '#000',
+              border: 'none',
+              borderRadius: 12,
+              padding: '16px 0',
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              height: 56,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isLast ? "Let's go →" : 'Next'}
+          </button>
+          {!slide.hideSkip && (
+            <button
+              onClick={handleSkip}
+              style={{
+                width: '100%',
+                background: 'transparent',
+                color: 'rgba(255,255,255,0.4)',
+                border: 'none',
+                borderRadius: 12,
+                padding: '14px',
+                fontSize: 15,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              Skip for now
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
