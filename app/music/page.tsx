@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { getArtworkHiRes } from '@/lib/itunes';
 import AppShell from '@/components/AppShell';
 import { sessionGenre, sessionOffset } from '@/lib/sessionSeed';
@@ -44,6 +45,7 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
 // SeeAllCard now lives in @/components/SeeAllCard — imported above
 
 export default function MusicPage() {
+  const searchParams = useSearchParams();
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
   const [albums, setAlbums] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,7 @@ export default function MusicPage() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
   const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
 
@@ -62,6 +65,17 @@ export default function MusicPage() {
     const pick = sessionGenre(GENRES.filter(g => g.id !== null));
     setActiveGenre(pick.id);
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('from') === 'onboarding') {
+      const dismissed = localStorage.getItem('lyra_ranking_banner_dismissed');
+      if (!dismissed) {
+        setShowBanner(true);
+        const timer = setTimeout(() => setShowBanner(false), 5000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     setLoading(true);
@@ -97,8 +111,43 @@ export default function MusicPage() {
 
   const genreName = GENRES.find(g => g.id === activeGenre)?.name ?? 'Top Albums';
 
+  const handleBannerDismiss = () => {
+    localStorage.setItem('lyra_ranking_banner_dismissed', 'true');
+    setShowBanner(false);
+  };
+
   return (
     <AppShell>
+      {showBanner && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: '#F59E0B',
+          color: '#000',
+          padding: '14px 24px',
+          fontWeight: 600,
+          fontSize: 14,
+        }}>
+          <span>You're set. Start ranking music to build your taste profile.</span>
+          <button
+            onClick={handleBannerDismiss}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#000',
+              fontSize: 20,
+              cursor: 'pointer',
+              lineHeight: 1,
+              marginLeft: 16,
+              flexShrink: 0,
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
