@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { getArtworkHiRes } from '@/lib/itunes';
@@ -44,27 +44,9 @@ function AlbumTile({ artwork, title, artist, onClick }: { artwork: string; title
 
 // SeeAllCard now lives in @/components/SeeAllCard — imported above
 
-export default function MusicPage() {
+function StartRankingBanner() {
   const searchParams = useSearchParams();
-  const [activeGenre, setActiveGenre] = useState<string | null>(null);
-  const [albums, setAlbums] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modalItem, setModalItem] = useState<ModalItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
-  const [searching, setSearching] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
-
-  const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-    // Set random starting genre after mount to avoid SSR hydration mismatch
-    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
-    setActiveGenre(pick.id);
-  }, []);
 
   useEffect(() => {
     if (searchParams.get('from') === 'onboarding') {
@@ -76,6 +58,34 @@ export default function MusicPage() {
       }
     }
   }, [searchParams]);
+
+  if (!showBanner) return null;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#F59E0B', color: '#000', padding: '14px 24px', fontWeight: 600, fontSize: 14 }}>
+      <span>You're set. Start ranking music to build your taste profile.</span>
+      <button onClick={() => { localStorage.setItem('lyra_ranking_banner_dismissed', 'true'); setShowBanner(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: '#000', fontWeight: 800, paddingLeft: 16 }}>×</button>
+    </div>
+  );
+}
+
+export default function MusicPage() {
+  const [activeGenre, setActiveGenre] = useState<string | null>(null);
+  const [albums, setAlbums] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalItem, setModalItem] = useState<ModalItem | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  const open = (item: ModalItem) => { setModalItem(item); setModalOpen(true); };
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    // Set random starting genre after mount to avoid SSR hydration mismatch
+    const pick = sessionGenre(GENRES.filter(g => g.id !== null));
+    setActiveGenre(pick.id);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -111,42 +121,9 @@ export default function MusicPage() {
 
   const genreName = GENRES.find(g => g.id === activeGenre)?.name ?? 'Top Albums';
 
-  const handleBannerDismiss = () => {
-    localStorage.setItem('lyra_ranking_banner_dismissed', 'true');
-    setShowBanner(false);
-  };
-
   return (
     <AppShell>
-      {showBanner && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#F59E0B',
-          color: '#000',
-          padding: '14px 24px',
-          fontWeight: 600,
-          fontSize: 14,
-        }}>
-          <span>You're set. Start ranking music to build your taste profile.</span>
-          <button
-            onClick={handleBannerDismiss}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#000',
-              fontSize: 20,
-              cursor: 'pointer',
-              lineHeight: 1,
-              marginLeft: 16,
-              flexShrink: 0,
-            }}
-          >
-            ×
-          </button>
-        </div>
-      )}
+      <Suspense fallback={null}><StartRankingBanner /></Suspense>
 
       <div style={{ padding: '32px 32px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
