@@ -9,6 +9,7 @@ import AlbumView from '@/components/AlbumView';
 import { useModals } from '@/hooks/useModals';
 import { supabase } from '@/lib/supabase';
 import SeeAllCard from '@/components/SeeAllCard';
+import WelcomeOnboarding from '@/components/WelcomeOnboarding';
 
 const GENRES = [
   { name: 'All',        id: null },
@@ -207,6 +208,7 @@ export default function MusicPage() {
 
   return (
     <AppShell>
+      <WelcomeOnboarding />
       <div className="lyra-page music-page-wrap" style={{ padding: '32px 28px 80px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif' }}>
 
         {/* Header */}
