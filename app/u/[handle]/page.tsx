@@ -126,6 +126,7 @@ export default function UserProfilePage() {
           .profile-rank-num { width: 28px !important; font-size: 13px !important; }
           .profile-rank-art { width: 56px !important; height: 56px !important; }
           .profile-rank-title { font-size: 14px !important; }
+          .profile-tab-btn { padding: 6px 14px !important; font-size: 12px !important; }
         }
         @media (min-width: 769px) {
           .profile-rank-item { padding: 14px 20px !important; border-radius: 16px !important; }
@@ -208,7 +209,7 @@ export default function UserProfilePage() {
             <div className="profile-tabs flex gap-2 mb-6" style={{ paddingBottom: 4 }}>
               {(['top', 'songs', 'albums'] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)}
-                  className="transition-colors"
+                  className="profile-tab-btn transition-colors"
                   style={{
                     padding: '9px 20px', borderRadius: 100, fontSize: 14, fontWeight: 600, cursor: 'pointer',
                     background: tab === t ? '#6C63FF' : 'rgba(255,255,255,0.07)',
