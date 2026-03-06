@@ -212,7 +212,7 @@ export default function AppHome() {
 
   // Welcome modal trigger
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v3') && me) {
+    if (typeof window !== 'undefined' && !localStorage.getItem('lyra_welcomed_v4') && me) {
       setShowWelcome(true);
       setWelcomeStep(1);
     }
@@ -550,7 +550,7 @@ export default function AppHome() {
       {/* Welcome Modal */}
       {showWelcome && (() => {
         const TOTAL = 5;
-        const dismissWelcome = () => { setShowWelcome(false); localStorage.setItem('lyra_welcomed_v3', 'true'); };
+        const dismissWelcome = () => { setShowWelcome(false); localStorage.setItem('lyra_welcomed_v4', 'true'); };
         const goNext = () => setWelcomeStep(s => Math.min(s + 1, TOTAL) as any);
         const goBack = () => setWelcomeStep(s => Math.max(s - 1, 1) as any);
 
