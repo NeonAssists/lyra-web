@@ -193,7 +193,8 @@ export default function UserProfilePage() {
             <div className="profile-tabs flex gap-2 mb-5" style={{ overflowX: "auto", paddingBottom: 4, WebkitOverflowScrolling: "touch" as any, msOverflowStyle: "none" as any, scrollbarWidth: "none" as any }}>
               {(['top', 'songs', 'albums'] as const).map(t => (
                 <button key={t} onClick={() => setTab(t)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${tab === t ? 'bg-[#6C63FF] text-white' : 'bg-[#141414] text-[#8E8E93] hover:text-white'}`}>
+                  className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition-colors ${tab === t ? 'bg-[#6C63FF] text-white' : 'text-[#8E8E93] hover:text-white'}`}
+                  style={tab !== t ? { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)' } : {}}>
                   {t === 'top' ? 'Top Ranked' : t}
                   <span className="opacity-60 text-xs ml-1">
                     ({t === 'top' ? Math.min(rankings.length, 20) : t === 'songs' ? songs.length : albums.length})
