@@ -117,7 +117,7 @@ export default function UserProfilePage() {
       <style>{`
         .profile-wrap { margin-left: auto !important; margin-right: auto !important; }
         @media (max-width: 768px) {
-          .profile-wrap { padding-left: 20px !important; padding-right: 20px !important; padding-top: 24px !important; }
+          .profile-wrap { padding-left: 20px !important; padding-right: 20px !important; padding-top: 24px !important; max-width: 100% !important; }
           .profile-header { flex-direction: column !important; align-items: center !important; text-align: center; gap: 16px !important; }
           .profile-header > div:last-child { width: 100% !important; }
           .profile-actions { flex-direction: column !important; align-items: center !important; gap: 12px !important; }
@@ -125,7 +125,7 @@ export default function UserProfilePage() {
         }
         .profile-tabs::-webkit-scrollbar { display: none; }
       `}</style>
-      <div className="profile-wrap" style={{ width: '100%', maxWidth: 720, padding: '40px 32px 100px', boxSizing: 'border-box' }}>
+      <div className="profile-wrap" style={{ width: '100%', maxWidth: 900, padding: '40px 48px 100px', boxSizing: 'border-box' }}>
         {loading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -142,7 +142,7 @@ export default function UserProfilePage() {
           <>
             {/* Profile header */}
             <div className="profile-header flex items-start gap-5 mb-6">
-              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={96} />
+              <Avatar src={profile.avatar_url} alt={profile.display_name} initials={initials} size={112} />
               <div className="flex-1 min-w-0">
                 <div className="profile-actions flex items-start justify-between gap-3">
                   <div>
@@ -211,11 +211,11 @@ export default function UserProfilePage() {
                   const col = ratingColor(item.rating);
                   return (
                     <button key={`up-${i}-${item.id}`} onClick={() => openModal(item)}
-                      className="flex items-center gap-3 w-full px-3 py-3 hover:bg-white/[0.03] rounded-xl transition-colors text-left group">
+                      className="flex items-center gap-3 w-full px-3 py-3.5 hover:bg-white/[0.03] rounded-xl transition-colors text-left group">
                       <span className="text-sm font-black text-[#48484A] w-7 text-right flex-none">{i + 1}</span>
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#141414] flex-none">
+                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#141414] flex-none">
                         {item.artwork_url
-                          ? <Image src={item.artwork_url} alt={item.title} fill className="object-cover" unoptimized sizes="48px" />
+                          ? <Image src={item.artwork_url} alt={item.title} fill className="object-cover" unoptimized sizes="56px" />
                           : <div className="w-full h-full flex items-center justify-center text-[#48484A]">♪</div>}
                       </div>
                       <div className="flex-1 min-w-0">
